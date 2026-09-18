@@ -1,0 +1,16 @@
+{
+  "name": "web-fundamentals",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The browser platform React sits on, written with no framework",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lab/lesson-shell": "*"
+  }
+}

@@ -1,0 +1,120 @@
+/**
+ * The event loop, microtasks, and why your UI freezes
+ * ==================================================
+ * JavaScript runs on one thread. Everything you do competes with painting.
+ *
+ * The order the demo prints is fixed by the spec, not by luck:
+ *
+ *   1. synchronous code           runs to completion first, always
+ *   2. microtasks                 promise callbacks, queueMicrotask
+ *   3. requestAnimationFrame      just before the next paint
+ *   4. macrotasks                 setTimeout, even with 0ms
+ *
+ * The microtask queue is drained *completely* between macrotasks, and a
+ * microtask that queues another microtask gets drained in the same pass. An
+ * infinite chain of promises therefore starves the browser forever, while an
+ * infinite chain of setTimeout(0) does not.
+ *
+ * Why this matters in React: state updates are batched and flushed inside this
+ * machinery. "Why is my state still the old value on the next line" is a
+ * question about this diagram. So is every dropped frame: a synchronous 200ms
+ * loop is 200ms of no painting, no scrolling and no clicking.
+ */
+import { must, type Lesson } from "../types";
+
+export type Tick = string;
+
+/**
+ * Records the order four queues actually fire in. Exported separately from the
+ * DOM so the test can assert the order without a browser.
+ */
+export function recordOrder(): Promise<Tick[]> {
+  const ticks: Tick[] = [];
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      ticks.push("macrotask: setTimeout 0");
+      // By the time this runs, everything faster has already been drained.
+      resolve(ticks);
+    }, 0);
+
+    queueMicrotask(() => ticks.push("microtask: queueMicrotask"));
+
+    Promise.resolve().then(() => {
+      ticks.push("microtask: promise.then");
+      // Queued from inside a microtask, so it still runs before any macrotask.
+      queueMicrotask(() => ticks.push("microtask: queued from a microtask"));
+    });
+
+    ticks.push("sync: end of the function body");
+  });
+}
+
+/** Burns the main thread for real. This is what a dropped frame is made of. */
+function blockFor(ms: number): void {
+  const until = performance.now() + ms;
+  while (performance.now() < until) {
+    /* deliberately spinning */
+  }
+}
+
+export function mountEventLoop(root: HTMLElement): () => void {
+  root.innerHTML = `
+    <div class="stack">
+      <div class="row">
+        <button id="order">Show the ordering</button>
+        <button id="block">Block the thread for 1.5s</button>
+      </div>
+      <p class="note">
+        While the thread is blocked, try to select this text or click the other button.
+        Nothing responds, including the spinner below.
+      </p>
+      <p id="spinner" style="font-size:1.6rem">◐</p>
+      <pre id="out" class="log">Click a button.</pre>
+    </div>
+  `;
+
+  const out = must<HTMLPreElement>(root, "#out");
+  const spinner = must<HTMLParagraphElement>(root, "#spinner");
+  const orderButton = must<HTMLButtonElement>(root, "#order");
+  const blockButton = must<HTMLButtonElement>(root, "#block");
+
+  const frames = ["◐", "◓", "◑", "◒"];
+  let frame = 0;
+  // A rAF loop paints once per frame. It is also the clearest possible proof
+  // that a blocked thread paints nothing at all.
+  let handle = requestAnimationFrame(function tick() {
+    frame = (frame + 1) % frames.length;
+    spinner.textContent = frames[frame] ?? "◐";
+    handle = requestAnimationFrame(tick);
+  });
+
+  async function showOrder(): Promise<void> {
+    const ticks = await recordOrder();
+    out.textContent = ticks.map((tick, index) => `${index + 1}. ${tick}`).join("\n");
+  }
+
+  function block(): void {
+    out.textContent = "Blocking… the spinner is frozen and clicks are queued.";
+    blockFor(1500);
+    out.textContent = "Done. Every click you made during those 1.5s fires now, at once.";
+  }
+
+  orderButton.addEventListener("click", showOrder);
+  blockButton.addEventListener("click", block);
+
+  return () => {
+    cancelAnimationFrame(handle);
+    orderButton.removeEventListener("click", showOrder);
+    blockButton.removeEventListener("click", block);
+    root.innerHTML = "";
+  };
+}
+
+export const lesson: Lesson = {
+  id: "event-loop",
+  title: "The event loop and microtasks",
+  summary: "Sync, then microtasks, then a frame, then timers. Block any of it and the page stops.",
+  file: "src/lessons/02_event_loop.ts",
+  mount: mountEventLoop,
+};

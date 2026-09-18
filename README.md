@@ -31,6 +31,15 @@ whose claims are assertions fails CI when React changes under it.
 | [projects/](projects/)                 | Capstone apps that combine the modules                                    |
 | [packages/](packages/)                 | Shared internals. Only `lesson-shell`, the sidebar the modules mount into |
 
+## What is here so far
+
+Four things are built and tested: [web-fundamentals](web-fundamentals/),
+[learning/react-core](learning/react-core/),
+[learning/data-fetching](learning/data-fetching/), and the shared
+[lesson-shell](packages/lesson-shell/). Everything else in the path below is
+marked planned and has no folder yet. `npm test` runs 68 assertions across the
+three modules that exist.
+
 ## Suggested learning path
 
 Each module stands alone, so skip ahead if a topic is already familiar.
@@ -41,32 +50,32 @@ Each module stands alone, so skip ahead if a topic is already familiar.
 2. **[learning/react-core/](learning/react-core/)** — state, effects, refs,
    context, reducers, Suspense, transitions. The largest module, and the one
    everything else assumes.
-3. **[learning/typescript-react/](learning/typescript-react/)** — typing props,
+3. **learning/typescript-react** (planned) — typing props,
    children, events, refs, generic components, and state that cannot be invalid.
-4. **[learning/styling/](learning/styling/)** — CSS modules, Tailwind 4, design
+4. **learning/styling** (planned) — CSS modules, Tailwind 4, design
    tokens, dark mode, container queries, animation.
-5. **[learning/routing/](learning/routing/)** — React Router 8 data routers and
+5. **learning/routing** (planned) — React Router 8 data routers and
    TanStack Router, nested layouts, and the URL as state.
 6. **[learning/data-fetching/](learning/data-fetching/)** — TanStack Query,
    caching, mutations, optimistic updates, and mocking a network with MSW.
-7. **[learning/state-management/](learning/state-management/)** — where state
+7. **learning/state-management** (planned) — where state
    belongs, and what Zustand, Redux Toolkit and Jotai each buy you.
-8. **[learning/forms/](learning/forms/)** — React Hook Form with Zod, validation
+8. **learning/forms** (planned) — React Hook Form with Zod, validation
    UX, and errors a screen reader announces.
-9. **[learning/testing/](learning/testing/)** — Vitest, Testing Library,
+9. **learning/testing** (planned) — Vitest, Testing Library,
    Playwright, Storybook.
-10. **[learning/accessibility/](learning/accessibility/)** — semantics, keyboard
+10. **learning/accessibility** (planned) — semantics, keyboard
     order, focus management, and axe in CI.
-11. **[learning/performance/](learning/performance/)** — the React Compiler,
+11. **learning/performance** (planned) — the React Compiler,
     code splitting, virtualization, Core Web Vitals, bundle analysis.
 12. **Rendering off the client** —
-    [rendering-strategies](learning/rendering-strategies/) for the concepts,
-    then [next-app-router](learning/next-app-router/) and
-    [astro-islands](learning/astro-islands/).
-13. **[learning/production/](learning/production/)** — env config, CSP, auth in
+    rendering-strategies (planned) for the concepts,
+    then next-app-router (planned) and
+    astro-islands (planned).
+13. **learning/production** (planned) — env config, CSP, auth in
     the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
 14. **[projects/](projects/)** — read and run
-    [bookmark-manager](projects/bookmark-manager/) first, then the others.
+    bookmark-manager (planned) first, then the others.
 
 ### What each module needs to run
 

@@ -1,0 +1,17 @@
+{
+  "name": "typescript-react",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Typing props, events, refs, generics, context, and the boundary where types stop being true",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lab/lesson-shell": "*",
+    "zod": "^4.6.5"
+  }
+}

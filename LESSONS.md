@@ -82,3 +82,94 @@ API surface did not change. A stale _engine_ or a real API break is not. Check
 the plugin's changelog before reaching for `overrides`, and never use
 `--legacy-peer-deps`, which turns the check off repo-wide instead of for the one
 package that needs it.
+
+## Testing Suspense: `render` poisons the act scope
+
+**Expected.** Render a component that suspends, then
+`await screen.findByTestId("bio")`. Testing Library polls until the promise
+resolves and the content appears.
+
+**What happened.** The fallback stayed on screen for the full two-second timeout
+and the test failed with "Unable to find an element". stderr had the real cause,
+one line buried above the failure:
+
+```
+A component suspended inside an `act` scope, but the `act` call was not awaited.
+```
+
+Testing Library's `render` does its work inside a *synchronous* `act`. A
+component that suspends inside one of those is never retried, so `findBy` polls
+a tree React has deliberately decided not to touch.
+
+Four things did not fix it: waiting longer, switching the promise from a timer
+to a microtask, fake timers with `advanceTimersByTimeAsync`, and an empty
+`await act(async () => {})` after the wait. Rendering with `createRoot` directly,
+no Testing Library, worked first time, which is what identified `render` as the
+culprit.
+
+**The fix.** Give `render` its own awaited `act`, and the waiting a second one.
+They have to be separate calls: doing both inside one act re-renders the
+component but never commits.
+
+```ts
+await act(async () => {
+  render(<SuspenseAndUse />);
+});
+await act(async () => {
+  await new Promise((resolve) => setTimeout(resolve, 500));
+});
+```
+
+Any later interaction that suspends again (a click that loads new data) needs
+the same wrapper.
+
+**Next time.** When an async React test hangs, read stderr before touching the
+timeout. React's act warnings say exactly what is wrong and are easy to scroll
+past, because the assertion failure underneath them looks like the real error.
+
+## Fake timers and user-event deadlock each other
+
+**Expected.** `vi.useFakeTimers()` plus
+`userEvent.setup({ advanceTimers: vi.advanceTimersByTime })`, which is the
+documented pairing.
+
+**What happened.** The first `await user.click(...)` never resolved. The test
+died on Vitest's five-second timeout with no indication of which line was stuck.
+
+user-event awaits its own timers between keystrokes and clicks. With the clock
+frozen, nothing advances it, and `advanceTimers` is never reached because the
+call that would reach it is the one waiting.
+
+**The fix.** `vi.useFakeTimers({ shouldAdvanceTime: true })`. The clock still
+moves in real time, so user-event's waits resolve, and `advanceTimersByTime`
+still jumps ahead on demand.
+
+**Next time.** A test that times out with no assertion failure is usually a
+deadlock, not slowness. Raising the timeout confirms it and fixes nothing.
+
+## Lint plugins have not all finished the flat-config move
+
+**Expected.** `reactHooks.configs.recommended` in an ESLint flat config array.
+
+**What happened.** ESLint refused to start:
+
+```
+A config object has a "plugins" key defined as an array of strings.
+```
+
+In `eslint-plugin-react-hooks@7`, `configs.recommended` and
+`configs["recommended-latest"]` are still the eslintrc shape. The flat versions
+are one level down, under `configs.flat`.
+
+**The fix.** `reactHooks.configs.flat["recommended-latest"]`, which is also the
+one that carries the React Compiler rules.
+
+Those rules then failed the build on three lessons, correctly:
+`react-hooks/refs` on a render-counting hook, and `react-hooks/set-state-in-effect`
+on the deliberately wrong half of the "you might not need an effect" lesson.
+Both are now disabled on the specific line with a comment saying the rule is
+right and the lesson is showing what it forbids. Silencing a rule is fine when
+you can say why in a sentence. Turning it off repo-wide is not.
+
+**Next time.** `node -e "import('eslint-plugin-x').then(m => console.log(Object.keys(m.default.configs)))"`
+answers "which of these is the flat one" faster than reading the changelog.

@@ -1,0 +1,243 @@
+/*
+ * The shell's own styling. Deliberately plain CSS with custom properties: the
+ * styling module teaches Tailwind and CSS modules, and the shell should not
+ * force either on a module that has not got there yet.
+ *
+ * Colours are declared once on :root and redefined for dark mode, so a lesson
+ * never hardcodes a hex value.
+ */
+
+:root {
+  --bg: #fbfbfd;
+  --surface: #ffffff;
+  --border: #e3e3e8;
+  --text: #17171c;
+  --muted: #61616b;
+  --accent: #3b5bdb;
+  --accent-soft: #eef1fd;
+  --danger: #c02b3f;
+  --radius: 10px;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131318;
+    --surface: #1b1b22;
+    --border: #2e2e38;
+    --text: #ececf1;
+    --muted: #9a9aa6;
+    --accent: #8ca4ff;
+    --accent-soft: #23263a;
+    --danger: #ff8189;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.55;
+}
+
+/* Layout */
+
+.lesson-layout {
+  display: grid;
+  grid-template-columns: 17rem 1fr;
+  min-height: 100vh;
+}
+
+@media (max-width: 52rem) {
+  .lesson-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lesson-nav {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1.5rem 1rem 3rem;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.lesson-nav-head h1 {
+  font-size: 1.05rem;
+  margin: 0 0 0.25rem;
+}
+
+.lesson-nav-head p {
+  margin: 0 0 1.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.lesson-nav h2 {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 1.25rem 0 0.4rem;
+}
+
+.lesson-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lesson-nav a {
+  display: block;
+  padding: 0.35rem 0.6rem;
+  border-radius: 7px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.lesson-nav a:hover {
+  background: var(--accent-soft);
+}
+
+.lesson-nav a[aria-current="page"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* A visible focus ring is not decoration. It is the only way a keyboard user
+   can tell where they are. */
+.lesson-nav a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.lesson-main {
+  padding: 2.25rem 2rem 4rem;
+  max-width: 54rem;
+}
+
+@media (max-width: 52rem) {
+  .lesson-main {
+    padding: 1.5rem 1rem 3rem;
+  }
+}
+
+.lesson-head h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+}
+
+.lesson-head p {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+}
+
+.lesson-head code,
+.lesson-demo code {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  background: var(--accent-soft);
+  padding: 0.12rem 0.4rem;
+  border-radius: 5px;
+}
+
+.lesson-demo {
+  margin-top: 1.75rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.lesson-error {
+  color: var(--danger);
+}
+
+.lesson-error pre {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  white-space: pre-wrap;
+}
+
+.lesson-empty {
+  padding: 2rem;
+  color: var(--muted);
+}
+
+/* Small shared primitives, so lessons can stay about React rather than CSS. */
+
+button {
+  font: inherit;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.note {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.log {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 0.6rem 0.75rem;
+  margin: 0;
+  max-height: 14rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@lab/lesson-shell",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sidebar and runner that every learning module mounts its lessons into",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

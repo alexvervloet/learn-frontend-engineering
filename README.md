@@ -33,12 +33,13 @@ whose claims are assertions fails CI when React changes under it.
 
 ## What is here so far
 
-Four things are built and tested: [web-fundamentals](web-fundamentals/),
+Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/react-core](learning/react-core/),
+[learning/typescript-react](learning/typescript-react/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 68 assertions across the
-three modules that exist.
+marked planned and has no folder yet. `npm test` runs 135 assertions across the
+four modules that exist, including type-level ones.
 
 ## Suggested learning path
 
@@ -50,7 +51,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
 2. **[learning/react-core/](learning/react-core/)** — state, effects, refs,
    context, reducers, Suspense, transitions. The largest module, and the one
    everything else assumes.
-3. **learning/typescript-react** (planned) — typing props,
+3. **[learning/typescript-react/](learning/typescript-react/)** — typing props,
    children, events, refs, generic components, and state that cannot be invalid.
 4. **learning/styling** (planned) — CSS modules, Tailwind 4, design
    tokens, dark mode, container queries, animation.
@@ -102,7 +103,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **react-core** — rendering, state, props, lists and keys, effects and when not
   to use one, refs, context, `useReducer`, composition, custom hooks, portals,
   error boundaries, Suspense, `useTransition`, `useOptimistic`, `useActionState`
-- **typescript-react** — props and children, events, `ref` as a prop in React 19,
+- **[typescript-react](learning/typescript-react/)** — props and children, events, `ref` as a prop in React 19,
   generic and polymorphic components, discriminated unions for state, type-safe
   context, when `as` is a bug
 - **styling** — CSS modules, Tailwind 4 and its CSS-first config, design tokens

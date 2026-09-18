@@ -17,7 +17,7 @@ npm test -- --project <module>
 
 ## Planned
 
-typescript-react, styling, routing, state-management, forms, testing,
+styling, routing, state-management, forms, testing,
 accessibility, performance, rendering-strategies, next-app-router,
 astro-islands, production. The root [README](../README.md) says what each one
 will cover.

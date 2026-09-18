@@ -36,11 +36,6 @@
  * about failure. You need both.
  */
 
-// loadBio is exported for the tests, alongside the component, so Fast Refresh
-// falls back to a full reload for this file. That is the right trade in a
-// lesson: a pure function you can test without a DOM is worth more than hot
-// reload on a file nobody is iterating on.
-/* eslint-disable react-refresh/only-export-components */
 import { Suspense, lazy, startTransition, use, useState } from "react";
 
 const HeavyPanel = lazy(() => import("./11_heavy_panel"));

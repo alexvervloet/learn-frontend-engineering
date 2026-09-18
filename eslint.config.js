@@ -49,5 +49,21 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Lesson files export the component *and* the pure helpers their tests
+    // import: a reducer, a parser, a hook. Fast Refresh falls back to a full
+    // reload for those files, which is the right trade here. Nobody is
+    // hot-editing a finished lesson, and a function you can test without a DOM
+    // is worth more than hot reload on it.
+    files: ["learning/*/src/lessons/**", "packages/*/src/**"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
+    // In a type test the expression *is* the assertion. `withSatisfies.typo;`
+    // under a @ts-expect-error asserts that the key does not exist, and there
+    // is nothing to assign it to.
+    files: ["**/*.test-d.ts", "**/*.test-d.tsx"],
+    rules: { "@typescript-eslint/no-unused-expressions": "off" },
+  },
   prettier,
 );

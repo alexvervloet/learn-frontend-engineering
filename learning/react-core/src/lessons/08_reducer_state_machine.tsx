@@ -34,11 +34,6 @@
  * because the error state holds it. A reducer makes that kind of thing obvious.
  */
 
-// the reducer is exported for the tests, alongside the component, so Fast Refresh
-// falls back to a full reload for this file. That is the right trade in a
-// lesson: a pure function you can test without a DOM is worth more than hot
-// reload on a file nobody is iterating on.
-/* eslint-disable react-refresh/only-export-components */
 import { useReducer } from "react";
 
 export type SubmitState =

@@ -1,0 +1,63 @@
+# The repo's own CI.
+#
+# Three jobs rather than one. `check` is seconds and gives a clear signal before
+# the slower jobs finish; `test` is the one that catches a lesson whose claims
+# have stopped being true; `build` catches the things that only break in a
+# production bundle, which for a frontend repo is most of them.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Only the latest run per branch matters.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      # --max-warnings 0 on purpose. A warning nobody has to fix is a warning
+      # everybody stops reading, and the react-hooks rules here are the ones
+      # worth failing a build over.
+      - run: npm run lint -- --max-warnings 0
+      - run: npm run format:check
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false # one Node version failing alone is useful information
+      matrix:
+        node-version: ["24", "26"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      # `npm ci` honours the allowScripts block in package.json, so esbuild gets
+      # its binary. If a dependency bump ever re-blocks it, this job is where it
+      # shows up, as a Vite command failing for no visible reason.
+      - run: npm run build

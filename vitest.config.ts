@@ -4,6 +4,14 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    projects: ["packages/*", "web-fundamentals", "learning/*", "projects/*"],
+    // Globbed at the config file, not the folder. A bare `learning/*` also
+    // matches learning/README.md, and Vitest refuses to start rather than
+    // guessing what you meant.
+    projects: [
+      "packages/*/vitest.config.ts",
+      "web-fundamentals/vitest.config.ts",
+      "learning/*/vitest.config.ts",
+      "projects/*/vitest.config.ts",
+    ],
   },
 });

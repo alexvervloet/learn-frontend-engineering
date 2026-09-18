@@ -13,7 +13,12 @@ import type { ViteUserConfig } from "vitest/config";
 
 const setupFiles = [fileURLToPath(new URL("./vitest.setup.ts", import.meta.url))];
 
-export function reactProject(name: string): ViteUserConfig {
+/**
+ * `extraSetupFiles` is for a module that needs more than the shared setup, such
+ * as data-fetching starting an MSW server. They run after the shared one.
+ */
+
+export function reactProject(name: string, extraSetupFiles: string[] = []): ViteUserConfig {
   return {
     plugins: [react()],
     test: {
@@ -23,7 +28,7 @@ export function reactProject(name: string): ViteUserConfig {
       // closer match to a real browser, and lessons about focus and scrolling
       // depend on that.
       environment: "jsdom",
-      setupFiles,
+      setupFiles: [...setupFiles, ...extraSetupFiles],
     },
   };
 }

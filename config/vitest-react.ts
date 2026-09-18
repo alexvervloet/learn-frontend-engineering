@@ -7,11 +7,13 @@
 import { fileURLToPath } from "node:url";
 
 import react from "@vitejs/plugin-react";
-import type { UserConfig } from "vitest/config";
+// Vitest 5 re-exports Vite's config type under a new name, augmented with the
+// `test` key. The plain `UserConfig` from "vitest/config" is gone.
+import type { ViteUserConfig } from "vitest/config";
 
 const setupFiles = [fileURLToPath(new URL("./vitest.setup.ts", import.meta.url))];
 
-export function reactProject(name: string): UserConfig {
+export function reactProject(name: string): ViteUserConfig {
   return {
     plugins: [react()],
     test: {

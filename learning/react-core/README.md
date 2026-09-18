@@ -11,34 +11,34 @@ lesson claims.
 
 ### How React runs
 
-| File | What it teaches |
-|---|---|
-| `01_rendering.tsx` | Render is React calling your function; commit is the DOM change. Batching, and bailing out when nothing changed |
-| `02_state_snapshot.tsx` | `count` is baked into one render. Three `setCount(count + 1)` calls add one. The updater form adds three |
-| `03_lists_and_keys.tsx` | An index key hands one row's state to a different row when the list shifts |
+| File                    | What it teaches                                                                                                 |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `01_rendering.tsx`      | Render is React calling your function; commit is the DOM change. Batching, and bailing out when nothing changed |
+| `02_state_snapshot.tsx` | `count` is baked into one render. Three `setCount(count + 1)` calls add one. The updater form adds three        |
+| `03_lists_and_keys.tsx` | An index key hands one row's state to a different row when the list shifts                                      |
 
 ### Effects
 
-| File | What it teaches |
-|---|---|
-| `04_no_effect_needed.tsx` | State mirrored from a calculation costs a render and a frame of stale UI. Two versions, with counters |
-| `05_effects_and_cleanup.tsx` | Connect and disconnect, not mount and unmount. Skip the cleanup and intervals stack up until reload |
+| File                         | What it teaches                                                                                       |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `04_no_effect_needed.tsx`    | State mirrored from a calculation costs a render and a frame of stale UI. Two versions, with counters |
+| `05_effects_and_cleanup.tsx` | Connect and disconnect, not mount and unmount. Skip the cleanup and intervals stack up until reload   |
 
 ### Escape hatches
 
-| File | What it teaches |
-|---|---|
-| `06_refs_and_focus.tsx` | A ref changes without a render. Focus management, and `ref` as an ordinary prop in React 19 |
-| `07_context.tsx` | Every consumer re-renders when the value changes. Splitting by rate of change, and memoising the value |
-| `08_reducer_state_machine.tsx` | A discriminated union makes `loading && error` impossible to spell. The reducer tests with no DOM |
+| File                           | What it teaches                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `06_refs_and_focus.tsx`        | A ref changes without a render. Focus management, and `ref` as an ordinary prop in React 19            |
+| `07_context.tsx`               | Every consumer re-renders when the value changes. Splitting by rate of change, and memoising the value |
+| `08_reducer_state_machine.tsx` | A discriminated union makes `loading && error` impossible to spell. The reducer tests with no DOM      |
 
 ### Concurrent React
 
-| File | What it teaches |
-|---|---|
-| `09_transitions.tsx` | `useTransition` and `useDeferredValue` over a 20,000 row filter. Interruption, not debouncing |
-| `10_actions_and_optimistic.tsx` | `<form action>`, `useActionState`, `useFormStatus`, and a rollback you did not write |
-| `11_suspense.tsx` | `use(promise)`, why the promise must be cached, `lazy()`, and keeping content on screen with a transition |
+| File                            | What it teaches                                                                                           |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `09_transitions.tsx`            | `useTransition` and `useDeferredValue` over a 20,000 row filter. Interruption, not debouncing             |
+| `10_actions_and_optimistic.tsx` | `<form action>`, `useActionState`, `useFormStatus`, and a rollback you did not write                      |
+| `11_suspense.tsx`               | `use(promise)`, why the promise must be cached, `lazy()`, and keeping content on screen with a transition |
 
 `useRenderCount.ts` is the measuring instrument the lessons share. It mutates a
 ref during render, which is exactly what React asks you not to do, and it has

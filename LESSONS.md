@@ -97,7 +97,7 @@ one line buried above the failure:
 A component suspended inside an `act` scope, but the `act` call was not awaited.
 ```
 
-Testing Library's `render` does its work inside a *synchronous* `act`. A
+Testing Library's `render` does its work inside a _synchronous_ `act`. A
 component that suspends inside one of those is never retried, so `findBy` polls
 a tree React has deliberately decided not to touch.
 

@@ -173,3 +173,68 @@ you can say why in a sentence. Turning it off repo-wide is not.
 
 **Next time.** `node -e "import('eslint-plugin-x').then(m => console.log(Object.keys(m.default.configs)))"`
 answers "which of these is the flat one" faster than reading the changelog.
+
+## Prettier moves `@ts-expect-error` onto the wrong line
+
+**Expected.** A directive above an assertion applies to that assertion.
+
+```tsx
+// @ts-expect-error an h4 has no href
+assertType(
+  <Text as="h4" href="/x">
+    heading
+  </Text>,
+);
+```
+
+**What happened.** `npm run format` reflowed the JSX across five lines, leaving
+the directive sitting above `assertType(`. That line contains no error, so the
+type test failed with "Unused '@ts-expect-error' directive" _and_ the real error
+underneath it went unsuppressed. Two failures from one reformat, and the
+assertion had silently stopped testing what it claimed.
+
+**The fix.** Pin the directive to the thing it is about, not to the statement:
+
+```tsx
+assertType(
+  <Text
+    as="h4"
+    // @ts-expect-error an h4 has no href
+    href="/x"
+  >
+    heading
+  </Text>,
+);
+```
+
+**Next time.** Run the formatter _before_ trusting a type test, not after. Any
+`@ts-expect-error` above a call that a formatter might reflow is a line-number
+dependency waiting to break, and the failure mode is the assertion quietly
+passing rather than an obvious error.
+
+## Type tests need two lint rules switched off, and it is worth understanding why
+
+**What happened.** `npm run lint` failed on the `.test-d.tsx` files with
+`@typescript-eslint/no-unused-expressions`. The offending lines look like
+mistakes:
+
+```tsx
+// @ts-expect-error `typo` is not one of the two keys
+withSatisfies.typo;
+```
+
+They are not. In a type test the bare expression _is_ the assertion: it says
+"reading this property is an error", and there is nothing to assign it to.
+
+The second was `react-refresh/only-export-components`, which fires on any lesson
+file exporting a pure helper next to its component. That is deliberate in every
+lesson here, because a reducer or parser you can test without a DOM is worth more
+than hot reload on a file nobody is editing.
+
+**The fix.** Both are now `files`-scoped overrides in `eslint.config.js` rather
+than disable comments repeated in a dozen files, and the per-file comments that
+were in react-core are gone. A rule you exempt in one place with a reason is
+maintainable. The same comment pasted into every new lesson is not.
+
+**Next time.** Two or three identical disable comments is the signal to move it
+into the config. Before that, the comment is more honest.

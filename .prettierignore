@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+.next/
+.astro/
+storybook-static/
+package-lock.json
+*.tsbuildinfo

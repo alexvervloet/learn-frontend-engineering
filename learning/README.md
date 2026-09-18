@@ -10,10 +10,10 @@ npm test -- --project <module>
 
 ## Modules
 
-| Module | Needs | What it covers |
-|---|---|---|
-| [react-core](react-core/) | 🟢 | State, effects, refs, context, reducers, transitions, Suspense |
-| [data-fetching](data-fetching/) | 🟢 | TanStack Query, caching, mutations, optimistic updates, MSW |
+| Module                          | Needs | What it covers                                                 |
+| ------------------------------- | ----- | -------------------------------------------------------------- |
+| [react-core](react-core/)       | 🟢    | State, effects, refs, context, reducers, transitions, Suspense |
+| [data-fetching](data-fetching/) | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW    |
 
 ## Planned
 

@@ -1,0 +1,21 @@
+{
+  "name": "data-fetching",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TanStack Query, caching, mutations, optimistic updates, and MSW",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lab/lesson-shell": "*",
+    "@tanstack/react-query": "^5.103.1",
+    "@tanstack/react-query-devtools": "^5.103.1"
+  },
+  "devDependencies": {
+    "msw": "^2.15.0"
+  }
+}

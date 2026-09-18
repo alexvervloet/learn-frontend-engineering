@@ -25,7 +25,9 @@ describe("event targets", () => {
       Equals<ChangeEvent<HTMLInputElement>["target"], EventTarget & HTMLInputElement>
     >().toEqualTypeOf<true>();
 
-    expectTypeOf<Equals<MouseEvent<HTMLButtonElement>["target"], EventTarget>>().toEqualTypeOf<true>();
+    expectTypeOf<
+      Equals<MouseEvent<HTMLButtonElement>["target"], EventTarget>
+    >().toEqualTypeOf<true>();
     expectTypeOf<Equals<FormEvent<HTMLFormElement>["target"], EventTarget>>().toEqualTypeOf<true>();
   });
 
@@ -40,7 +42,9 @@ describe("event targets", () => {
 
 describe("FormData", () => {
   it("returns something that may be a File, or missing entirely", () => {
-    expectTypeOf<Equals<ReturnType<FormData["get"]>, FormDataEntryValue | null>>().toEqualTypeOf<true>();
+    expectTypeOf<
+      Equals<ReturnType<FormData["get"]>, FormDataEntryValue | null>
+    >().toEqualTypeOf<true>();
     expectTypeOf<Equals<FormDataEntryValue, string | File>>().toEqualTypeOf<true>();
   });
 });

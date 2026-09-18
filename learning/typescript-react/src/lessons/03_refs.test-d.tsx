@@ -7,7 +7,9 @@ describe("useRef", () => {
   it("keeps null in the type when null is what it starts as", () => {
     const element = useRef<HTMLInputElement>(null);
 
-    expectTypeOf<Equals<typeof element, RefObject<HTMLInputElement | null>>>().toEqualTypeOf<true>();
+    expectTypeOf<
+      Equals<typeof element, RefObject<HTMLInputElement | null>>
+    >().toEqualTypeOf<true>();
 
     // @ts-expect-error current may be null until React has committed
     element.current.focus();

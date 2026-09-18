@@ -1,0 +1,35 @@
+node_modules/
+dist/
+coverage/
+*.log
+
+# Build caches and framework output
+.vite/
+.next/
+.astro/
+.turbo/
+*.tsbuildinfo
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# Storybook
+storybook-static/
+
+# Secrets. Vite inlines anything prefixed VITE_ into the bundle, so a real key
+# in here ships to every visitor. Only .env.example is committed.
+.env
+.env.*
+!.env.example
+
+# Working notes for whoever is mid-task. Never part of the repo.
+PLAN.md
+
+# VS Code Local History extension
+.history/
+
+# macOS
+.DS_Store

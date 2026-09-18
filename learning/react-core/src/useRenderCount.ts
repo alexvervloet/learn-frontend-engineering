@@ -13,7 +13,10 @@ import { useRef } from "react";
  */
 export function useRenderCount(): number {
   const count = useRef(0);
-  // eslint-disable-next-line react-hooks/set-state-in-render, react-hooks/purity
+  // react-hooks/refs is right and this hook is the exception that proves it:
+  // measuring renders is the one job that needs a value React is not tracking.
+  /* eslint-disable react-hooks/refs */
   count.current += 1;
   return count.current;
+  /* eslint-enable react-hooks/refs */
 }

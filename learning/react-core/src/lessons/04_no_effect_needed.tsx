@@ -47,6 +47,10 @@ function WithEffect({ query }: { query: string }) {
   const renders = useRenderCount();
 
   useEffect(() => {
+    // The lint rule below is the whole lesson. `react-hooks/set-state-in-effect`
+    // exists to stop exactly this, and it is switched off here only so the
+    // wrong version can be run next to the right one.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFiltered(ITEMS.filter(matches(query)));
   }, [query]);
 

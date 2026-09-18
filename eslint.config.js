@@ -25,7 +25,10 @@ export default tseslint.config(
   },
   js.configs.recommended,
   tseslint.configs.recommended,
-  reactHooks.configs.recommended,
+  // `configs.recommended` is still the eslintrc shape. The flat versions live
+  // under `configs.flat`, and `recommended-latest` is the one that includes the
+  // React Compiler rule.
+  reactHooks.configs.flat["recommended-latest"],
   jsxA11y.flatConfigs.recommended,
   {
     files: ["**/*.{ts,tsx}"],

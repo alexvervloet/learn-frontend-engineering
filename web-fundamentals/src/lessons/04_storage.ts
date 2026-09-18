@@ -99,7 +99,9 @@ export function mountStorage(root: HTMLElement): () => void {
 
   function show(): void {
     const result = readJson<string>(localStorage, KEY);
-    out.textContent = result.ok ? `stored: ${JSON.stringify(result.value)}` : `nothing (${result.reason})`;
+    out.textContent = result.ok
+      ? `stored: ${JSON.stringify(result.value)}`
+      : `nothing (${result.reason})`;
   }
 
   function onSave(): void {

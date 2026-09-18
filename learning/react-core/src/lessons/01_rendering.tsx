@@ -67,8 +67,8 @@ export function Rendering() {
 
       <p className="note">
         Both +3 buttons add one render, not three. “Set the same value” stops adding renders
-        entirely after the first click. In the browser every number is doubled, because
-        StrictMode renders twice in development on purpose.
+        entirely after the first click. In the browser every number is doubled, because StrictMode
+        renders twice in development on purpose.
       </p>
     </div>
   );

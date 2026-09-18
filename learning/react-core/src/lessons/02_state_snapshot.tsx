@@ -63,8 +63,8 @@ export function StateSnapshot() {
       </div>
 
       <p className="note">
-        Press “Read count in 1s”, then press +1 as fast as you can. The number that appears is
-        the one from the render where you clicked, not the current one.
+        Press “Read count in 1s”, then press +1 as fast as you can. The number that appears is the
+        one from the render where you clicked, not the current one.
       </p>
       <p data-testid="captured">
         {captured === null ? "nothing captured yet" : `captured: ${captured}`}

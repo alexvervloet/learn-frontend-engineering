@@ -88,8 +88,8 @@ export function EffectsAndCleanup() {
 
       <p className="note">
         Change the interval a few times. The left counter accelerates away, because every change
-        left another interval running. It never slows down again, and nothing you click will stop
-        it short of a reload.
+        left another interval running. It never slows down again, and nothing you click will stop it
+        short of a reload.
       </p>
     </div>
   );

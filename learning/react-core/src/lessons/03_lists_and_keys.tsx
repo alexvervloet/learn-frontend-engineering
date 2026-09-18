@@ -48,7 +48,9 @@ export function ListsAndKeys() {
   return (
     <div className="stack">
       <div className="row">
-        <button onClick={() => setPeople((current) => current.slice(1))}>Remove the first row</button>
+        <button onClick={() => setPeople((current) => current.slice(1))}>
+          Remove the first row
+        </button>
         <button onClick={() => setPeople(INITIAL)}>Reset</button>
       </div>
 

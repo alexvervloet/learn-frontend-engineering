@@ -84,7 +84,8 @@ export function mountDelegation(root: HTMLElement): () => void {
 export const lesson: Lesson = {
   id: "dom-and-events",
   title: "The DOM and event delegation",
-  summary: "One listener on a container handles children that do not exist yet. React does this too.",
+  summary:
+    "One listener on a container handles children that do not exist yet. React does this too.",
   file: "src/lessons/01_dom_and_events.ts",
   mount: mountDelegation,
 };

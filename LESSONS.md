@@ -17,7 +17,7 @@ peer typescript@">=4.8.4 <6.1.0" from typescript-eslint@8.70.0
 
 typescript-eslint has not shipped TypeScript 7 support, on `latest` or on
 `canary` (`8.70.1-alpha.25` caps at the same range). typescript-eslint is not
-optional here: it supplies the *parser*. Without it ESLint cannot read a `.ts`
+optional here: it supplies the _parser_. Without it ESLint cannot read a `.ts`
 or `.tsx` file at all, so dropping it means no linting of any kind, not just
 losing the type-aware rules.
 
@@ -78,7 +78,7 @@ config and only the declared range is stale:
 ```
 
 **Next time.** A stale peer range is worth overriding when the plugin's actual
-API surface did not change. A stale *engine* or a real API break is not. Check
+API surface did not change. A stale _engine_ or a real API break is not. Check
 the plugin's changelog before reaching for `overrides`, and never use
 `--legacy-peer-deps`, which turns the check off repo-wide instead of for the one
 package that needs it.

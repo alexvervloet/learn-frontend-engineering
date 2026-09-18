@@ -33,13 +33,13 @@ survives a refresh. Renaming an id breaks anyone's bookmark.
 
 ## Exports
 
-| Export | What it is |
-|---|---|
-| `LessonShell` | Sidebar, lesson header, and the mounted demo |
-| `defineLessons` | Identity function that type-checks the array where you write it |
-| `LessonBoundary` | Error boundary around each demo, reset when the lesson changes |
-| `useHash` | Reads the URL hash through `useSyncExternalStore` |
-| `@lab/lesson-shell/styles.css` | Layout, colours, and a few shared form primitives |
+| Export                         | What it is                                                      |
+| ------------------------------ | --------------------------------------------------------------- |
+| `LessonShell`                  | Sidebar, lesson header, and the mounted demo                    |
+| `defineLessons`                | Identity function that type-checks the array where you write it |
+| `LessonBoundary`               | Error boundary around each demo, reset when the lesson changes  |
+| `useHash`                      | Reads the URL hash through `useSyncExternalStore`               |
+| `@lab/lesson-shell/styles.css` | Layout, colours, and a few shared form primitives               |
 
 ## Two decisions worth knowing about
 

@@ -24,12 +24,12 @@ whose claims are assertions fails CI when React changes under it.
 
 ## Structure
 
-| Folder | What's in it |
-|---|---|
-| [web-fundamentals/](web-fundamentals/) | The browser platform, with no React in sight |
-| [learning/](learning/) | One workspace per concept module |
-| [projects/](projects/) | Capstone apps that combine the modules |
-| [packages/](packages/) | Shared internals. Only `lesson-shell`, the sidebar the modules mount into |
+| Folder                                 | What's in it                                                              |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| [web-fundamentals/](web-fundamentals/) | The browser platform, with no React in sight                              |
+| [learning/](learning/)                 | One workspace per concept module                                          |
+| [projects/](projects/)                 | Capstone apps that combine the modules                                    |
+| [packages/](packages/)                 | Shared internals. Only `lesson-shell`, the sidebar the modules mount into |
 
 ## Suggested learning path
 
@@ -70,24 +70,26 @@ Each module stands alone, so skip ahead if a topic is already familiar.
 
 ### What each module needs to run
 
-| Icon | Meaning |
-|---|---|
-| 🟢 | Nothing but `npm install`. Runs in a browser tab or in jsdom |
-| 🎭 | Playwright browsers (`npx playwright install`) |
-| 🌐 | A backend. Every module that wants one can use MSW instead, and says so |
-| 🐳 | Docker |
-| ☁️ | An account somewhere (Sentry, a host, a feature-flag service) |
+| Icon | Meaning                                                                 |
+| ---- | ----------------------------------------------------------------------- |
+| 🟢   | Nothing but `npm install`. Runs in a browser tab or in jsdom            |
+| 🎭   | Playwright browsers (`npx playwright install`)                          |
+| 🌐   | A backend. Every module that wants one can use MSW instead, and says so |
+| 🐳   | Docker                                                                  |
+| ☁️   | An account somewhere (Sentry, a host, a feature-flag service)           |
 
 Each module's README states exactly what it needs.
 
 ## Modules
 
 ### web-fundamentals
+
 The platform React compiles down to. Event loop and task queues, DOM APIs and
 event delegation, the rendering pipeline, `fetch` with abort and caching
 headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 
 ### learning/
+
 - **react-core** — rendering, state, props, lists and keys, effects and when not
   to use one, refs, context, `useReducer`, composition, custom hooks, portals,
   error boundaries, Suspense, `useTransition`, `useOptimistic`, `useActionState`
@@ -132,6 +134,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   CI/CD and preview deploys
 
 ### projects/
+
 - **bookmark-manager** — React Router, TanStack Query, React Hook Form, tested
   end to end, containerised
 - **dashboard** — charts, virtualised tables, keyboard-complete, measured
@@ -170,14 +173,14 @@ is not listed, run `npm install-scripts approve <pkg>`.
 
 ### How this repo is set up
 
-| Choice | Why |
-|---|---|
-| npm workspaces | One `npm install`, but a module that needs Next or Astro is not forced on the ones that do not. React resolves to a single copy at the root, which is what stops the "two Reacts" hook error |
-| `moduleResolution: "bundler"` | Vite resolves imports, so relative imports have no extension. The backend repo's `.js` suffixes are a Node requirement and do not apply here |
-| Vitest over Jest | It reuses the Vite config, so tests see the same aliases, plugins and transforms as the dev server. Nothing to keep in sync |
-| jsdom over happy-dom | Slower, but closer to a real browser on focus, layout and events, and lessons about focus depend on that |
-| ESLint over Biome | Biome is faster and one tool instead of two. React's lint rules are the reason: `eslint-plugin-react-hooks` ships the React Compiler check, and there is no equivalent |
-| TypeScript 5.9, not 7 | typescript-eslint does not support TypeScript 7 yet, and it supplies the parser. See [LESSONS.md](LESSONS.md) |
+| Choice                        | Why                                                                                                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| npm workspaces                | One `npm install`, but a module that needs Next or Astro is not forced on the ones that do not. React resolves to a single copy at the root, which is what stops the "two Reacts" hook error |
+| `moduleResolution: "bundler"` | Vite resolves imports, so relative imports have no extension. The backend repo's `.js` suffixes are a Node requirement and do not apply here                                                 |
+| Vitest over Jest              | It reuses the Vite config, so tests see the same aliases, plugins and transforms as the dev server. Nothing to keep in sync                                                                  |
+| jsdom over happy-dom          | Slower, but closer to a real browser on focus, layout and events, and lessons about focus depend on that                                                                                     |
+| ESLint over Biome             | Biome is faster and one tool instead of two. React's lint rules are the reason: `eslint-plugin-react-hooks` ships the React Compiler check, and there is no equivalent                       |
+| TypeScript 5.9, not 7         | typescript-eslint does not support TypeScript 7 yet, and it supplies the parser. See [LESSONS.md](LESSONS.md)                                                                                |
 
 Versions were pinned from the registry in September 2026: React 19.3, Vite 8,
 Vitest 5, TypeScript 5.9, Tailwind 4.3, React Router 8, TanStack Query 5.103,

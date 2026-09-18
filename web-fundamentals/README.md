@@ -9,13 +9,13 @@ Skip it if you already know what a microtask is and why a search box needs an
 
 ## What the files cover
 
-| File | What it teaches |
-|---|---|
-| `src/lessons/01_dom_and_events.ts` | Bubbling, and one listener on a container handling children that do not exist yet. This is what React does at the root |
-| `src/lessons/02_event_loop.ts` | Sync, then microtasks, then a frame, then timers. Plus 1.5s of a blocked thread, so you can feel it |
-| `src/lessons/03_fetch_and_races.ts` | The stale-response bug, and the two fixes: abort the old request, or ignore its answer |
-| `src/lessons/04_storage.ts` | Cookies, `localStorage`, `sessionStorage`, IndexedDB, Cache Storage. Size, thread cost, and XSS exposure for each |
-| `src/main.ts` | The sidebar, hand-rolled. Sixty lines that do badly what React does well |
+| File                                | What it teaches                                                                                                        |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `src/lessons/01_dom_and_events.ts`  | Bubbling, and one listener on a container handling children that do not exist yet. This is what React does at the root |
+| `src/lessons/02_event_loop.ts`      | Sync, then microtasks, then a frame, then timers. Plus 1.5s of a blocked thread, so you can feel it                    |
+| `src/lessons/03_fetch_and_races.ts` | The stale-response bug, and the two fixes: abort the old request, or ignore its answer                                 |
+| `src/lessons/04_storage.ts`         | Cookies, `localStorage`, `sessionStorage`, IndexedDB, Cache Storage. Size, thread cost, and XSS exposure for each      |
+| `src/main.ts`                       | The sidebar, hand-rolled. Sixty lines that do badly what React does well                                               |
 
 `src/types.ts` holds the `Lesson` shape and `must()`, a `querySelector` that
 throws instead of returning `null`.
@@ -49,7 +49,9 @@ teardown:
 
 ```ts
 export function mountDelegation(root: HTMLElement): () => void {
-  const onClick = () => { /* … */ };
+  const onClick = () => {
+    /* … */
+  };
   root.addEventListener("click", onClick);
   return () => root.removeEventListener("click", onClick);
 }

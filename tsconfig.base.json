@@ -1,0 +1,35 @@
+// Shared TypeScript settings. Every workspace extends this and adds only its
+// own `include`.
+//
+// moduleResolution is "bundler", not "nodenext": Vite resolves imports, so
+// extensionless relative imports are correct here. That is the opposite of the
+// backend repo, where Node does the resolving and every relative import needs a
+// ".js" suffix.
+//
+// noEmit is set everywhere. Vite builds the bundles; `tsc --noEmit` only checks
+// types. No workspace produces JavaScript with tsc.
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

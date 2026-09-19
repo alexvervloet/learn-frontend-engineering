@@ -38,10 +38,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/typescript-react](learning/typescript-react/),
 [learning/styling](learning/styling/),
 [learning/routing](learning/routing/),
+[learning/state-management](learning/state-management/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 215 assertions across the
-six modules that exist, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 250 assertions across the
+seven modules that exist, including type-level ones.
 
 ## Suggested learning path
 
@@ -61,7 +62,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    TanStack Router, nested layouts, and the URL as state.
 6. **[learning/data-fetching/](learning/data-fetching/)** — TanStack Query,
    caching, mutations, optimistic updates, and mocking a network with MSW.
-7. **learning/state-management** (planned) — where state
+7. **[learning/state-management/](learning/state-management/)** — where state
    belongs, and what Zustand, Redux Toolkit and Jotai each buy you.
 8. **learning/forms** (planned) — React Hook Form with Zod, validation
    UX, and errors a screen reader announces.
@@ -118,7 +119,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   (cache keys, staleness, invalidation, mutations, optimistic updates, infinite
   queries, prefetching), SWR for contrast, MSW as the test network, retries,
   error and loading states that do not flash
-- **state-management** — local vs lifted vs context vs store, the server/client
+- **[state-management](learning/state-management/)** — local vs lifted vs context vs store, the server/client
   state split, Zustand, Redux Toolkit, Jotai, selectors and the re-render cost
   of getting it wrong
 - **forms** — controlled and uncontrolled inputs, React Hook Form with a Zod

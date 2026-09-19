@@ -16,11 +16,12 @@ npm test -- --project <module>
 | [typescript-react](typescript-react/) | 🟢    | Props, events, refs, unions, generics, context, and the boundary. Asserts types as well as behaviour |
 | [styling](styling/)                   | 🟢    | CSS modules, Tailwind 4, design tokens, container queries, cascade layers, cva, motion               |
 | [routing](routing/)                   | 🟢    | React Router 8 data routers, the URL as state, code splitting, TanStack Router                       |
+| [state-management](state-management/) | 🟢    | Where state belongs, the cost of lifting, Zustand, Redux Toolkit, Jotai                              |
 | [data-fetching](data-fetching/)       | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-state-management, forms, testing, accessibility, performance,
+forms, testing, accessibility, performance,
 rendering-strategies, next-app-router, astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 

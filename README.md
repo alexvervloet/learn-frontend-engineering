@@ -45,10 +45,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/accessibility](learning/accessibility/),
 [learning/rendering-strategies](learning/rendering-strategies/),
 [learning/next-app-router](learning/next-app-router/),
+[learning/astro-islands](learning/astro-islands/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
 marked planned and has no folder yet. `npm test` runs 438 assertions across the
-thirteen modules that exist, plus 34 Playwright specs in a real browser, including type-level ones.
+fourteen modules that exist, plus 46 Playwright specs in a real browser, including type-level ones.
 
 ## Suggested learning path
 
@@ -81,7 +82,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
 12. **Rendering off the client** —
     [rendering-strategies](learning/rendering-strategies/) for the concepts,
     then [next-app-router](learning/next-app-router/) and
-    astro-islands (planned).
+    [astro-islands](learning/astro-islands/).
 13. **learning/production** (planned) — env config, CSP, auth in
     the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
 14. **[projects/](projects/)** — read and run
@@ -145,7 +146,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   against React's own APIs so the framework versions stop being magic
 - **[next-app-router](learning/next-app-router/)** — Next 16, Server Components, server actions, streaming
   and caching, route handlers, the client/server boundary
-- **astro-islands** — Astro 7, partial hydration, and when a React SPA is the
+- **[astro-islands](learning/astro-islands/)** — Astro 7, partial hydration, and when a React SPA is the
   wrong answer
 - **production** — build output and env config, Content Security Policy and XSS,
   where a token can safely live, Sentry, RUM and Core Web Vitals in the field,

@@ -4,6 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 const STYLING_PORT = 5180;
 const PERFORMANCE_PORT = 5181;
+const ACCESSIBILITY_PORT = 5182;
 const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 /**
@@ -50,6 +51,13 @@ export default defineConfig({
     {
       command: `npm run dev -w learning/performance -- --port ${PERFORMANCE_PORT} --strictPort`,
       url: `http://localhost:${PERFORMANCE_PORT}`,
+      cwd: repoRoot,
+      reuseExistingServer: !process.env["CI"],
+      timeout: 120_000,
+    },
+    {
+      command: `npm run dev -w learning/accessibility -- --port ${ACCESSIBILITY_PORT} --strictPort`,
+      url: `http://localhost:${ACCESSIBILITY_PORT}`,
       cwd: repoRoot,
       reuseExistingServer: !process.env["CI"],
       timeout: 120_000,

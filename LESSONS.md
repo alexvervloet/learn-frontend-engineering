@@ -531,3 +531,55 @@ plainly that it stands in for `Date.now()` and why the clock is not used.
 the machine it runs on. If a test needs two values to differ, make them
 differ; do not rely on time passing between them. And a test that passes in CI
 is not a test that is deterministic, it is a test that has not lost yet.
+
+## Chowning your way to a non-root nginx does not work
+
+**Expected.** The official `nginx:alpine` image runs as root, and a container
+serving static files should not. Create a user, chown `/var/cache/nginx`,
+`/var/run` and `/var/log/nginx`, add `USER web`, done.
+
+**What happened.** The image built. The container started and exited
+immediately, so the smoke test got one "Connection reset by peer" followed by
+twenty-nine "Couldn't connect to server" and no clue why. The entrypoint
+scripts and the default config expect root in more places than those three
+directories, and finding them one at a time is a losing game.
+
+**The fix.** `nginxinc/nginx-unprivileged`. The same nginx, built for this:
+runs as uid 101, listens on 8080 rather than 80, needs no chown at all.
+
+**Next time.** When hardening means fighting an image's assumptions, look for
+the variant built with those assumptions changed. And always print
+`docker logs` when a container fails a health check: the first version of the
+CI step did not, which is why the failure said nothing.
+
+## nginx `add_header` does not merge across levels
+
+**Expected.** A `Content-Security-Policy` in the `server` block applies to
+every response from that server.
+
+**What happened.** It applied to most of them. A location block that declares
+**any** `add_header` of its own discards _every_ `add_header` inherited from
+its parent, and both cache-control locations declare one:
+
+```nginx
+location = /index.html {
+  add_header Cache-Control "no-cache, must-revalidate";   # drops the CSP
+}
+```
+
+So `index.html`, the one response anybody would inspect, was served with a
+200, correct markup, a working deep-link fallback, and no CSP at all.
+
+**The fix.** The headers live in `nginx-security-headers.conf`, and every
+location that sets a header of its own `include`s it again. There is a test
+that walks the location blocks and asserts exactly that.
+
+**Next time.** nginx directive inheritance is per-directive and not
+intuitive: `add_header` replaces, `proxy_set_header` replaces,
+`try_files` does not inherit at all. Assume replacement and verify with
+`curl -I` against the running container.
+
+**And the wider point.** Both of these were found by CI building the image and
+curling it, not by the twenty tests asserting what the Dockerfile and
+`nginx.conf` _say_. Those tests are worth having, and they cannot tell you
+whether the thing runs.

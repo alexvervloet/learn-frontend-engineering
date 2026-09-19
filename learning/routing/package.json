@@ -1,0 +1,18 @@
+{
+  "name": "routing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "React Router 8 data routers, TanStack Router, and the URL as state",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lab/lesson-shell": "*",
+    "@tanstack/react-router": "^1.170.38",
+    "react-router": "^8.4.0"
+  }
+}

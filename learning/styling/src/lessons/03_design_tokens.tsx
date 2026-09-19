@@ -105,8 +105,8 @@ export function DesignTokens() {
         }}
       >
         <p style={{ marginTop: 0 }}>
-          Every colour here is a role. <span style={{ color: "var(--text-muted)" }}>Muted text</span>
-          , and{" "}
+          Every colour here is a role.{" "}
+          <span style={{ color: "var(--text-muted)" }}>Muted text</span>, and{" "}
           <span
             style={{
               background: "var(--accent-bg)",

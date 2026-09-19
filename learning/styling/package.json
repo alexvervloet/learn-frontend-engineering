@@ -1,0 +1,24 @@
+{
+  "name": "styling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CSS modules, Tailwind 4, design tokens, container queries, cascade layers, variants, motion",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lab/lesson-shell": "*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "motion": "^13.4.0",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

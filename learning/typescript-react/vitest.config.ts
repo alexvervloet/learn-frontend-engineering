@@ -4,9 +4,7 @@ import { defineConfig } from "vitest/config";
 
 import { reactProject } from "../../config/vitest-react.ts";
 
-const base = reactProject("typescript-react", [
-  fileURLToPath(new URL("./vitest.setup.ts", import.meta.url)),
-]);
+const base = reactProject("typescript-react");
 
 export default defineConfig({
   ...base,

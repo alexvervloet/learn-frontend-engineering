@@ -65,10 +65,23 @@ export function StableGreeting({ name }: { name: string }) {
  * rule that exists to keep the React Compiler able to optimise your components
  * is the same rule that keeps hydration working. Impure render, no
  * optimisation, and a mismatch on the server. One cause, three symptoms.
+ *
+ * A counter rather than `Date.now()`, and the reason is a lesson in itself.
+ * `Date.now()` is the canonical example, and on a fast machine the server
+ * render and the client render land in the *same millisecond*, so the two
+ * outputs match and there is no mismatch to observe. The test built on it
+ * failed roughly one run in three. A counter differs every time, which is
+ * what the demonstration needs.
  */
+let renderNumber = 0;
+
 export function UnstableTimestamp() {
-  // eslint-disable-next-line react-hooks/purity
-  return <p data-testid="unstable">Rendered at {Date.now()}</p>;
+  /* eslint-disable react-hooks/purity */
+  renderNumber += 1;
+  // Stands in for Date.now(), Math.random(), or anything else that is
+  // different by the time the client runs it.
+  return <p data-testid="unstable">Rendered at {`t${renderNumber}`}</p>;
+  /* eslint-enable react-hooks/purity */
 }
 
 /** The fix: same on both, then updated by an effect. */

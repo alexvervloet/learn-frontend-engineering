@@ -81,8 +81,13 @@ describe("a mismatch", () => {
   it("is reported", async () => {
     const { errors } = await serverThenHydrate(<UnstableTimestamp />);
 
-    // Date.now() on the server, a different Date.now() a moment later on the
-    // client. React notices.
+    // The component's output differs between the server render and the
+    // client one, so React notices.
+    //
+    // This used to use Date.now(), which is the canonical example and made a
+    // flaky test: on a fast machine both renders land in the same
+    // millisecond, the outputs match, and there is nothing to report. It
+    // failed about one run in three and passed in CI for a week first.
     expect(errors.some((message) => /hydrat/i.test(message))).toBe(true);
   });
 
@@ -92,7 +97,7 @@ describe("a mismatch", () => {
     // The page looks right. React threw the server's subtree away and
     // re-rendered it on the client, at the cost of the work the server did.
     expect(container.querySelector('[data-testid="unstable"]')?.textContent).toMatch(
-      /Rendered at \d+/,
+      /Rendered at t\d+/,
     );
   });
 });

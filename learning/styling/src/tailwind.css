@@ -1,0 +1,61 @@
+/*
+ * Tailwind 4, configured in CSS.
+ *
+ * There is no tailwind.config.js in this module and there does not need to be.
+ * v4 reads its configuration from the stylesheet: `@theme` declares the design
+ * tokens, and every token becomes both a CSS custom property and a set of
+ * utility classes. Declaring `--color-brand-500` gives you `bg-brand-500`,
+ * `text-brand-500`, `border-brand-500` and the rest, for free.
+ *
+ * Preflight is deliberately left out. The three lines below import the theme
+ * and the utilities but not `tailwindcss/preflight.css`, because this module
+ * shares a stylesheet with the rest of the repo and Preflight's reset would
+ * strip the lesson shell's buttons, headings and lists back to nothing.
+ *
+ * That is not a recommendation for an app. In an app, take Preflight: a
+ * consistent baseline across browsers is most of what it is for. Leave it out
+ * only when you are adding Tailwind to something that already has its own
+ * reset, which is exactly the situation here.
+ *
+ * The explicit `@layer` line at the top fixes the order of the layers. Without
+ * it the order is decided by whichever file the bundler happens to emit first,
+ * and lesson 05 is about why that matters.
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/*
+ * Extending the theme. These are additions, not a replacement: everything
+ * Tailwind ships with is still there.
+ */
+@theme {
+  --color-brand-50: oklch(0.97 0.02 265);
+  --color-brand-200: oklch(0.88 0.07 265);
+  --color-brand-500: oklch(0.58 0.19 265);
+  --color-brand-700: oklch(0.45 0.17 265);
+
+  --font-display: "Iowan Old Style", Georgia, serif;
+
+  /* A custom spacing step. `p-gutter` and `gap-gutter` now exist. */
+  --spacing-gutter: 1.25rem;
+
+  /* A named container size, so `@md:` works on container queries. */
+  --container-card: 22rem;
+}
+
+/*
+ * A component class, in the components layer so utilities still beat it. This
+ * is the escape hatch for a pattern that repeats often enough to name, and it
+ * is worth resisting until it genuinely does.
+ */
+@layer components {
+  .panel {
+    border: 1px solid var(--color-brand-200);
+    border-radius: 0.625rem;
+    padding: var(--spacing-gutter);
+    background: var(--color-brand-50);
+  }
+}

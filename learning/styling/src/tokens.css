@@ -1,0 +1,57 @@
+/*
+ * The semantic token layer.
+ *
+ * Two tiers, and the distinction is the whole idea:
+ *
+ *   primitive   --color-brand-500. A value with a name. Declared in the
+ *               @theme block in tailwind.css
+ *   semantic    --surface, --text-muted, --border-subtle. A *role*, pointing at
+ *               a primitive. This file
+ *
+ * Components use semantic tokens only. That is what makes a theme switch one
+ * file rather than a search-and-replace: the roles keep their names and change
+ * what they point at.
+ *
+ * The dark block is written three times on purpose, and the guard matters:
+ *
+ *   @media (prefers-color-scheme: dark) with :root:not([data-theme="light"])
+ *     follow the OS, unless the user has explicitly chosen light
+ *   :root[data-theme="dark"]
+ *     the user chose dark, whatever the OS says
+ *
+ * Without the :not() guard, a user on a dark OS who picks light in your app
+ * gets dark anyway, because the media query has the same specificity and comes
+ * later. That bug is common and confusing, and it is one selector to avoid.
+ */
+
+:root {
+  --surface: oklch(1 0 0);
+  --surface-sunken: oklch(0.97 0.004 265);
+  --text-strong: oklch(0.2 0.02 265);
+  --text-muted: oklch(0.55 0.02 265);
+  --border-subtle: oklch(0.9 0.01 265);
+  --accent-fg: var(--color-brand-700);
+  --accent-bg: var(--color-brand-50);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: oklch(0.21 0.015 265);
+    --surface-sunken: oklch(0.17 0.015 265);
+    --text-strong: oklch(0.95 0.01 265);
+    --text-muted: oklch(0.7 0.02 265);
+    --border-subtle: oklch(0.32 0.02 265);
+    --accent-fg: var(--color-brand-200);
+    --accent-bg: oklch(0.27 0.05 265);
+  }
+}
+
+:root[data-theme="dark"] {
+  --surface: oklch(0.21 0.015 265);
+  --surface-sunken: oklch(0.17 0.015 265);
+  --text-strong: oklch(0.95 0.01 265);
+  --text-muted: oklch(0.7 0.02 265);
+  --border-subtle: oklch(0.32 0.02 265);
+  --accent-fg: var(--color-brand-200);
+  --accent-bg: oklch(0.27 0.05 265);
+}

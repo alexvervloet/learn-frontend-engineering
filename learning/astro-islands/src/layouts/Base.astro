@@ -1,0 +1,126 @@
+---
+/**
+ * An Astro layout. Everything between the fences runs at build time, on the
+ * server, and never reaches the browser. There is no way to make it
+ * interactive, which is the point: it cannot accidentally become client code.
+ */
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <style is:global>
+      :root {
+        --bg: #fbfbfd;
+        --surface: #fff;
+        --border: #e3e3e8;
+        --text: #17171c;
+        --muted: #61616b;
+        --accent: #3b5bdb;
+        --radius: 10px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #131318;
+          --surface: #1b1b22;
+          --border: #2e2e38;
+          --text: #ececf1;
+          --muted: #9a9aa6;
+          --accent: #8ca4ff;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        line-height: 1.55;
+      }
+      .page {
+        max-width: 48rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+      }
+      nav.top {
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+      }
+      a {
+        color: var(--accent);
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.85rem;
+      }
+      pre {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.75rem;
+        overflow-x: auto;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem;
+        background: var(--surface);
+      }
+      .note {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .row {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      button {
+        font: inherit;
+        padding: 0.4rem 0.7rem;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+      }
+      .spacer {
+        height: 150vh;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <nav class="top" aria-label="Sections">
+        <a href="/">Overview</a>
+        <a href="/static/">Zero JavaScript</a>
+        <a href="/islands/">Islands</a>
+        <a href="/directives/">Directives</a>
+      </nav>
+      <slot />
+    </div>
+  </body>
+</html>

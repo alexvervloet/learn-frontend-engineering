@@ -1,0 +1,46 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Astro islands">
+  <main>
+    <h1>Astro 7, islands</h1>
+
+    <p>
+      Astro renders every component to HTML at build time and ships <strong>no JavaScript</strong>
+      unless you ask for some. A React component becomes an <em>island</em> only when you put a
+      <code>client:*</code> directive on it, and then only that component's code is sent.
+    </p>
+
+    <p>
+      The inversion is the whole idea. In a React SPA everything is interactive and you work to
+      make parts static. In Astro everything is static and you work to make parts interactive.
+    </p>
+
+    <h2>The pages</h2>
+    <ul>
+      <li><a href="/static/">Zero JavaScript</a> — a page with React on it and no bundle at all</li>
+      <li><a href="/islands/">Islands</a> — two independent islands on one static page</li>
+      <li><a href="/directives/">Directives</a> — load, idle, visible, only, and what each costs</li>
+    </ul>
+
+    <h2>When this is the right answer, and when it is not</h2>
+    <ul>
+      <li>
+        <strong>Right:</strong> content-led sites. Docs, marketing, blogs, landing pages. Anywhere
+        most of the page is text and a few parts are interactive.
+      </li>
+      <li>
+        <strong>Wrong:</strong> an app that is one long interaction. A dashboard, an editor, a
+        checkout with shared state across the page. Islands cannot easily share state, and fighting
+        that is worse than shipping a SPA.
+      </li>
+    </ul>
+
+    <p class="note">
+      The <code>e2e/</code> folder asserts the claim the whole framework rests on: that
+      <code>/static</code> loads zero JavaScript, and that an island below the fold does not
+      hydrate until you scroll to it.
+    </p>
+  </main>
+</Base>

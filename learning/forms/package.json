@@ -1,0 +1,19 @@
+{
+  "name": "forms",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Controlled and uncontrolled inputs, React Hook Form, Zod, and errors a screen reader announces",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@lab/lesson-shell": "*",
+    "react-hook-form": "^7.88.0",
+    "zod": "^4.6.5"
+  }
+}

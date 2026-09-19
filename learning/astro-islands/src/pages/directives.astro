@@ -1,0 +1,59 @@
+---
+import Base from "../layouts/Base.astro";
+import { HydrationBadge } from "../components/HydrationBadge";
+
+/**
+ * The hydration directives, in the order you should reach for them.
+ *
+ *   (none)          rendered to HTML, no JavaScript. The default, and right
+ *                   for most of a page
+ *   client:visible  hydrates when it scrolls into view, via an
+ *                   IntersectionObserver. The best default for anything below
+ *                   the fold
+ *   client:idle     hydrates when the browser is idle. For things that should
+ *                   work soon but are not why the user came
+ *   client:load     hydrates immediately. For the thing the user came to use
+ *   client:only     never rendered on the server at all. For a component that
+ *                   cannot run without a browser, such as a map or a chart
+ *                   reading element sizes
+ *
+ * `client:only` needs the framework named, because Astro has no server render
+ * to infer it from: `client:only="react"`.
+ *
+ * The cost of getting this wrong is not a crash. `client:load` on everything
+ * is a slower page that still works, which is why it happens; `client:visible`
+ * on the primary control means the first click does nothing.
+ */
+---
+
+<Base title="Directives">
+  <main>
+    <h1>Directives</h1>
+
+    <p>
+      Each badge below says whether it has hydrated. Watch them as you scroll, and check the
+      network tab for when each island's JavaScript is requested.
+    </p>
+
+    <h2>No directive</h2>
+    <HydrationBadge name="none" />
+    <p class="note">Rendered to HTML at build time. Never hydrates, because no code was sent.</p>
+
+    <h2>client:load</h2>
+    <HydrationBadge name="load" client:load />
+    <p class="note">Hydrated before you finished reading this line.</p>
+
+    <h2>client:idle</h2>
+    <HydrationBadge name="idle" client:idle />
+    <p class="note">Waits for the browser to have nothing better to do.</p>
+
+    <div class="spacer">↓ scroll down for the visible one ↓</div>
+
+    <h2>client:visible</h2>
+    <HydrationBadge name="visible" client:visible />
+    <p class="note">
+      Did not exist as JavaScript until this scrolled into view. This is the best default for
+      anything below the fold.
+    </p>
+  </main>
+</Base>

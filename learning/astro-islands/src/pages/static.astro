@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import { Counter } from "../components/Counter";
+
+/**
+ * A React component with no `client:*` directive.
+ *
+ * Astro renders it to HTML at build time and then throws the component away.
+ * The markup is in the page; the JavaScript is not anywhere. The buttons below
+ * are real buttons that do nothing, which is the honest consequence and the
+ * reason the directive exists.
+ */
+---
+
+<Base title="Zero JavaScript">
+  <main>
+    <h1>Zero JavaScript</h1>
+
+    <p>
+      The counter below is a React component, rendered at build time. There is no
+      <code>client:*</code> directive on it, so Astro rendered it to HTML and shipped none of its
+      code. The buttons are inert.
+    </p>
+
+    <Counter label="Static counter" testId="static-counter" />
+
+    <p class="note">
+      View source: the markup is there. Check the network tab: there is no JavaScript at all. The
+      e2e suite asserts exactly that, by counting script responses.
+    </p>
+
+    <h2>Why this is the default</h2>
+    <p>
+      Most of a content page is not interactive. A React SPA sends the framework, the router and
+      every component regardless, because it has no way to know which parts a user will touch.
+      Astro's answer is to make you say.
+    </p>
+  </main>
+</Base>

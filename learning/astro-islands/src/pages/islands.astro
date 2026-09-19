@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import { Counter } from "../components/Counter";
+
+/**
+ * Two islands on one page, and a lot of static content between them.
+ *
+ * Each island hydrates independently, with its own React root. They do not
+ * share state and cannot, which is the constraint that decides whether Astro
+ * suits an app: two counters on a page is fine, a basket whose contents three
+ * separate islands need is not.
+ *
+ * The usual answers when islands do need to share something: put the state in
+ * the URL, in a small store outside React (nanostores is the common choice),
+ * or merge the islands into one.
+ */
+---
+
+<Base title="Islands">
+  <main>
+    <h1>Islands</h1>
+
+    <p>
+      Two React components with <code>client:load</code>, separated by static HTML. Each is its
+      own React root, hydrated separately.
+    </p>
+
+    <Counter label="First island" testId="first" client:load />
+
+    <div class="card">
+      <h2>Static content between them</h2>
+      <p>
+        This heading and paragraph are plain HTML. They cost nothing, they are in the page before
+        any JavaScript runs, and no framework is involved in rendering them.
+      </p>
+    </div>
+
+    <Counter label="Second island" testId="second" client:load />
+
+    <h2>They cannot share state</h2>
+    <p>
+      Increment one and the other does not move. Each island is a separate React root with a
+      separate tree, so there is no context, no store and no parent between them. That is the
+      constraint to weigh before choosing Astro for something app-shaped.
+    </p>
+
+    <p class="note">
+      When islands genuinely need shared state: put it in the URL, put it in a framework-agnostic
+      store outside React, or make them one island.
+    </p>
+  </main>
+</Base>

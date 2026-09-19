@@ -507,3 +507,27 @@ explicitly why it stops short of the separator.
 
 **Next time.** Treat formatted output like a date format. Assert the parts you
 control, not the whole string.
+
+## The canonical hydration-mismatch example makes a flaky test
+
+**Expected.** A component rendering `Date.now()` produces different output on
+the server and on the client, so `hydrateRoot` reports a mismatch. That is the
+example in every article about hydration, including the one in this repo.
+
+**What happened.** The test passed when written, passed in CI for a week, and
+then failed about one run in three on a quiet machine.
+
+On a fast machine `renderToString` and `hydrateRoot` run in the **same
+millisecond**. `Date.now()` returns the same number twice, the two renders
+agree, and there is no mismatch to report. The test was not asserting about
+timing at all, so the failure read as "React stopped reporting mismatches",
+which sent me looking in the wrong place.
+
+**The fix.** A module-level counter that increments on every render. It is the
+same impurity, it differs every time, and the component's docblock says
+plainly that it stands in for `Date.now()` and why the clock is not used.
+
+**Next time.** Anything derived from the wall clock in a test is a race with
+the machine it runs on. If a test needs two values to differ, make them
+differ; do not rely on time passing between them. And a test that passes in CI
+is not a test that is deterministic, it is a test that has not lost yet.

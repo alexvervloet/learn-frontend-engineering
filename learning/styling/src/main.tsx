@@ -7,6 +7,7 @@ import "@lab/lesson-shell/styles.css";
 import "./tailwind.css";
 // Semantic tokens last: they reference the primitives @theme declared.
 import "./tokens.css";
+import "./motion.css";
 
 import { App } from "./App";
 

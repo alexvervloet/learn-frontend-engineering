@@ -36,10 +36,11 @@ whose claims are assertions fails CI when React changes under it.
 Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/react-core](learning/react-core/),
 [learning/typescript-react](learning/typescript-react/),
+[learning/styling](learning/styling/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 135 assertions across the
-four modules that exist, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 183 assertions across the
+five modules that exist, including type-level ones.
 
 ## Suggested learning path
 
@@ -53,7 +54,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    everything else assumes.
 3. **[learning/typescript-react/](learning/typescript-react/)** — typing props,
    children, events, refs, generic components, and state that cannot be invalid.
-4. **learning/styling** (planned) — CSS modules, Tailwind 4, design
+4. **[learning/styling/](learning/styling/)** — CSS modules, Tailwind 4, design
    tokens, dark mode, container queries, animation.
 5. **learning/routing** (planned) — React Router 8 data routers and
    TanStack Router, nested layouts, and the URL as state.
@@ -106,7 +107,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **[typescript-react](learning/typescript-react/)** — props and children, events, `ref` as a prop in React 19,
   generic and polymorphic components, discriminated unions for state, type-safe
   context, when `as` is a bug
-- **styling** — CSS modules, Tailwind 4 and its CSS-first config, design tokens
+- **[styling](learning/styling/)** — CSS modules, Tailwind 4 and its CSS-first config, design tokens
   with custom properties, dark mode, container queries, cascade layers,
   `class-variance-authority` and the shadcn/ui pattern, animation with Motion
 - **routing** — React Router 8 data routers, loaders and actions, nested

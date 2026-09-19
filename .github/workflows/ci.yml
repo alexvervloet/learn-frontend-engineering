@@ -70,6 +70,9 @@ jobs:
       # than a dev server, because streaming and caching only behave correctly
       # there.
       - run: npm run e2e -w learning/next-app-router
+      # Astro's suite checks the claim the framework rests on: a page with a
+      # React component on it and zero script responses.
+      - run: npm run e2e -w learning/astro-islands
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -77,6 +80,7 @@ jobs:
           path: |
             learning/testing/playwright-report/
             learning/next-app-router/playwright-report/
+            learning/astro-islands/playwright-report/
           retention-days: 7
 
   build:

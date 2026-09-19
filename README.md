@@ -41,10 +41,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/state-management](learning/state-management/),
 [learning/forms](learning/forms/),
 [learning/testing](learning/testing/),
+[learning/performance](learning/performance/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 331 assertions across the
-nine modules that exist, plus 9 Playwright specs in a real browser, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 360 assertions across the
+ten modules that exist, plus 12 Playwright specs in a real browser, including type-level ones.
 
 ## Suggested learning path
 
@@ -72,7 +73,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    Playwright, Storybook.
 10. **learning/accessibility** (planned) — semantics, keyboard
     order, focus management, and axe in CI.
-11. **learning/performance** (planned) — the React Compiler,
+11. **[learning/performance/](learning/performance/)** — the React Compiler,
     code splitting, virtualization, Core Web Vitals, bundle analysis.
 12. **Rendering off the client** —
     rendering-strategies (planned) for the concepts,
@@ -133,7 +134,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **accessibility** — semantic HTML first, the accessibility tree, keyboard
   order, focus management in dialogs and route changes, live regions, ARIA
   patterns, axe in CI
-- **performance** — the React Profiler, `memo`/`useMemo`/`useCallback` and how
+- **[performance](learning/performance/)** — the React Profiler, `memo`/`useMemo`/`useCallback` and how
   the React Compiler changes that advice, `Suspense` and lazy routes,
   virtualization with TanStack Virtual, images, Core Web Vitals, reading a
   bundle analysis

@@ -33,3 +33,6 @@ PLAN.md
 
 # macOS
 .DS_Store
+
+# Playwright's local browser download marker (browsers live in ~/Library/Caches)
+learning/*/test-results/

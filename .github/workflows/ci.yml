@@ -63,14 +63,20 @@ jobs:
       # Chromium only. The other two engines roughly triple the download for
       # tests that are about layout and the cascade, not about engine quirks.
       - run: npm run e2e:install -w learning/testing
-      # Playwright starts the styling module's dev server itself; see
+      # Playwright starts the dev servers itself; see
       # learning/testing/playwright.config.ts.
       - run: npm run e2e -w learning/testing
+      # The Next module has its own suite, against a production build rather
+      # than a dev server, because streaming and caching only behave correctly
+      # there.
+      - run: npm run e2e -w learning/next-app-router
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: playwright-report
-          path: learning/testing/playwright-report/
+          path: |
+            learning/testing/playwright-report/
+            learning/next-app-router/playwright-report/
           retention-days: 7
 
   build:

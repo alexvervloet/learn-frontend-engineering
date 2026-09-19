@@ -55,7 +55,7 @@ export default tseslint.config(
     // reload for those files, which is the right trade here. Nobody is
     // hot-editing a finished lesson, and a function you can test without a DOM
     // is worth more than hot reload on it.
-    files: ["learning/*/src/lessons/**", "packages/*/src/**"],
+    files: ["learning/*/src/lessons/**", "learning/*/src/render/**", "packages/*/src/**"],
     rules: { "react-refresh/only-export-components": "off" },
   },
   {

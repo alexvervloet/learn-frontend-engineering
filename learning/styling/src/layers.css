@@ -1,0 +1,50 @@
+/*
+ * A demonstration of cascade layers, kept in its own file so the order is
+ * visible in one place.
+ *
+ * The rules below are deliberately perverse: the *low* specificity selector
+ * wins, because layer order beats specificity entirely.
+ */
+
+/* Declaring the order up front is the important line. Layers rank in the order
+   they are first named, and naming them all here means no later @layer block
+   can change the ranking by appearing earlier in the bundle. */
+@layer demo-reset, demo-components, demo-utilities;
+
+@layer demo-reset {
+  /* Three classes. Specificity 0-3-0, and it still loses to everything below,
+     because its layer ranks lowest. */
+  .demo-box.demo-box.demo-box {
+    background: oklch(0.55 0.02 265);
+    color: white;
+  }
+}
+
+@layer demo-components {
+  .demo-card {
+    background: var(--color-brand-200);
+    color: var(--text-strong);
+    border-radius: 0.625rem;
+    padding: 1rem;
+  }
+}
+
+@layer demo-utilities {
+  /* Specificity 0-1-0, the weakest selector here, and it wins. */
+  .demo-accent {
+    background: var(--color-brand-500);
+    color: white;
+  }
+}
+
+/*
+ * Unlayered rules beat every layered rule, whatever the layer order and
+ * whatever the specificity. That is the one thing to remember: an unlayered
+ * stylesheet is not "in the first layer", it is above all of them.
+ *
+ * It is also why putting a third-party stylesheet in a layer is such a good
+ * trick. Your own unlayered CSS then wins without a single !important.
+ */
+.demo-override {
+  outline: 2px dashed var(--color-brand-700);
+}

@@ -238,3 +238,71 @@ maintainable. The same comment pasted into every new lesson is not.
 
 **Next time.** Two or three identical disable comments is the signal to move it
 into the config. Before that, the comment is more honest.
+
+## `?raw` on a CSS file returns an empty string under Vitest
+
+**Expected.** `import tailwindCss from "../tailwind.css?raw"` gives the file's
+contents, so a test can assert what the stylesheet declares.
+
+**What happened.** It gave `""`. Vitest skips CSS by default, and
+`learning/styling` only opts `.module.css` back in, so everything else is
+stubbed before `?raw` is honoured.
+
+The bad part is not the empty string. It is that **every assertion still
+passed** while it was being developed against a truthy expectation, and would
+have gone on passing forever:
+
+```ts
+expect(tailwindCss).not.toContain("preflight"); // passes on ""
+```
+
+Only the assertions that expected content to be _present_ failed, which is what
+gave it away. An assertion suite that reads a file can be entirely vacuous and
+look green.
+
+**The fix.** `readFileSync(join(import.meta.dirname, "..", "tailwind.css"))`.
+`import.meta.dirname` works fine under Vitest; an earlier attempt with
+`fileURLToPath(new URL(…, import.meta.url))` threw "The URL must be of scheme
+file" and was not worth chasing.
+
+**Next time.** When a test reads an external file, assert something is present
+before asserting anything is absent. A single `expect(contents.length).toBeGreaterThan(0)`
+would have caught this in seconds.
+
+## A substring check matched the comment explaining it
+
+**What happened.** `expect(tailwindCss).not.toContain("preflight")` failed,
+because the file contains three paragraphs explaining _why_ preflight is left
+out.
+
+**The fix.** Assert the syntax, not the word:
+
+```ts
+expect(tailwindCss).not.toMatch(/@import\s+"tailwindcss\/preflight/);
+expect(tailwindCss).not.toMatch(/@import\s+"tailwindcss";/);
+```
+
+The second line matters independently: `@import "tailwindcss"` pulls preflight
+in as well, so checking only for the explicit path would miss it.
+
+**Next time.** Any test that greps a source file is also grepping its comments.
+In a repo whose files are mostly comments on purpose, match on structure.
+
+## jsdom is missing three browser APIs, and each one costs a confused half hour
+
+**What happened.** `ResizeObserver is not defined` in `learning/styling`, having
+already hit and fixed the same thing in `learning/typescript-react` a day
+earlier. `matchMedia` and `IntersectionObserver` are equally absent.
+
+**The fix.** All three are now stubbed once in `config/vitest.setup.ts` rather
+than per module. They are deliberately inert: jsdom does no layout, so there are
+no size changes, intersections or media matches to report, and a stub that
+returned plausible numbers would let a test assert something no browser would
+do.
+
+The exception proves the rule. `useReducedMotion` genuinely needs a media query
+that changes, so `learning/styling` has `createMatchMediaStub`, which a test
+overrides the global with and can flip mid-test to cover the `change` listener.
+
+**Next time.** The second time a stub is needed, it belongs in shared setup.
+The first time, it belongs next to the test that needs it.

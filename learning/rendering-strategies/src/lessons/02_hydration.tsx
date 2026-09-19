@@ -76,12 +76,16 @@ export function StableGreeting({ name }: { name: string }) {
 let renderNumber = 0;
 
 export function UnstableTimestamp() {
-  /* eslint-disable react-hooks/purity */
+  // `react-hooks/globals` catches this, and it is the same finding as the
+  // purity rule it replaced: mutating something outside the component during
+  // render is impure, which is exactly what produces a mismatch. The rule is
+  // right; the component exists to be wrong.
+  // eslint-disable-next-line react-hooks/globals
   renderNumber += 1;
-  // Stands in for Date.now(), Math.random(), or anything else that is
-  // different by the time the client runs it.
+
+  // Stands in for Date.now(), Math.random(), or anything else that differs
+  // by the time the client runs it.
   return <p data-testid="unstable">Rendered at {`t${renderNumber}`}</p>;
-  /* eslint-enable react-hooks/purity */
 }
 
 /** The fix: same on both, then updated by an effect. */

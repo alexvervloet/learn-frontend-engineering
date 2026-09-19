@@ -42,10 +42,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/forms](learning/forms/),
 [learning/testing](learning/testing/),
 [learning/performance](learning/performance/),
+[learning/accessibility](learning/accessibility/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 360 assertions across the
-ten modules that exist, plus 12 Playwright specs in a real browser, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 402 assertions across the
+eleven modules that exist, plus 18 Playwright specs in a real browser, including type-level ones.
 
 ## Suggested learning path
 
@@ -71,7 +72,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    UX, and errors a screen reader announces.
 9. **[learning/testing/](learning/testing/)** — Vitest, Testing Library,
    Playwright, Storybook.
-10. **learning/accessibility** (planned) — semantics, keyboard
+10. **[learning/accessibility/](learning/accessibility/)** — semantics, keyboard
     order, focus management, and axe in CI.
 11. **[learning/performance/](learning/performance/)** — the React Compiler,
     code splitting, virtualization, Core Web Vitals, bundle analysis.
@@ -131,7 +132,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **[testing](learning/testing/)** — Vitest, Testing Library and querying by role, `user-event`, MSW,
   what belongs in a unit test and what does not, Playwright end to end,
   Storybook 10 with interaction and a11y tests, coverage that means something
-- **accessibility** — semantic HTML first, the accessibility tree, keyboard
+- **[accessibility](learning/accessibility/)** — semantic HTML first, the accessibility tree, keyboard
   order, focus management in dialogs and route changes, live regions, ARIA
   patterns, axe in CI
 - **[performance](learning/performance/)** — the React Profiler, `memo`/`useMemo`/`useCallback` and how

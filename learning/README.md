@@ -20,11 +20,11 @@ npm test -- --project <module>
 | [forms](forms/)                       | 🟢    | Controlled vs uncontrolled, React Hook Form, Zod, accessible errors, field arrays                    |
 | [testing](testing/)                   | 🟢 🎭 | Vitest and Testing Library, Storybook stories run in Vitest, Playwright against the styling module   |
 | [performance](performance/)           | 🟢    | Profiler over render counts, the React Compiler, virtualization, Web Vitals, bundle size             |
+| [accessibility](accessibility/)       | 🟢    | The accessibility tree, keyboard order, focus management, live regions, axe                          |
 | [data-fetching](data-fetching/)       | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-accessibility,
 rendering-strategies, next-app-router, astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 

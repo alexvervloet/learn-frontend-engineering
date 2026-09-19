@@ -17,11 +17,12 @@ npm test -- --project <module>
 | [styling](styling/)                   | 🟢    | CSS modules, Tailwind 4, design tokens, container queries, cascade layers, cva, motion               |
 | [routing](routing/)                   | 🟢    | React Router 8 data routers, the URL as state, code splitting, TanStack Router                       |
 | [state-management](state-management/) | 🟢    | Where state belongs, the cost of lifting, Zustand, Redux Toolkit, Jotai                              |
+| [forms](forms/)                       | 🟢    | Controlled vs uncontrolled, React Hook Form, Zod, accessible errors, field arrays                    |
 | [data-fetching](data-fetching/)       | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-forms, testing, accessibility, performance,
+testing, accessibility, performance,
 rendering-strategies, next-app-router, astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 

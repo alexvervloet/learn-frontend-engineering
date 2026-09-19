@@ -37,10 +37,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/react-core](learning/react-core/),
 [learning/typescript-react](learning/typescript-react/),
 [learning/styling](learning/styling/),
+[learning/routing](learning/routing/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 183 assertions across the
-five modules that exist, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 215 assertions across the
+six modules that exist, including type-level ones.
 
 ## Suggested learning path
 
@@ -56,7 +57,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    children, events, refs, generic components, and state that cannot be invalid.
 4. **[learning/styling/](learning/styling/)** — CSS modules, Tailwind 4, design
    tokens, dark mode, container queries, animation.
-5. **learning/routing** (planned) — React Router 8 data routers and
+5. **[learning/routing/](learning/routing/)** — React Router 8 data routers and
    TanStack Router, nested layouts, and the URL as state.
 6. **[learning/data-fetching/](learning/data-fetching/)** — TanStack Query,
    caching, mutations, optimistic updates, and mocking a network with MSW.
@@ -110,7 +111,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **[styling](learning/styling/)** — CSS modules, Tailwind 4 and its CSS-first config, design tokens
   with custom properties, dark mode, container queries, cascade layers,
   `class-variance-authority` and the shadcn/ui pattern, animation with Motion
-- **routing** — React Router 8 data routers, loaders and actions, nested
+- **[routing](learning/routing/)** — React Router 8 data routers, loaders and actions, nested
   layouts, route-level code splitting, TanStack Router's type-safe params,
   search params as application state
 - **data-fetching** — `fetch` in an effect and why it goes wrong, TanStack Query

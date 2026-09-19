@@ -9,6 +9,7 @@ import { Shipping } from "./07_shipping";
 const root = join(import.meta.dirname, "..", "..");
 const dockerfile = readFileSync(join(root, "Dockerfile"), "utf8");
 const nginxConf = readFileSync(join(root, "nginx.conf"), "utf8");
+const securityHeaders = readFileSync(join(root, "nginx-security-headers.conf"), "utf8");
 // At the repo root, because that is where the build context starts.
 const dockerignore = readFileSync(join(root, "..", "..", ".dockerignore"), "utf8");
 
@@ -90,7 +91,7 @@ describe("the nginx config", () => {
   });
 
   it("sets a CSP with no unsafe-inline on scripts", () => {
-    const csp = /add_header Content-Security-Policy "([^"]+)"/.exec(nginxConf)?.[1] ?? "";
+    const csp = /add_header Content-Security-Policy "([^"]+)"/.exec(securityHeaders)?.[1] ?? "";
 
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("frame-ancestors 'none'");
@@ -98,9 +99,22 @@ describe("the nginx config", () => {
   });
 
   it("sets the one-line headers that have no downside", () => {
-    expect(nginxConf).toContain("X-Content-Type-Options");
-    expect(nginxConf).toContain("Referrer-Policy");
-    expect(nginxConf).toContain("Permissions-Policy");
+    expect(securityHeaders).toContain("X-Content-Type-Options");
+    expect(securityHeaders).toContain("Referrer-Policy");
+    expect(securityHeaders).toContain("Permissions-Policy");
+  });
+
+  it("includes the headers in every location that sets one of its own", () => {
+    // `add_header` does not merge across levels: a location with any
+    // add_header of its own discards the parent's. CI caught this as a
+    // missing CSP on index.html, served with a 200.
+    const blocks = [...nginxConf.matchAll(/location[^{]*\{([^}]*)\}/g)].map((m) => m[1] ?? "");
+    const withOwnHeader = blocks.filter((body) => body.includes("add_header"));
+
+    expect(withOwnHeader.length).toBeGreaterThan(0);
+    for (const body of withOwnHeader) {
+      expect(body).toContain("include /etc/nginx/conf.d/security-headers.conf;");
+    }
   });
 
   it("refuses to serve source maps", () => {
@@ -118,7 +132,7 @@ describe("the lesson", () => {
 
     const rows = within(screen.getByTestId("decisions")).getAllByRole("row").slice(1);
 
-    expect(rows).toHaveLength(8);
+    expect(rows).toHaveLength(9);
     for (const row of rows) {
       const cells = within(row).getAllByRole("cell");
       expect(cells[1]?.textContent?.trim().length ?? 0).toBeGreaterThan(20);

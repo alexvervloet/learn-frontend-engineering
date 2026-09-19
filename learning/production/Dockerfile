@@ -48,6 +48,7 @@ FROM nginxinc/nginx-unprivileged:1.29-alpine AS serve
 
 COPY --from=build /repo/learning/production/dist /usr/share/nginx/html
 COPY learning/production/nginx.conf /etc/nginx/conf.d/default.conf
+COPY learning/production/nginx-security-headers.conf /etc/nginx/conf.d/security-headers.conf
 
 # Already the default in this image; stated so it is visible in the file.
 USER 101

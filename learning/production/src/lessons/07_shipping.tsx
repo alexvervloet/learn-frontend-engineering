@@ -37,11 +37,24 @@
  *                                 and users get last week's app asking for
  *                                 files that no longer exist
  *   security headers              CSP from lesson 02, plus nosniff, a
- *                                 referrer policy and a permissions policy
+ *                                 referrer policy and a permissions policy,
+ *                                 in an *included* file. See below
  *
  * That third one is the one people get wrong, and the symptom is horrible: a
  * deploy goes out, a proportion of users get a white screen, and it clears up
  * on its own over hours as caches expire.
+ *
+ * **`add_header` does not merge across levels.** A location block that
+ * declares any `add_header` of its own discards *every* `add_header` from its
+ * parent. Both cache-control locations above declare one, so a
+ * Content-Security-Policy written once at server level is silently absent
+ * from `index.html`: the page loads, the status is 200, and the header is
+ * gone from the one response anybody would inspect.
+ *
+ * This is not hypothetical. The CI smoke test for this image caught it: the
+ * markup was right, the deep link returned 200, and the CSP assertion failed.
+ * The headers now live in `nginx-security-headers.conf` and every location
+ * that sets a header of its own includes it again.
  *
  * **Run as a non-root user, using the image built for it.** The official
  * `nginx` image runs as root. The first version of this Dockerfile created a
@@ -85,6 +98,10 @@ const DECISIONS = [
   {
     decision: "index.html never cached",
     why: "It points at the hashed assets. Cache it and you ship a white screen",
+  },
+  {
+    decision: "Headers in an included file",
+    why: "add_header does not merge: a location with one of its own drops the parent's CSP",
   },
   {
     decision: "nginx-unprivileged",

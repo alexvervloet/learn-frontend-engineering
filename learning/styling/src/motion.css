@@ -1,0 +1,30 @@
+/*
+ * The blanket safety net for reduced motion.
+ *
+ * Every component honouring the preference individually is the ideal, and it
+ * will not happen: someone adds a CSS transition in a hurry and nobody notices.
+ * This catches those.
+ *
+ * `0.01ms` rather than `0s` on purpose. A zero-duration transition may never
+ * fire `transitionend`, and code that waits for that event to clean up or
+ * advance a step then hangs forever. A hundredth of a millisecond is
+ * imperceptible and still fires.
+ *
+ * `!important` is justified here in a way it almost never is: the rule has to
+ * beat inline styles written by animation libraries at runtime, and there is no
+ * selector that can do that.
+ *
+ * This is a floor, not a solution. It makes everything instant, which is a
+ * blunter answer than the setting asks for. Components that matter should
+ * cross-fade instead, the way `motionPropsFor` does in lesson 07.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

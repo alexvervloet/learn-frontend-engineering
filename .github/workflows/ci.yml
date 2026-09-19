@@ -96,3 +96,33 @@ jobs:
       # its binary. If a dependency bump ever re-blocks it, this job is where it
       # shows up, as a Vite command failing for no visible reason.
       - run: npm run build
+
+  # The production module ships a Dockerfile and an nginx config, and its
+  # tests assert what those files say rather than that they work. Building the
+  # image here is what turns that into a checked claim: a broken base image,
+  # a wrong workspace path or a missing file fails the build.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build the production image
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=https://api.example.com \
+            --build-arg VITE_COMMIT_SHA=${GITHUB_SHA::7} \
+            -f learning/production/Dockerfile \
+            -t frontend:${GITHUB_SHA::7} .
+      - name: Check it serves the built app
+        run: |
+          docker run -d --name frontend -p 8080:8080 frontend:${GITHUB_SHA::7}
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:8080/ > /tmp/index.html; then break; fi
+            sleep 1
+          done
+          # The SPA fallback, the security headers and the real markup. If the
+          # image starts and serves nothing useful, this is where it shows.
+          grep -q '<div id="root">' /tmp/index.html
+          curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:8080/some/deep/link | grep -q 200
+          curl -fsSI http://localhost:8080/ | grep -qi 'content-security-policy'
+          curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/assets/nothing.map | grep -q 404
+          docker rm -f frontend

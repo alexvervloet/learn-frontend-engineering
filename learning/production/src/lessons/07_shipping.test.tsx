@@ -42,8 +42,12 @@ describe("the Dockerfile", () => {
     expect(install).toBeLessThan(sourceCopy);
   });
 
-  it("runs as a non-root user", () => {
-    expect(dockerfile).toMatch(/^USER web$/m);
+  it("runs as a non-root user, via the image built for it", () => {
+    // Not `nginx:alpine` plus a pile of chowns: that builds and then exits on
+    // startup, because the entrypoint expects root in more places.
+    expect(dockerfile).toContain("nginxinc/nginx-unprivileged");
+    expect(dockerfile).toMatch(/^USER 101$/m);
+    expect(dockerfile).not.toMatch(/^FROM nginx:/m);
   });
 
   it("has a health check", () => {

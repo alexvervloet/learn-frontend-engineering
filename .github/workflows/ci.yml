@@ -119,6 +119,13 @@ jobs:
             if curl -fsS http://localhost:8080/ > /tmp/index.html; then break; fi
             sleep 1
           done
+          # Without this, a container that exits on startup looks like thirty
+          # identical connection-refused lines and nothing about the cause.
+          if ! curl -fsS http://localhost:8080/ > /tmp/index.html; then
+            echo "--- container logs ---"
+            docker logs frontend || true
+            exit 1
+          fi
           # The SPA fallback, the security headers and the real markup. If the
           # image starts and serves nothing useful, this is where it shows.
           grep -q '<div id="root">' /tmp/index.html

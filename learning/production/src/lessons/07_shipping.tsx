@@ -43,8 +43,14 @@
  * deploy goes out, a proportion of users get a white screen, and it clears up
  * on its own over hours as caches expire.
  *
- * **Run as a non-root user.** The `nginx` base image runs as root. A
- * container that serves files has no reason to, and it is four lines to fix.
+ * **Run as a non-root user, using the image built for it.** The official
+ * `nginx` image runs as root. The first version of this Dockerfile created a
+ * user and chowned `/var/cache/nginx`, `/var/run` and `/var/log/nginx` to it;
+ * the image built and the container exited on startup, because the entrypoint
+ * and the default config expect root in more places than that.
+ * `nginxinc/nginx-unprivileged` is the same nginx, running as uid 101 and
+ * listening on 8080, with no chown needed. Reach for the purpose-built image
+ * rather than chowning your way there.
  *
  * **Block `.map` at the server.** Lesson 04 sets `sourcemap: "hidden"` so the
  * comment is not emitted; this stops the files being reachable even if one is
@@ -80,7 +86,10 @@ const DECISIONS = [
     decision: "index.html never cached",
     why: "It points at the hashed assets. Cache it and you ship a white screen",
   },
-  { decision: "Non-root user", why: "A file server has no reason to be root" },
+  {
+    decision: "nginx-unprivileged",
+    why: "A file server has no reason to be root, and chowning the official image does not work",
+  },
   { decision: ".map returns 404", why: "Source maps go to the error tracker, not to visitors" },
 ];
 

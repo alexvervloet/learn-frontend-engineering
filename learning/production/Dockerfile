@@ -32,18 +32,25 @@ ENV VITE_COMMIT_SHA=$VITE_COMMIT_SHA
 RUN npm run build --workspace learning/production
 
 # ---- serve ----
-FROM nginx:1.29-alpine AS serve
-
-# Runs as a non-root user. The default nginx image runs as root, and a
-# container that only serves files has no reason to.
-RUN addgroup -S web && adduser -S web -G web
+#
+# The unprivileged image, not `nginx:alpine`.
+#
+# A container that serves static files has no reason to run as root, and the
+# official nginx image does. The first version of this file created a user and
+# chowned /var/cache/nginx, /var/run and /var/log/nginx to it. The image built
+# and the container exited immediately: the entrypoint scripts and the
+# default config expect root in more places than that, and chasing them one
+# at a time is a losing game.
+#
+# nginxinc/nginx-unprivileged is the same nginx built for this. It runs as uid
+# 101, listens on 8080 rather than 80, and needs no chown at all.
+FROM nginxinc/nginx-unprivileged:1.29-alpine AS serve
 
 COPY --from=build /repo/learning/production/dist /usr/share/nginx/html
 COPY learning/production/nginx.conf /etc/nginx/conf.d/default.conf
 
-# nginx needs to write these, and they are owned by root in the base image.
-RUN chown -R web:web /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html
-USER web
+# Already the default in this image; stated so it is visible in the file.
+USER 101
 
 EXPOSE 8080
 

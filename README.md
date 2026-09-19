@@ -33,7 +33,7 @@ whose claims are assertions fails CI when React changes under it.
 
 ## What is here so far
 
-Built and tested: [web-fundamentals](web-fundamentals/),
+Every learning module is built and tested: [web-fundamentals](web-fundamentals/),
 [learning/react-core](learning/react-core/),
 [learning/typescript-react](learning/typescript-react/),
 [learning/styling](learning/styling/),
@@ -46,10 +46,12 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/rendering-strategies](learning/rendering-strategies/),
 [learning/next-app-router](learning/next-app-router/),
 [learning/astro-islands](learning/astro-islands/),
+[learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 438 assertions across the
-fourteen modules that exist, plus 46 Playwright specs in a real browser, including type-level ones.
+[lesson-shell](packages/lesson-shell/). `npm test` runs 517 assertions across
+fifteen modules, including type-level ones, and `npm run e2e` adds 46
+Playwright specs in a real browser. Only the [capstone projects](projects/)
+are still to come.
 
 ## Suggested learning path
 
@@ -83,7 +85,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
     [rendering-strategies](learning/rendering-strategies/) for the concepts,
     then [next-app-router](learning/next-app-router/) and
     [astro-islands](learning/astro-islands/).
-13. **learning/production** (planned) — env config, CSP, auth in
+13. **[learning/production/](learning/production/)** — env config, CSP, auth in
     the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
 14. **[projects/](projects/)** — read and run
     bookmark-manager (planned) first, then the others.
@@ -148,7 +150,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   and caching, route handlers, the client/server boundary
 - **[astro-islands](learning/astro-islands/)** — Astro 7, partial hydration, and when a React SPA is the
   wrong answer
-- **production** — build output and env config, Content Security Policy and XSS,
+- **[production](learning/production/)** — build output and env config, Content Security Policy and XSS,
   where a token can safely live, Sentry, RUM and Core Web Vitals in the field,
   feature flags, i18n with react-i18next, PWA and offline, Docker and nginx,
   CI/CD and preview deploys

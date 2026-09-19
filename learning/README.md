@@ -24,12 +24,13 @@ npm test -- --project <module>
 | [rendering-strategies](rendering-strategies/) | 🟢    | CSR, SSR, streaming, SSG and ISR against React's own server APIs                                     |
 | [next-app-router](next-app-router/)           | 🟢 🎭 | Next 16: Server Components, the client boundary, streaming, server actions                           |
 | [astro-islands](astro-islands/)               | 🟢 🎭 | Astro 7: zero JavaScript by default, and hydrating only what needs it                                |
+| [production](production/)                     | 🟢 🐳 | Env config, XSS and CSP, auth storage, error reporting, feature flags, i18n, Docker and nginx        |
 | [data-fetching](data-fetching/)               | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
-## Planned
+## All of them are built
 
-production. The root [README](../README.md) says what each one
-will cover.
+Every module listed above is complete, with a README of its own. The
+[projects](../projects/) folder is what remains.
 
 ## Adding one
 

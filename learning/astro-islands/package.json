@@ -1,0 +1,26 @@
+{
+  "name": "astro-islands",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Astro 7 islands: zero JavaScript by default, and hydrating only what needs it",
+  "scripts": {
+    "dev": "astro dev --port 5191",
+    "build": "astro build",
+    "preview": "astro preview --port 5191",
+    "typecheck": "astro check --minimumSeverity error",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium",
+    "preview:static": "vite preview --outDir dist --port 5191 --strictPort"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.6",
+    "astro": "^7.3.3",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.63.0"
+  }
+}

@@ -40,3 +40,6 @@ learning/*/test-results/
 # Next.js
 learning/*/.next/
 learning/*/next-env.d.ts
+
+# Astro
+learning/*/.astro/

@@ -306,3 +306,76 @@ overrides the global with and can flip mid-test to cover the `change` listener.
 
 **Next time.** The second time a stub is needed, it belongs in shared setup.
 The first time, it belongs next to the test that needs it.
+
+## A `ref` is null in React Hook Form's error callback
+
+**Expected.** `handleSubmit(onValid, onInvalid)` gives you an `onInvalid`
+callback for a failed submit, so focusing the error summary belongs there:
+
+```tsx
+handleSubmit(onValid, () => summaryRef.current?.focus());
+```
+
+**What happened.** Nothing. No error, no warning. The errors rendered, the
+summary appeared, and focus stayed on the submit button.
+
+`onInvalid` runs _before_ React has re-rendered with the errors, so the summary
+element does not exist yet and the ref is still null. `?.focus()` on null is a
+silent no-op, which is the worst possible failure mode: the code reads
+correctly and does nothing.
+
+For a keyboard or screen reader user this is not cosmetic. They press the
+button, are told nothing, and have to hunt for what went wrong.
+
+**The fix.** An effect keyed on `submitCount`, which changes on every submit
+attempt and therefore fires after the render that created the summary:
+
+```tsx
+useEffect(() => {
+  if (submitCount === 0) return;
+  summaryRef.current?.focus();
+}, [submitCount]);
+```
+
+**Next time.** Any DOM operation on something that is about to be rendered
+belongs in an effect, not in the callback that caused the render. And a
+focus-management assertion belongs in the test: `expect(summary).toHaveFocus()`
+is what caught this.
+
+## The render count was one, not zero, and the one was the lesson
+
+**Expected.** React Hook Form keeps values in the DOM, so typing causes no
+re-renders. The test asserted zero for fifteen keystrokes.
+
+**What happened.** One. The form reads `formState.isDirty` to show an
+unsaved-changes note, and `formState` is a Proxy: reading a property subscribes
+the component to it. `isDirty` flips false → true on the first keystroke, and
+that is one render. Every keystroke after it is free.
+
+**The call.** Keep the subscription and assert the real number, with a second
+test proving the subsequent keystrokes cost nothing. Deleting the note to make
+the number zero would have made a tidier claim and a less true one.
+
+**Next time.** When a measured number disagrees with the story, check whether
+the number is telling you something first. `formState` being a Proxy is
+documented behaviour and worth teaching; the round figure was not worth
+protecting.
+
+## A test passed because a number input ate the minus sign
+
+**Expected.** Typing `-5` into a quantity field would exercise the
+`Math.max(0, …)` clamp inside the Jotai write atom.
+
+**What happened.** The test passed, asserting the value was not negative. But
+`<input type="number">` silently drops a leading minus in jsdom, so the field
+received `5`, the clamp never ran, and the assertion was about nothing.
+
+It only came to light while writing the comment explaining what the test
+proved, and finding that it did not prove it.
+
+**The fix.** Drive the atom directly and assert `0`, with a separate, honest
+test that the input is wired to the atom at all.
+
+**Next time.** A passing test that goes through a form control is testing the
+control as much as the code. When the assertion is about a boundary condition,
+call the function.

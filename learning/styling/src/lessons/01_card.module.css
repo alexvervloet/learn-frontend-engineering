@@ -1,0 +1,31 @@
+/*
+ * A CSS module. The file name ending in `.module.css` is the whole opt-in:
+ * Vite hashes every class name in here and hands you a map of the originals to
+ * the hashed ones.
+ */
+
+/* A shared base, pulled into the two below with `composes`. */
+.base {
+  border-radius: 0.625rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+
+.card {
+  composes: base;
+  background: var(--surface);
+}
+
+.warning {
+  /* composes copies the *class reference*, not the declarations. The element
+     ends up with two class names on it, which keeps specificity flat and means
+     no duplicated CSS in the output. */
+  composes: base;
+  background: color-mix(in oklab, var(--danger) 12%, transparent);
+  border-color: var(--danger);
+}
+
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}

@@ -1,0 +1,12 @@
+/*
+ * A second module that also defines `.title`. The point of the lesson: these
+ * two never collide, because neither `.title` survives the build under that
+ * name.
+ */
+.title {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}

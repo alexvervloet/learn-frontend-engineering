@@ -379,3 +379,131 @@ test that the input is wired to the atom at all.
 **Next time.** A passing test that goes through a form control is testing the
 control as much as the code. When the assertion is about a boundary condition,
 call the function.
+
+## @vitejs/plugin-react 6 does not use Babel any more
+
+**Expected.** Enable the React Compiler the documented way:
+
+```ts
+react({ babel: { plugins: [["babel-plugin-react-compiler", { target: "19" }]] } });
+```
+
+**What happened.** The build succeeded, nothing warned, and no component was
+compiled. Plugin-react 6 transforms with **oxc**, not Babel, so there is no
+`babel` option and the whole object was silently ignored. Every instruction
+written before that release is now wrong in a way that produces no error.
+
+**The fix.** A flag, plus a separate package:
+
+```bash
+npm i -D oxc-transform-react
+```
+
+```ts
+react({ compiler: true });
+```
+
+**Next time.** When a build-time transform "does not seem to do anything",
+look at the output rather than the config. A compiled component starts with
+`const $ = _c(n)`, so `expect(Probe.toString()).toContain("_c(")` settles it in
+one test. An option a tool does not recognise is usually not an error.
+
+## A statically prerendered page does not stream
+
+**Expected.** A Next route with a `<Suspense>` around a 700ms query would send
+the shell first and the slow part later, and a Playwright test could assert
+the fallback was visible.
+
+**What happened.** The fallback never appeared, because the page had no
+request-specific input and Next had prerendered it at build time. The 700ms
+happened once, during the build, and every visitor got a finished HTML file.
+The test was asserting something no user would ever see.
+
+**The fix.** `export const dynamic = "force-dynamic"` for the lesson, with a
+note that a real app makes a page dynamic by reading `cookies()`,
+`headers()` or `searchParams` instead. The build output says which is which:
+
+```
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+```
+
+**Next time.** Read the route table after a Next build. If a page you expected
+to stream is marked ○, it is not streaming, and it does not need to.
+
+## Streamed content needs JavaScript to appear
+
+**Expected.** Streaming is progressive enhancement, so a Suspense boundary's
+content would render for a client with scripting disabled.
+
+**What happened.** The test failed, correctly. React sends the fallback where
+the boundary is, the real markup further down inside a `hidden` container, and
+a tiny inline `$RC(…)` script that swaps them. No script, no swap.
+
+So the content _is_ in the HTML, and a crawler that parses the response finds
+it, while a person with scripting off sees the fallback forever.
+
+**The rule.** Anything that must render without JavaScript belongs in the
+shell, outside every Suspense boundary.
+
+**Next time.** "Works without JavaScript" is three different claims: the
+markup is in the response, the page is readable, and the page is usable.
+Streaming satisfies the first and not always the second.
+
+## Two preview servers, two different traps
+
+**`astro preview` daemonises.** It forks, prints a pid, and the foreground
+process exits, so Playwright reports "Process from config.webServer exited
+early" while the server runs perfectly well on the port. There is a
+`--background` flag and no `--foreground` one. Astro's output is static files,
+so the config uses `vite preview` instead.
+
+**A plain static server does not guess trailing slashes.** Astro writes
+`dist/static/index.html`, and its own preview server serves that for `/static`
+as well as `/static/`. `vite preview` falls through to the SPA fallback and
+returns the **index page with a 200**, so twelve tests failed while asserting
+against the wrong document, each one reporting that some element was missing.
+
+`trailingSlash: "always"` makes the contract explicit. Worth setting for any
+static host rather than depending on one server's redirect behaviour.
+
+**Next time.** A 200 is not a match. When a test says an element is missing
+from a page that obviously has it, print the response body before touching the
+selector.
+
+## A missing .dockerignore uploaded 817MB before the build started
+
+**Expected.** `docker build -f learning/production/Dockerfile .` from the repo
+root would take a minute or two.
+
+**What happened.** Ten minutes with no output at all, and it was killed. The
+build context is everything in the directory and Docker sends all of it to the
+daemon _before the first instruction runs_. For this monorepo that is 817MB,
+almost all of it `node_modules`.
+
+**The fix.** A `.dockerignore` at the repo root. The Dockerfile installs from
+the lockfile anyway, so sending `node_modules` is worse than pointless: a
+host's copy can contain binaries built for the wrong platform.
+
+**Next time.** Write the `.dockerignore` before the Dockerfile. And note that
+no progress output is a symptom in itself: Docker streams each step, so
+silence means it has not reached step one.
+
+## Intl output depends on the runtime's ICU data
+
+**Expected.** `Intl.NumberFormat("pl", { style: "currency", currency: "PLN" })`
+formatting 1234.56 as `1 234,56 zł`, which is what CLDR specifies.
+
+**What happened.** `1234,56 zł`, with no thousands separator at all, on Node
+24 locally.
+
+Intl results depend on the ICU data the runtime was built with, so exact
+formatted output can differ between your machine, CI and a user's browser. A
+snapshot of a formatted number is a test that fails somewhere else.
+
+**The fix.** Assert the things that hold everywhere: the decimal separator,
+the currency symbol's position, the relative-time wording. The test says
+explicitly why it stops short of the separator.
+
+**Next time.** Treat formatted output like a date format. Assert the parts you
+control, not the whole string.

@@ -1,0 +1,29 @@
+# The build context is everything in this directory, and Docker sends all of
+# it to the daemon before the first instruction runs. Without this file that
+# is the whole monorepo including every node_modules, which is hundreds of
+# megabytes and takes minutes.
+#
+# The Dockerfile installs dependencies itself from the lockfile, so sending
+# them is worse than pointless: a host's node_modules can contain binaries
+# built for the wrong platform.
+node_modules
+**/node_modules
+
+# Build output, which the image rebuilds.
+dist
+**/dist
+**/.next
+**/.astro
+**/storybook-static
+
+# Nothing here belongs in an image.
+.git
+.github
+**/coverage
+**/playwright-report
+**/test-results
+**/*.tsbuildinfo
+.history
+**/.env
+**/.env.*
+PLAN.md

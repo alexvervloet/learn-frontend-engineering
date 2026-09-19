@@ -58,6 +58,11 @@ vi.stubGlobal("matchMedia", (query: string): MediaQueryList => {
   return list;
 });
 
+// jsdom has no viewport to scroll, and logs "Not implemented: Window's
+// scrollTo()" every time a router restores a scroll position. It is noise that
+// buries real warnings, and there is nothing to implement.
+vi.stubGlobal("scrollTo", vi.fn());
+
 afterEach(() => {
   cleanup();
 });

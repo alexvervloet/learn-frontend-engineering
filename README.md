@@ -44,10 +44,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/performance](learning/performance/),
 [learning/accessibility](learning/accessibility/),
 [learning/rendering-strategies](learning/rendering-strategies/),
+[learning/next-app-router](learning/next-app-router/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
 marked planned and has no folder yet. `npm test` runs 438 assertions across the
-twelve modules that exist, plus 18 Playwright specs in a real browser, including type-level ones.
+thirteen modules that exist, plus 34 Playwright specs in a real browser, including type-level ones.
 
 ## Suggested learning path
 
@@ -79,7 +80,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
     code splitting, virtualization, Core Web Vitals, bundle analysis.
 12. **Rendering off the client** —
     [rendering-strategies](learning/rendering-strategies/) for the concepts,
-    then next-app-router (planned) and
+    then [next-app-router](learning/next-app-router/) and
     astro-islands (planned).
 13. **learning/production** (planned) — env config, CSP, auth in
     the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
@@ -142,7 +143,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   bundle analysis
 - **[rendering-strategies](learning/rendering-strategies/)** — CSR, SSR, SSG, ISR and streaming, hand-rolled
   against React's own APIs so the framework versions stop being magic
-- **next-app-router** — Next 16, Server Components, server actions, streaming
+- **[next-app-router](learning/next-app-router/)** — Next 16, Server Components, server actions, streaming
   and caching, route handlers, the client/server boundary
 - **astro-islands** — Astro 7, partial hydration, and when a React SPA is the
   wrong answer

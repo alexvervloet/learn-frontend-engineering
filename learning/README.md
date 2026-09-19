@@ -22,11 +22,12 @@ npm test -- --project <module>
 | [performance](performance/)                   | 🟢    | Profiler over render counts, the React Compiler, virtualization, Web Vitals, bundle size             |
 | [accessibility](accessibility/)               | 🟢    | The accessibility tree, keyboard order, focus management, live regions, axe                          |
 | [rendering-strategies](rendering-strategies/) | 🟢    | CSR, SSR, streaming, SSG and ISR against React's own server APIs                                     |
+| [next-app-router](next-app-router/)           | 🟢 🎭 | Next 16: Server Components, the client boundary, streaming, server actions                           |
 | [data-fetching](data-fetching/)               | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-next-app-router, astro-islands, production. The root [README](../README.md) says what each one
+astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 
 ## Adding one

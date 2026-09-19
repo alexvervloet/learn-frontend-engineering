@@ -114,22 +114,38 @@ jobs:
             -t frontend:${GITHUB_SHA::7} .
       - name: Check it serves the built app
         run: |
+          set -x
           docker run -d --name frontend -p 8080:8080 frontend:${GITHUB_SHA::7}
+
           for i in $(seq 1 30); do
-            if curl -fsS http://localhost:8080/ > /tmp/index.html; then break; fi
+            curl -fsS http://localhost:8080/ -o /tmp/index.html && break
             sleep 1
           done
-          # Without this, a container that exits on startup looks like thirty
+
+          # A container that exits on startup otherwise looks like thirty
           # identical connection-refused lines and nothing about the cause.
-          if ! curl -fsS http://localhost:8080/ > /tmp/index.html; then
+          if [ ! -s /tmp/index.html ]; then
             echo "--- container logs ---"
             docker logs frontend || true
             exit 1
           fi
-          # The SPA fallback, the security headers and the real markup. If the
-          # image starts and serves nothing useful, this is where it shows.
-          grep -q '<div id="root">' /tmp/index.html
-          curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:8080/some/deep/link | grep -q 200
-          curl -fsSI http://localhost:8080/ | grep -qi 'content-security-policy'
-          curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/assets/nothing.map | grep -q 404
+
+          echo "--- what it served ---"
+          head -c 400 /tmp/index.html; echo
+
+          # The real markup, not a fallback page.
+          grep -q 'id="root"' /tmp/index.html
+
+          # The SPA fallback: a deep link that is not a file returns the app.
+          deep=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/some/deep/link)
+          [ "$deep" = "200" ] || { echo "deep link returned $deep"; exit 1; }
+
+          # The security headers from nginx.conf.
+          curl -sI http://localhost:8080/ | tee /tmp/headers.txt
+          grep -qi 'content-security-policy' /tmp/headers.txt
+
+          # Source maps are uploaded to the error tracker, never served.
+          maps=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/assets/nothing.map)
+          [ "$maps" = "404" ] || { echo "a .map returned $maps"; exit 1; }
+
           docker rm -f frontend

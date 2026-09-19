@@ -10,16 +10,18 @@ npm test -- --project <module>
 
 ## Modules
 
-| Module                          | Needs | What it covers                                                 |
-| ------------------------------- | ----- | -------------------------------------------------------------- |
-| [react-core](react-core/)       | 🟢    | State, effects, refs, context, reducers, transitions, Suspense |
-| [data-fetching](data-fetching/) | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW    |
+| Module                                | Needs | What it covers                                                                                       |
+| ------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
+| [react-core](react-core/)             | 🟢    | State, effects, refs, context, reducers, transitions, Suspense                                       |
+| [typescript-react](typescript-react/) | 🟢    | Props, events, refs, unions, generics, context, and the boundary. Asserts types as well as behaviour |
+| [styling](styling/)                   | 🟢    | CSS modules, Tailwind 4, design tokens, container queries, cascade layers, cva, motion               |
+| [routing](routing/)                   | 🟢    | React Router 8 data routers, the URL as state, code splitting, TanStack Router                       |
+| [data-fetching](data-fetching/)       | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-state-management, forms, testing,
-accessibility, performance, rendering-strategies, next-app-router,
-astro-islands, production. The root [README](../README.md) says what each one
+state-management, forms, testing, accessibility, performance,
+rendering-strategies, next-app-router, astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 
 ## Adding one

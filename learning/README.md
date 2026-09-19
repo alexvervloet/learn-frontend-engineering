@@ -18,11 +18,12 @@ npm test -- --project <module>
 | [routing](routing/)                   | 🟢    | React Router 8 data routers, the URL as state, code splitting, TanStack Router                       |
 | [state-management](state-management/) | 🟢    | Where state belongs, the cost of lifting, Zustand, Redux Toolkit, Jotai                              |
 | [forms](forms/)                       | 🟢    | Controlled vs uncontrolled, React Hook Form, Zod, accessible errors, field arrays                    |
+| [testing](testing/)                   | 🟢 🎭 | Vitest and Testing Library, Storybook stories run in Vitest, Playwright against the styling module   |
 | [data-fetching](data-fetching/)       | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
 
 ## Planned
 
-testing, accessibility, performance,
+accessibility, performance,
 rendering-strategies, next-app-router, astro-islands, production. The root [README](../README.md) says what each one
 will cover.
 

@@ -40,10 +40,11 @@ Built and tested: [web-fundamentals](web-fundamentals/),
 [learning/routing](learning/routing/),
 [learning/state-management](learning/state-management/),
 [learning/forms](learning/forms/),
+[learning/testing](learning/testing/),
 [learning/data-fetching](learning/data-fetching/), and the shared
 [lesson-shell](packages/lesson-shell/). Everything else in the path below is
-marked planned and has no folder yet. `npm test` runs 292 assertions across the
-eight modules that exist, including type-level ones.
+marked planned and has no folder yet. `npm test` runs 331 assertions across the
+nine modules that exist, plus 9 Playwright specs in a real browser, including type-level ones.
 
 ## Suggested learning path
 
@@ -67,7 +68,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
    belongs, and what Zustand, Redux Toolkit and Jotai each buy you.
 8. **[learning/forms/](learning/forms/)** — React Hook Form with Zod, validation
    UX, and errors a screen reader announces.
-9. **learning/testing** (planned) — Vitest, Testing Library,
+9. **[learning/testing/](learning/testing/)** — Vitest, Testing Library,
    Playwright, Storybook.
 10. **learning/accessibility** (planned) — semantics, keyboard
     order, focus management, and axe in CI.
@@ -126,7 +127,7 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 - **[forms](learning/forms/)** — controlled and uncontrolled inputs, React Hook Form with a Zod
   schema, async validation, field arrays, file upload, `useActionState`,
   accessible error messaging
-- **testing** — Vitest, Testing Library and querying by role, `user-event`, MSW,
+- **[testing](learning/testing/)** — Vitest, Testing Library and querying by role, `user-event`, MSW,
   what belongs in a unit test and what does not, Playwright end to end,
   Storybook 10 with interaction and a11y tests, coverage that means something
 - **accessibility** — semantic HTML first, the accessibility tree, keyboard

@@ -1,0 +1,22 @@
+{
+  "name": "next-app-router",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Next 16 App Router: Server Components, the client boundary, server actions, caching",
+  "scripts": {
+    "dev": "next dev --port 5190",
+    "build": "next build",
+    "start": "next start --port 5190",
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

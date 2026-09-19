@@ -36,3 +36,7 @@ PLAN.md
 
 # Playwright's local browser download marker (browsers live in ~/Library/Caches)
 learning/*/test-results/
+
+# Next.js
+learning/*/.next/
+learning/*/next-env.d.ts

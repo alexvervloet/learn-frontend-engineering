@@ -13,7 +13,7 @@ export default async function ProductsPage() {
       <h1 className="text-2xl font-semibold">Everything</h1>
       <ul className="mt-4 grid list-none gap-4 p-0 sm:grid-cols-2">
         {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard key={product.slug} product={product} level={2} />
         ))}
       </ul>
     </div>

@@ -742,3 +742,51 @@ does.
 direction: on the bookmark-manager I ran `git add -A` before a staged-commit
 sequence and landed 54 files in one commit. Committing by name is still
 right. The gap is the check afterwards, not the method.
+
+## One cookie read in the root layout made every route dynamic
+
+**What I expected.** The storefront's root layout reads the cart cookie so
+the bag count is right in the first HTML response, and the product pages
+below it prerender with `export const revalidate = 60`. I wrote a comment in
+the layout saying exactly that.
+
+**What happened.** The first build printed seven routes and every one of them
+was `ƒ`, server-rendered on demand. Including the product pages whose only
+job in this project is to demonstrate ISR. In the classic model a single
+`cookies()` call anywhere in a tree opts the whole tree out of static
+rendering, and it does it silently. My comment was confidently wrong and the
+build output was two lines below it.
+
+**The fix, in three steps, each of which failed differently.**
+
+Turning on `cacheComponents` broke the build: `Route segment config
+"revalidate" is not compatible with nextConfig.cacheComponents`. Caching has
+moved from a per-route export to a per-function one. `export const
+revalidate = 60` on the page becomes `"use cache"` plus
+`cacheLife("minutes")` inside the data function, where the arguments are the
+cache key.
+
+Then the build refused `/cart`:
+
+```
+Error: Route "/cart": Next.js encountered uncached or runtime data during prerendering.
+`cookies()` ... accessed outside of <Suspense> prevents the route from being prerendered
+```
+
+This is the good change. The old model let you make every page dynamic by
+accident and said nothing; this one will not build until the request-specific
+part is behind a boundary. `/cart` and `/search` both needed splitting into a
+static shell and an async child.
+
+Last, the bag count moved out of the layout into its own component inside a
+Suspense boundary in `BagLink`, with a same-size fallback pill so the header
+does not jump.
+
+Now all seven routes are `◐`, and the eight product pages are prerendered
+individually with a 1m revalidate.
+
+**Next time.** Read the route table at the end of every Next build. `ƒ` where
+you expected `◐` or `○` is a whole class of bug that no test catches and no
+page looks wrong because of. And with `cacheComponents` on, splitting a page
+into a static shell and a streamed child is not an optimisation you get to
+postpone. The build makes you do it.

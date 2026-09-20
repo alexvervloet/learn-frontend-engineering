@@ -583,3 +583,41 @@ intuitive: `add_header` replaces, `proxy_set_header` replaces,
 curling it, not by the twenty tests asserting what the Dockerfile and
 `nginx.conf` _say_. Those tests are worth having, and they cannot tell you
 whether the thing runs.
+
+## A "nice" axis top does not give you nice ticks
+
+**What I expected.** `niceExtent` rounds the maximum up to a round number, so
+dividing that range into four gives four round ticks.
+
+**What happened.** `niceExtent([4100])` returns a max of 6000, which is round.
+Dividing it into four gives ticks at 0, 1500, 3000, 4500, 6000. The axis top is
+round and three of the five labels are not, which is the exact thing the
+function exists to prevent. The test that caught it asserted the max and
+happened to disagree for an unrelated reason, so I only looked at the ticks
+because I was already in there.
+
+**The fix.** Pick the round step first and let the tick count fall out of it,
+rather than fixing the count and dividing. `step` is now part of `Extent`, and
+`ticks` reads it instead of recomputing anything:
+
+```ts
+export function ticks(extent: Extent): number[] {
+  const count = Math.round((extent.max - extent.min) / extent.step);
+  return Array.from({ length: count + 1 }, (_, i) => extent.min + i * extent.step);
+}
+```
+
+`tickCount` stays an argument to `niceExtent`, but it is a hint for choosing
+the step, not a promise about how many ticks come back.
+
+**Next time.** Assert the property, not an example. The replacement test walks
+five different inputs and checks that every tick has at most two significant
+digits, which is what "nice" actually means. The old test checked one number
+against one other number, and a number can be right for the wrong reason.
+
+**The second half of the same test.** `formatCompact(1500)` returned `"1.5k"`
+where I expected `"1.5K"`. Lowercase is correct for `en-GB`, so the assertion
+was wrong, not the code. I uppercase the suffix by hand now because it reads
+better on an axis, which also removes the dependency on whatever ICU data the
+runtime ships. That is the second time this repo has been bitten by assuming
+`Intl` output.

@@ -831,3 +831,33 @@ immediately. `page.goto` cancels the action still in flight, and the cart
 renders empty. It passed roughly one run in five, which is the worst
 frequency: often enough to look fine locally, rare enough to fail in CI. Wait
 for the effect, not for the click.
+
+## A timing test that passed for weeks measured the CI runner
+
+**What happened.** The performance module's first lesson renders a
+deliberately expensive subtree next to a cheap one and asserts the Profiler
+reports the expensive one as slower. On my machine the gap is twentyfold. In
+CI, on Node 26, it failed:
+
+```
+AssertionError: expected 3.5426030000003266 to be greater than 3.8751170000000457
+```
+
+3.54ms against 3.88ms. The real numbers are about 1.9ms and 0.08ms. Both CI
+figures were the shared runner: four Vitest workers competing for cores, and
+a single `render()` catching whichever one got descheduled.
+
+**The fix.** Render five times, keep the fastest of each, and require a
+twofold margin. Noise only ever adds time, so the minimum of several runs is
+the closest estimate of the real cost, and the mean is the one statistic
+guaranteed to be contaminated. A twofold margin cannot be closed by
+scheduling noise, and if the real gap ever narrows that far the lesson it
+teaches is wrong anyway.
+
+**Next time.** Never assert on one timing sample, and never use the mean.
+Also: this is a module about measuring, and its own test was measuring badly.
+Worth checking that the tests for a lesson practise what the lesson says.
+
+**Separately**, the same CI run failed `format:check` on LESSONS.md, this
+file, because Prettier reflows the prose. I had been running `lint` and
+`typecheck` locally and not `format:check`. All three now, before every push.

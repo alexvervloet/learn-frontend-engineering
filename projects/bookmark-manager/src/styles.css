@@ -1,0 +1,83 @@
+/*
+ * Tailwind 4, configured in CSS. See learning/styling.
+ *
+ * Preflight is taken here, unlike in the styling module: this is an app with
+ * no other reset, and a consistent baseline across browsers is most of what
+ * Preflight is for.
+ */
+@import "tailwindcss";
+
+@theme {
+  --color-ink-50: oklch(0.98 0.003 265);
+  --color-ink-200: oklch(0.9 0.008 265);
+  --color-ink-500: oklch(0.55 0.02 265);
+  --color-ink-800: oklch(0.28 0.02 265);
+  --color-ink-950: oklch(0.17 0.015 265);
+
+  --color-brand-50: oklch(0.97 0.02 265);
+  --color-brand-200: oklch(0.88 0.07 265);
+  --color-brand-500: oklch(0.55 0.19 265);
+  --color-brand-700: oklch(0.44 0.17 265);
+}
+
+/*
+ * Semantic tokens over the primitives above, so a component names a role and
+ * the theme decides the value. Dark mode is then one block, not a `dark:`
+ * variant on every element.
+ */
+:root {
+  --surface: var(--color-white);
+  --surface-sunken: var(--color-ink-50);
+  --text-strong: var(--color-ink-950);
+  --text-muted: var(--color-ink-500);
+  --border-subtle: var(--color-ink-200);
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --surface: var(--color-ink-950);
+    --surface-sunken: oklch(0.13 0.012 265);
+    --text-strong: var(--color-ink-50);
+    --text-muted: oklch(0.72 0.02 265);
+    --border-subtle: oklch(0.3 0.02 265);
+  }
+}
+
+body {
+  background: var(--surface-sunken);
+  color: var(--text-strong);
+}
+
+/* A visible focus ring is not decoration: it is the only way a keyboard user
+   can tell where they are. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* The skip link: off screen until focused, never display:none, which would
+   make it unreachable and therefore pointless. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.5rem;
+  z-index: 50;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

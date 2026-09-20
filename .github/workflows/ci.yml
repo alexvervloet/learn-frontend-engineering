@@ -73,6 +73,9 @@ jobs:
       # Astro's suite checks the claim the framework rests on: a page with a
       # React component on it and zero script responses.
       - run: npm run e2e -w learning/astro-islands
+      # The capstone's journeys, its keyboard behaviour and axe against the
+      # rendered pages.
+      - run: npm run e2e -w projects/bookmark-manager
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -81,6 +84,7 @@ jobs:
             learning/testing/playwright-report/
             learning/next-app-router/playwright-report/
             learning/astro-islands/playwright-report/
+            projects/bookmark-manager/playwright-report/
           retention-days: 7
 
   build:
@@ -103,6 +107,14 @@ jobs:
   # a wrong workspace path or a missing file fails the build.
   docker:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: production
+            dockerfile: learning/production/Dockerfile
+          - name: bookmark-manager
+            dockerfile: projects/bookmark-manager/Dockerfile
     steps:
       - uses: actions/checkout@v7
       - name: Build the production image
@@ -110,12 +122,12 @@ jobs:
           docker build \
             --build-arg VITE_API_URL=https://api.example.com \
             --build-arg VITE_COMMIT_SHA=${GITHUB_SHA::7} \
-            -f learning/production/Dockerfile \
-            -t frontend:${GITHUB_SHA::7} .
+            -f ${{ matrix.dockerfile }} \
+            -t frontend-${{ matrix.name }}:${GITHUB_SHA::7} .
       - name: Check it serves the built app
         run: |
           set -x
-          docker run -d --name frontend -p 8080:8080 frontend:${GITHUB_SHA::7}
+          docker run -d --name frontend -p 8080:8080 frontend-${{ matrix.name }}:${GITHUB_SHA::7}
 
           for i in $(seq 1 30); do
             curl -fsS http://localhost:8080/ -o /tmp/index.html && break

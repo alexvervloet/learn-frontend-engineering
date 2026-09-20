@@ -1,0 +1,29 @@
+{
+  "name": "bookmark-manager",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Capstone: React Router, TanStack Query, React Hook Form and Zod, against the Express API of the same name",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.9.1",
+    "@tanstack/react-query": "^5.103.1",
+    "react-hook-form": "^7.88.0",
+    "react-router": "^8.4.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "msw": "^2.15.0",
+    "tailwindcss": "^4.3.3"
+  }
+}

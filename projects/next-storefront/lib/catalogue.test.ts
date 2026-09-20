@@ -61,6 +61,13 @@ describe("filtering", () => {
     expect(applyFilters(PRODUCTS, {})).toHaveLength(4);
   });
 
+  it("treats an empty category as no filter", () => {
+    // A GET form submits every field, so choosing "Any" sends
+    // `category=`. Reading that as a value matched nothing.
+    expect(applyFilters(PRODUCTS, { category: "" })).toHaveLength(4);
+    expect(applyFilters(PRODUCTS, { q: "lamp", category: "" }).map((p) => p.slug)).toEqual(["c"]);
+  });
+
   it("ignores a category nobody sells", () => {
     // ?category=nonsense comes from the URL, so it arrives eventually.
     expect(applyFilters(PRODUCTS, { category: "nonsense" })).toEqual([]);

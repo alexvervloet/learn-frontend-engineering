@@ -21,7 +21,14 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 function one(value: string | string[] | undefined): string | undefined {
   // ?category=desk&category=audio arrives as an array. Taking the first is
   // a decision; crashing on it is what happens if you assume a string.
-  return Array.isArray(value) ? value[0] : value;
+  const first = Array.isArray(value) ? value[0] : value;
+
+  // An empty string is not a filter. A GET form always submits every field,
+  // so choosing "Any" in the category select sends `category=`, and
+  // treating that as a real value matched nothing at all. Every search from
+  // the form returned zero results, and only a browser test found it,
+  // because typing the URL by hand never produces the empty parameter.
+  return first === undefined || first === "" ? undefined : first;
 }
 
 export default function SearchPage({ searchParams }: Props) {
@@ -93,7 +100,7 @@ async function Results({ filters }: { filters: Filters }) {
       </p>
       <ul className="grid list-none gap-4 p-0 sm:grid-cols-2">
         {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
+          <ProductCard key={product.slug} product={product} level={2} />
         ))}
       </ul>
     </>

@@ -146,7 +146,10 @@ export function applyFilters(products: Product[], filters: Filters): Product[] {
   const needle = filters.q?.trim().toLowerCase() ?? "";
 
   const matched = products.filter((product) => {
-    if (filters.category !== undefined && product.category !== filters.category) return false;
+    // `category: ""` means no filter, not "match the empty category".
+    if (filters.category !== undefined && filters.category !== "") {
+      if (product.category !== filters.category) return false;
+    }
     if (needle === "") return true;
     return (
       product.name.toLowerCase().includes(needle) || product.blurb.toLowerCase().includes(needle)

@@ -76,6 +76,10 @@ jobs:
       # The capstone's journeys, its keyboard behaviour and axe against the
       # rendered pages.
       - run: npm run e2e -w projects/bookmark-manager
+      # The dashboard's suite is everything jsdom cannot see: how many rows a
+      # browser paints, the crosshair's geometry, whether the direct labels
+      # collide, and axe against real pixels in both colour schemes.
+      - run: npm run e2e -w projects/dashboard
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -85,6 +89,7 @@ jobs:
             learning/next-app-router/playwright-report/
             learning/astro-islands/playwright-report/
             projects/bookmark-manager/playwright-report/
+            projects/dashboard/playwright-report/
           retention-days: 7
 
   build:
@@ -100,6 +105,10 @@ jobs:
       # its binary. If a dependency bump ever re-blocks it, this job is where it
       # shows up, as a Vite command failing for no visible reason.
       - run: npm run build
+      # After the build, because it measures the built assets. A budget that
+      # only lives in a report is a number nobody reads; this one fails here,
+      # at the moment someone adds the dependency.
+      - run: npm run budget -w projects/dashboard
 
   # The production module ships a Dockerfile and an nginx config, and its
   # tests assert what those files say rather than that they work. Building the

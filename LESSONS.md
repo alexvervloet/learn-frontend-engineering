@@ -790,3 +790,42 @@ you expected `◐` or `○` is a whole class of bug that no test catches and no
 page looks wrong because of. And with `cacheComponents` on, splitting a page
 into a static shell and a streamed child is not an optimisation you get to
 postpone. The build makes you do it.
+
+## Every search from the form returned nothing, and only a browser found it
+
+**What happened.** The storefront's search page reads its filters from the
+query string and the form is a plain GET form. Typing `/search?q=lamp` by
+hand worked. Typing "lamp" into the form and pressing Search returned
+"Nothing matched", every time, for every query.
+
+**Why.** A GET form submits every field it has, including the ones left
+alone. Choosing "Any" in the category select sends `category=`, an empty
+string, and the filter read it as a value:
+
+```ts
+if (filters.category !== undefined && product.category !== filters.category) return false;
+```
+
+Nothing has a category of `""`, so nothing matched. The unit tests for
+`applyFilters` all passed, because every one of them either set a real
+category or left the key off entirely. I never wrote `{ category: "" }`,
+because by hand you never produce it.
+
+**The fix.** Normalise an empty string to `undefined` when reading the
+params, and guard in `applyFilters` as well. There is now a unit test for
+`{ category: "" }`, which is the case the browser actually generates.
+
+**Next time.** When a form feeds a parser, write the test from what the form
+sends, not from what the parser looks like it wants. `new
+FormData(form)` in a console is a faster way to find out than reasoning.
+
+**The other thing this run found.** `heading-order`. `ProductCard` hard-coded
+an `h3`, which nests correctly on the home page, where an `h2` sits above the
+grid, and jumps h1-to-h3 on `/products` and `/search`, which have no `h2`. A
+card does not know where it sits, so the level is a prop now.
+
+**And a test bug of mine.** One a11y test clicked "add to bag" and navigated
+immediately. `page.goto` cancels the action still in flight, and the cart
+renders empty. It passed roughly one run in five, which is the worst
+frequency: often enough to look fine locally, rare enough to fail in CI. Wait
+for the effect, not for the click.

@@ -48,10 +48,10 @@ Every learning module is built and tested: [web-fundamentals](web-fundamentals/)
 [learning/astro-islands](learning/astro-islands/),
 [learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). `npm test` runs 517 assertions across
-fifteen modules, including type-level ones, and `npm run e2e` adds 46
-Playwright specs in a real browser. Only the [capstone projects](projects/)
-are still to come.
+[lesson-shell](packages/lesson-shell/). `npm test` runs 580 assertions across
+fifteen modules and the first capstone, including type-level ones, and the
+browser suites add 58 Playwright specs. Two more
+[capstone projects](projects/) are still to come.
 
 ## Suggested learning path
 
@@ -88,7 +88,7 @@ Each module stands alone, so skip ahead if a topic is already familiar.
 13. **[learning/production/](learning/production/)** — env config, CSP, auth in
     the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
 14. **[projects/](projects/)** — read and run
-    bookmark-manager (planned) first, then the others.
+    [bookmark-manager](projects/bookmark-manager/) first, then the others.
 
 ### What each module needs to run
 
@@ -157,8 +157,8 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
 
 ### projects/
 
-- **bookmark-manager** — React Router, TanStack Query, React Hook Form, tested
-  end to end, containerised
+- **[bookmark-manager](projects/bookmark-manager/)** — React Router, TanStack Query,
+  React Hook Form, tested end to end, containerised
 - **dashboard** — charts, virtualised tables, keyboard-complete, measured
 - **next-storefront** — Server Components, server actions, ISR
 

@@ -682,7 +682,9 @@ right in the wrapper.
 `.viz-root` is a div inside `body`, and `body` reads the tokens itself:
 
 ```css
-body { color: var(--text-primary, #0b0b0b); }
+body {
+  color: var(--text-primary, #0b0b0b);
+}
 ```
 
 `body` is outside the scope that defines them, so it took the fallback, the
@@ -701,7 +703,7 @@ fourth line on the chart.
 
 And `scrollable-region-focusable`, twice. The two cases wanted opposite
 fixes. The event grid already had `tabIndex={0}` and its own key handling, so
-the answer was to make *it* the scroll container instead of nesting a
+the answer was to make _it_ the scroll container instead of nesting a
 scrolling div inside it, which removed the extra region rather than adding a
 second tab stop inside one widget. The chart's table view is a plain table
 with nothing to handle, so there the standard `tabIndex={0}` plus a label is

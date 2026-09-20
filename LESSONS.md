@@ -621,3 +621,52 @@ was wrong, not the code. I uppercase the suffix by hand now because it reads
 better on an axis, which also removes the dependency on whatever ICU data the
 runtime ships. That is the second time this repo has been bitten by assuming
 `Intl` output.
+
+## A virtualiser in jsdom renders nothing, and the test suite says fine
+
+**What I expected.** Render the virtualised table in jsdom, assert on the rows.
+
+**What happened.** No rows. jsdom does no layout, so the scroll element
+measures zero pixels tall, and a virtualiser told the viewport is 0px high is
+correct to render nothing. Six assertions about rows were green because
+`getAllByRole("row")` found the header and nothing else, and three failed only
+because I had indexed past it. A file full of `expect(rows.length).toBeLessThan(500)`
+would have passed forever against an empty grid.
+
+**Two wrong turns before the fix.**
+
+`initialRect: { width: 960, height: 420 }` looked like the option for exactly
+this. It is not. `observeElementRect` calls its handler synchronously on mount
+before any observer fires, so the measured zero overwrites the initial value
+immediately.
+
+Then I stubbed `HTMLElement.prototype.getBoundingClientRect`, which changed
+nothing, because virtual-core measures with `offsetWidth`/`offsetHeight`:
+
+```js
+const getRect = (element) => {
+  const { offsetWidth, offsetHeight } = element;
+  return { width: offsetWidth, height: offsetHeight };
+};
+```
+
+**The fix.** Redefine `offsetWidth` and `offsetHeight` on
+`HTMLElement.prototype` for the duration of the file, returning a real size
+for the scroller and 0 for everything else, and restore the original
+descriptors in `afterAll`.
+
+**What the stub is and is not worth.** It gets you the component's index
+arithmetic, its ARIA, and its key handling, all of which are the component's
+own logic. It cannot tell you how many rows a browser paints, because the
+number now comes from a constant I chose. That assertion belongs in Playwright
+against a real box, and it is there.
+
+**The bug this found.** With rows finally rendering, the roving-focus test
+failed for a second reason: the grid keeps DOM focus and marks the active row
+with `aria-selected`, but never set `aria-activedescendant`. Arrow keys moved a
+highlight that a screen reader was never told about. Rows now carry a `useId`
+prefixed id and the grid points at the active one.
+
+**Next time.** Before writing assertions against a component that measures
+itself, render it once and print the DOM. Green on an empty tree is the
+quietest failure there is.

@@ -14,6 +14,9 @@ export const ROW_HEIGHT = 36;
 export const VIEWPORT_HEIGHT = 420;
 export const OVERSCAN = 8;
 
+/** Narrower than this and the five columns collide, so the grid scrolls. */
+const MIN_WIDTH = "40rem";
+
 const COLUMNS: { key: SortKey; label: string; align: "left" | "right" }[] = [
   { key: "at", label: "Time", align: "left" },
   { key: "path", label: "Path", align: "left" },
@@ -24,8 +27,14 @@ const COLUMNS: { key: SortKey; label: string; align: "left" | "right" }[] = [
 
 const OUTCOME_STYLE = {
   ok: { background: "color-mix(in oklab, #0ca30c 14%, transparent)", color: "var(--text-primary)" },
-  slow: { background: "color-mix(in oklab, #fab219 22%, transparent)", color: "var(--text-primary)" },
-  error: { background: "color-mix(in oklab, #d03b3b 18%, transparent)", color: "var(--text-primary)" },
+  slow: {
+    background: "color-mix(in oklab, #fab219 22%, transparent)",
+    color: "var(--text-primary)",
+  },
+  error: {
+    background: "color-mix(in oklab, #d03b3b 18%, transparent)",
+    color: "var(--text-primary)",
+  },
 } as const;
 
 /** An icon as well as the colour: a status must never be colour alone. */
@@ -83,70 +92,92 @@ export function EventTable({
   }
 
   return (
-    <div
-      role="grid"
-      aria-label="Recent events"
-      // Told explicitly, because a screen reader cannot count rows that are
-      // not in the DOM.
-      aria-rowcount={rows.length}
-      aria-colcount={COLUMNS.length}
-      tabIndex={0}
-      // The grid keeps DOM focus and points at the active row. Moving real
-      // focus to a row instead would fight the virtualiser, which unmounts
-      // the focused element as soon as it scrolls out of the window.
-      aria-activedescendant={rows.length === 0 ? undefined : `${rowId}-${activeRow}`}
-      onKeyDown={onKeyDown}
-      className="rounded-xl"
-      style={{ background: "var(--surface-1)", border: "1px solid var(--grid)" }}
-      data-testid="event-grid"
-    >
-      <div role="rowgroup">
-        <div
-          role="row"
-          aria-rowindex={1}
-          className="grid text-sm font-medium"
-          style={{
-            gridTemplateColumns: "8rem 1fr 7rem 7rem 7rem",
-            borderBottom: "1px solid var(--grid)",
-          }}
-        >
-          {COLUMNS.map((column, index) => {
-            const isSorted = sort.key === column.key;
-
-            return (
-              <div
-                key={column.key}
-                role="columnheader"
-                aria-colindex={index + 1}
-                // The property a screen reader reads to announce the sort.
-                aria-sort={isSorted ? (sort.direction === "asc" ? "ascending" : "descending") : "none"}
-                className={column.align === "right" ? "text-right" : "text-left"}
-              >
-                <button
-                  type="button"
-                  onClick={() => onSortChange(nextSort(sort, column.key))}
-                  className="w-full px-3 py-2 text-inherit"
-                  style={{ textAlign: column.align }}
-                >
-                  {column.label}
-                  {/* An arrow, not only the aria-sort: a sighted user needs
-                      to see which column is sorted too. */}
-                  <span aria-hidden="true"> {isSorted ? (sort.direction === "asc" ? "↑" : "↓") : ""}</span>
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
+    <>
       <div
+        role="grid"
+        aria-label="Recent events"
+        // Told explicitly, because a screen reader cannot count rows that are
+        // not in the DOM.
+        aria-rowcount={rows.length}
+        aria-colcount={COLUMNS.length}
+        tabIndex={0}
+        // The grid keeps DOM focus and points at the active row. Moving real
+        // focus to a row instead would fight the virtualiser, which unmounts
+        // the focused element as soon as it scrolls out of the window.
+        aria-activedescendant={rows.length === 0 ? undefined : `${rowId}-${activeRow}`}
+        onKeyDown={onKeyDown}
+        className="rounded-xl"
+        style={{
+          background: "var(--surface-1)",
+          border: "1px solid var(--grid)",
+          // The grid is the scroll container, rather than wrapping a separate
+          // scrolling div. A nested scroller would be a keyboard-inaccessible
+          // scrollable region (axe's `scrollable-region-focusable`), and the
+          // obvious remedy, giving it tabIndex, puts a second tab stop inside
+          // a widget that is meant to be one. This element already has focus
+          // and already handles the keys, so it scrolls.
+          //
+          // Five columns need about 40rem, so on a phone it scrolls sideways
+          // here too, instead of widening the document and giving every other
+          // section a horizontal scrollbar.
+          overflow: "auto",
+          maxHeight: VIEWPORT_HEIGHT,
+        }}
         ref={scrollRef}
-        style={{ height: VIEWPORT_HEIGHT, overflow: "auto" }}
-        data-testid="event-scroller"
+        data-testid="event-grid"
       >
+        <div role="rowgroup" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+          <div
+            role="row"
+            aria-rowindex={1}
+            className="grid text-sm font-medium"
+            style={{
+              gridTemplateColumns: "8rem 1fr 7rem 7rem 7rem",
+              minWidth: MIN_WIDTH,
+              borderBottom: "1px solid var(--grid)",
+              background: "var(--surface-1)",
+            }}
+          >
+            {COLUMNS.map((column, index) => {
+              const isSorted = sort.key === column.key;
+
+              return (
+                <div
+                  key={column.key}
+                  role="columnheader"
+                  aria-colindex={index + 1}
+                  // The property a screen reader reads to announce the sort.
+                  aria-sort={
+                    isSorted ? (sort.direction === "asc" ? "ascending" : "descending") : "none"
+                  }
+                  className={column.align === "right" ? "text-right" : "text-left"}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSortChange(nextSort(sort, column.key))}
+                    className="w-full px-3 py-2 text-inherit"
+                    style={{ textAlign: column.align }}
+                  >
+                    {column.label}
+                    {/* An arrow, not only the aria-sort: a sighted user needs
+                      to see which column is sorted too. */}
+                    <span aria-hidden="true">
+                      {" "}
+                      {isSorted ? (sort.direction === "asc" ? "↑" : "↓") : ""}
+                    </span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* The full height, so the scrollbar is honest about how much there
-            is even though almost none of it exists. */}
-        <div style={{ height: virtualizer.getTotalSize(), position: "relative" }} role="rowgroup">
+          is even though almost none of it exists. */}
+        <div
+          style={{ height: virtualizer.getTotalSize(), position: "relative", minWidth: MIN_WIDTH }}
+          role="rowgroup"
+        >
           {items.map((item) => {
             const row = rows[item.index];
             if (row === undefined) return null;
@@ -201,11 +232,14 @@ export function EventTable({
         </div>
       </div>
 
+      {/* Outside the grid, not inside it: a role="grid" may only contain
+          rows and rowgroups, and it is now the scroll container, so a
+          paragraph in there would scroll away with the rows. */}
       <p className="px-3 py-2 text-sm" style={{ color: "var(--text-secondary)" }}>
         <span data-testid="rendered-count">{items.length}</span> of{" "}
         <span className="tabular">{rows.length.toLocaleString("en-GB")}</span> rows in the DOM ·
         arrow keys, Page Up/Down, Home and End move through them
       </p>
-    </div>
+    </>
   );
 }

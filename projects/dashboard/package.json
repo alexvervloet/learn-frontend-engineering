@@ -1,0 +1,27 @@
+{
+  "name": "dashboard",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Capstone: a time-series chart, a virtualised table, keyboard support, and a bundle budget that fails the build",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "analyse": "ANALYSE=1 vite build",
+    "budget": "node scripts/check-bundle-size.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.14.13"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "rollup-plugin-visualizer": "^7.1.1",
+    "tailwindcss": "^4.3.3"
+  }
+}

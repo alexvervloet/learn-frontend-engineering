@@ -35,7 +35,7 @@ beforeAll(() => {
     Object.defineProperty(HTMLElement.prototype, name, {
       configurable: true,
       get(this: HTMLElement) {
-        return this.dataset.testid === "event-scroller" ? size : 0;
+        return this.dataset.testid === "event-grid" ? size : 0;
       },
     });
   }
@@ -57,7 +57,9 @@ function Harness({ initial = { key: "at", direction: "desc" } as Sort }) {
 
 describe("the grid contract", () => {
   it("tells assistive tech how many rows exist, not how many are rendered", () => {
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     // This is the whole accessibility problem with virtualisation. The DOM
     // holds a couple of dozen rows; the grid has to say 500 (501 with the
@@ -68,7 +70,9 @@ describe("the grid contract", () => {
   });
 
   it("numbers rendered rows by their place in the data, offset past the header", () => {
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     const rows = screen.getAllByRole("row");
     expect(rows[0]).toHaveAttribute("aria-rowindex", "1");
@@ -76,20 +80,31 @@ describe("the grid contract", () => {
   });
 
   it("marks the sorted column and only that one", () => {
-    render(<EventTable rows={ROWS} sort={{ key: "durationMs", direction: "asc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable
+        rows={ROWS}
+        sort={{ key: "durationMs", direction: "asc" }}
+        onSortChange={vi.fn()}
+      />,
+    );
 
     expect(screen.getByRole("columnheader", { name: /duration/i })).toHaveAttribute(
       "aria-sort",
       "ascending",
     );
-    expect(screen.getByRole("columnheader", { name: /path/i })).toHaveAttribute("aria-sort", "none");
+    expect(screen.getByRole("columnheader", { name: /path/i })).toHaveAttribute(
+      "aria-sort",
+      "none",
+    );
   });
 
   it("shows the direction with an arrow as well as with aria-sort", () => {
     // aria-sort is invisible. A sighted mouse user needs to see which way
     // the column went, and the arrow is not announced twice because it is
     // aria-hidden.
-    render(<EventTable rows={ROWS} sort={{ key: "path", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "path", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     expect(screen.getByRole("columnheader", { name: /path/i }).textContent).toContain("↓");
   });
@@ -111,7 +126,13 @@ describe("sorting from the header", () => {
   it("reaches the header buttons with the keyboard", async () => {
     const user = userEvent.setup();
     const onSortChange = vi.fn();
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={onSortChange} />);
+    render(
+      <EventTable
+        rows={ROWS}
+        sort={{ key: "at", direction: "desc" }}
+        onSortChange={onSortChange}
+      />,
+    );
 
     // Two tabs: the grid itself is the first stop, and the header buttons
     // sit inside it.
@@ -125,7 +146,9 @@ describe("sorting from the header", () => {
 
 describe("keyboard navigation through the rows", () => {
   it("is one tab stop rather than five hundred", () => {
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     // Every rendered row being focusable is the naive version, and it makes
     // the grid a keyboard trap you scroll out of.
@@ -137,20 +160,26 @@ describe("keyboard navigation through the rows", () => {
 
   it("moves the active row with the arrow keys", async () => {
     const user = userEvent.setup();
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     const grid = screen.getByRole("grid");
     grid.focus();
     await user.keyboard("{ArrowDown}{ArrowDown}");
 
-    const selected = screen.getAllByRole("row").filter((row) => row.getAttribute("aria-selected") === "true");
+    const selected = screen
+      .getAllByRole("row")
+      .filter((row) => row.getAttribute("aria-selected") === "true");
     expect(selected).toHaveLength(1);
     expect(selected[0]).toHaveAttribute("aria-rowindex", "4");
   });
 
   it("jumps to the ends and clamps there", async () => {
     const user = userEvent.setup();
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     const grid = screen.getByRole("grid");
     grid.focus();
@@ -168,6 +197,9 @@ describe("keyboard navigation through the rows", () => {
     const user = userEvent.setup();
     const onKeyDown = vi.fn();
     render(
+      // A bare listener to observe what bubbles out of the grid. It is not
+      // a control, and nothing in the test interacts with it directly.
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div onKeyDown={onKeyDown}>
         <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />
       </div>,
@@ -184,7 +216,9 @@ describe("keyboard navigation through the rows", () => {
 
 describe("what a row says", () => {
   it("gives the outcome an icon and a word, never a colour on its own", () => {
-    render(<EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />);
+    render(
+      <EventTable rows={ROWS} sort={{ key: "at", direction: "desc" }} onSortChange={vi.fn()} />,
+    );
 
     const firstRow = screen.getAllByRole("row")[1]!;
     const outcome = within(firstRow).getAllByRole("gridcell").at(-1)!;

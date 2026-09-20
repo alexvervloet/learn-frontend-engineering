@@ -13,9 +13,30 @@ import {
 } from "./events";
 
 const SAMPLE: EventRow[] = [
-  { id: 1, at: "2026-09-20T09:00:00.000Z", path: "/docs/api", channel: "search", durationMs: 120, outcome: "ok" },
-  { id: 2, at: "2026-09-20T09:00:07.000Z", path: "/pricing", channel: "direct", durationMs: 3100, outcome: "slow" },
-  { id: 3, at: "2026-09-20T09:00:14.000Z", path: "/", channel: "referral", durationMs: 90, outcome: "error" },
+  {
+    id: 1,
+    at: "2026-09-20T09:00:00.000Z",
+    path: "/docs/api",
+    channel: "search",
+    durationMs: 120,
+    outcome: "ok",
+  },
+  {
+    id: 2,
+    at: "2026-09-20T09:00:07.000Z",
+    path: "/pricing",
+    channel: "direct",
+    durationMs: 3100,
+    outcome: "slow",
+  },
+  {
+    id: 3,
+    at: "2026-09-20T09:00:14.000Z",
+    path: "/",
+    channel: "referral",
+    durationMs: 90,
+    outcome: "error",
+  },
 ];
 
 describe("generating the rows", () => {

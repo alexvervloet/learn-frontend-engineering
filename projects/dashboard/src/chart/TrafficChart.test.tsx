@@ -35,9 +35,7 @@ function Harness() {
 }
 
 function renderChart(hidden: Channel[] = []) {
-  return render(
-    <TrafficChart points={POINTS} hidden={new Set(hidden)} onToggle={vi.fn()} />,
-  );
+  return render(<TrafficChart points={POINTS} hidden={new Set(hidden)} onToggle={vi.fn()} />);
 }
 
 describe("identity", () => {

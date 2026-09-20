@@ -80,6 +80,10 @@ jobs:
       # browser paints, the crosshair's geometry, whether the direct labels
       # collide, and axe against real pixels in both colour schemes.
       - run: npm run e2e -w projects/dashboard
+      # Against `next build && next start`. The dev server renders
+      # everything on demand, so an ISR test against it passes whatever the
+      # caching config says.
+      - run: npm run e2e -w projects/next-storefront
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -90,6 +94,7 @@ jobs:
             learning/astro-islands/playwright-report/
             projects/bookmark-manager/playwright-report/
             projects/dashboard/playwright-report/
+            projects/next-storefront/playwright-report/
           retention-days: 7
 
   build:

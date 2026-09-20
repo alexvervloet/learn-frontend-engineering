@@ -73,5 +73,22 @@ export default tseslint.config(
     files: ["**/*.test-d.ts", "**/*.test-d.tsx"],
     rules: { "@typescript-eslint/no-unused-expressions": "off" },
   },
+  {
+    // Build scripts run in Node and are not type-checked by a tsconfig that
+    // pulls in @types/node, so the globals have to be declared here.
+    files: ["**/scripts/**/*.mjs"],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    // A box that scrolls must be reachable by keyboard, which axe enforces
+    // as `scrollable-region-focusable`. jsx-a11y calls the same tabIndex a
+    // mistake because the element is not interactive. Both rules are right
+    // about their own concern and they cannot both be satisfied, so the
+    // accessibility audit that runs in a real browser wins.
+    files: ["**/*.tsx"],
+    rules: {
+      "jsx-a11y/no-noninteractive-tabindex": ["error", { tags: [], roles: ["region", "tabpanel"] }],
+    },
+  },
   prettier,
 );

@@ -670,3 +670,49 @@ prefixed id and the grid points at the active one.
 **Next time.** Before writing assertions against a component that measures
 itself, render it once and print the DOM. Green on an empty tree is the
 quietest failure there is.
+
+## A wrapper's custom properties do not reach the body that reads them
+
+**What I expected.** The dashboard's colour tokens live on `.viz-root`, both
+themes were run through the validator, and both passed. Dark mode looked
+right in the wrapper.
+
+**What happened.** axe reported white-ish text at 1.13:1 in dark mode:
+`#0b0b0b` on `#1a1a19`. Every token was correct. The problem is that
+`.viz-root` is a div inside `body`, and `body` reads the tokens itself:
+
+```css
+body { color: var(--text-primary, #0b0b0b); }
+```
+
+`body` is outside the scope that defines them, so it took the fallback, the
+light ink, and everything inside inherited it. The wrapper's own computed
+values were right the whole time, which is why reading the file did not show
+it.
+
+**The fix.** Declare the tokens on `:root` as well as `.viz-root`, in all
+three blocks.
+
+**Two more things the same axe run found.** White on `--series-direct`
+measures 4.41:1, just under the 4.5 axe wants at 14px, so the pressed
+range button now uses its own `--accent` / `--accent-ink` pair. A series hue
+was the wrong thing to reach for anyway: it made the button look like a
+fourth line on the chart.
+
+And `scrollable-region-focusable`, twice. The two cases wanted opposite
+fixes. The event grid already had `tabIndex={0}` and its own key handling, so
+the answer was to make *it* the scroll container instead of nesting a
+scrolling div inside it, which removed the extra region rather than adding a
+second tab stop inside one widget. The chart's table view is a plain table
+with nothing to handle, so there the standard `tabIndex={0}` plus a label is
+right.
+
+**Where the rules disagree.** jsx-a11y's `no-noninteractive-tabindex` flags
+exactly the tabIndex that axe demands. Both are right about their own
+concern, and neither can see the other. I let the browser audit win and
+configured `roles: ["region", "tabpanel"]` on the lint rule, with the reason
+written next to it.
+
+**Next time.** Validating a palette is necessary and does not tell you the
+palette is applied. Run axe against the rendered page in both schemes. Three
+real defects here, none of them visible in the CSS.

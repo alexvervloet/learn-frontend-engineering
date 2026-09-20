@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/*
+ * The chart palette, as roles rather than hex.
+ *
+ * Both modes are *selected*, not flipped: the dark column is the same three
+ * hues stepped for the dark surface, and both were run through the
+ * validator. Light and dark each pass the lightness band, the chroma floor,
+ * adjacent CVD separation and the normal-vision floor.
+ *
+ * One known warning: on the light surface the aqua sits at 2.74:1, below
+ * 3:1. That obliges relief rather than a colour change, and this dashboard
+ * ships both forms of it — every series is directly labelled at its end, and
+ * the chart has a table view. Colour never carries identity alone here.
+ */
+/*
+ * On :root as well as .viz-root, and the reason is worth knowing.
+ *
+ * Scoping the tokens to the wrapper alone leaves `body` outside them, so
+ * `body { color: var(--text-primary, #0b0b0b) }` falls back to the light ink
+ * and every element inherits it. In dark mode that is #0b0b0b on #1a1a19,
+ * a contrast ratio of 1.13:1. The wrapper itself looked correct, which is
+ * why axe found this and reading the file did not.
+ */
+:root,
+.viz-root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --surface-2: #f2f1ee;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --grid: #e3e2de;
+  --series-direct: #2a78d6;
+  --series-search: #eb6834;
+  --series-referral: #1baf7a;
+  /*
+   * The accent is a UI colour, not a series colour, and it is a separate
+   * token for a reason: white on --series-direct measures 4.41:1, which
+   * axe fails at 14px. Reusing a series hue for a pressed button also
+   * makes the button look like a fourth line on the chart.
+   */
+  --accent: #2166bd;
+  --accent-ink: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])),
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --grid: #33332f;
+    --series-direct: #3987e5;
+    --series-search: #d95926;
+    --series-referral: #199e70;
+    /* Dark flips the polarity: a light fill with dark ink, at 8.2:1. */
+    --accent: #7fb6f5;
+    --accent-ink: #1a1a19;
+  }
+}
+
+:root[data-theme="dark"],
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --surface-2: #232321;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --grid: #33332f;
+  --series-direct: #3987e5;
+  --series-search: #d95926;
+  --series-referral: #199e70;
+  --accent: #7fb6f5;
+  --accent-ink: #1a1a19;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-2, #f2f1ee);
+  color: var(--text-primary, #0b0b0b);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.5rem;
+  z-index: 50;
+  background: var(--surface-1);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--grid);
+}
+
+.skip-link:focus {
+  left: 0.5rem;
+}
+
+/* Tabular figures in columns, proportional everywhere else: a column of
+   numbers that do not line up is much harder to scan. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

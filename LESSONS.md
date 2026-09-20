@@ -716,3 +716,29 @@ written next to it.
 **Next time.** Validating a palette is necessary and does not tell you the
 palette is applied. Run axe against the rendered page in both schemes. Three
 real defects here, none of them visible in the CSS.
+
+## A green local run does not mean the commit is green
+
+**What happened.** I ran typecheck, lint and build at the repo root, got three
+passes, and pushed. The push contained a dashboard that could not build,
+because eleven of its files, including `package.json`, `vite.config.ts` and
+`index.html`, had never been staged. I had been committing in small
+deliberate chunks and staged each one by name, which is right, and simply
+never wrote the commit for the scaffold.
+
+Everything passed locally because the files were sitting in my working tree.
+`git status` was in the same output as the push and I read past it.
+
+**The fix.** A second push, ten commits later, with the scaffold in it. The
+broken commit is still on main. I did not rewrite public history for it.
+
+**Next time.** Check `git status` before the push, not in the same breath as
+it, and treat a non-empty untracked list as a blocker rather than noise. The
+stronger version is to verify from the index instead of the working tree,
+`git stash -u && npm run build`, which is what the CI runner effectively
+does.
+
+**This is the second time staging has been the problem**, in the opposite
+direction: on the bookmark-manager I ran `git add -A` before a staged-commit
+sequence and landed 54 files in one commit. Committing by name is still
+right. The gap is the check afterwards, not the method.

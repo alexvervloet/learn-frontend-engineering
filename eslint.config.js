@@ -61,9 +61,9 @@ export default tseslint.config(
   {
     // react-refresh is a Vite rule. Next has its own Fast Refresh and
     // *requires* non-component exports from a route file: `metadata`,
-    // `dynamic`, `revalidate`, `generateStaticParams`. The rule has nothing
+    // `generateMetadata`, `generateStaticParams`. The rule has nothing
     // useful to say here.
-    files: ["learning/next-app-router/**"],
+    files: ["learning/next-app-router/**", "projects/next-storefront/**"],
     rules: { "react-refresh/only-export-components": "off" },
   },
   {

@@ -7,6 +7,8 @@ import { KeysAndStaleness } from "./lessons/02_keys_and_staleness";
 import { Mutations } from "./lessons/03_mutations";
 import { Optimistic } from "./lessons/04_optimistic";
 import { Infinite } from "./lessons/05_infinite";
+import { SwrLesson } from "./lessons/06_swr";
+import { Realtime } from "./lessons/07_realtime";
 
 // One client for the whole app, created outside the component. Creating it
 // inside would build a new cache on every render, which is a cache that never
@@ -54,6 +56,22 @@ const lessons = defineLessons([
     summary: "Pages instead of one answer, and the server deciding where the list ends.",
     file: "src/lessons/05_infinite.tsx",
     Component: Infinite,
+  },
+  {
+    id: "06-swr",
+    group: "The alternatives",
+    title: "SWR, and what it leaves out",
+    summary: "The same cache and dedup in a third of the bundle, minus the mutation machinery.",
+    file: "src/lessons/06_swr.tsx",
+    Component: SwrLesson,
+  },
+  {
+    id: "07-realtime",
+    group: "The alternatives",
+    title: "Polling, SSE and WebSockets",
+    summary: "Pick the cheapest one that works, and let the cache be the state, not the messages.",
+    file: "src/lessons/07_realtime.tsx",
+    Component: Realtime,
   },
 ]);
 

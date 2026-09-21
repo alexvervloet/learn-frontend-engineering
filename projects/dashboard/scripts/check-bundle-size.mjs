@@ -39,10 +39,12 @@ function gzippedTotal(extension) {
   let total = 0;
 
   for (const name of readdirSync(DIST)) {
+    // Source maps end in `.map`, so they fail this test rather than needing
+    // one of their own. That is worth saying because the obvious next line
+    // is `if (name.endsWith(".map")) continue`, which can never run: a file
+    // called `index-abc.js.map` does not end in `.js`. It sat here for a
+    // while looking like it was doing something.
     if (!name.endsWith(extension)) continue;
-    // Source maps are emitted (hidden) and never served, so they are not
-    // part of what a user downloads.
-    if (name.endsWith(".map")) continue;
 
     const path = join(DIST, name);
     if (!statSync(path).isFile()) continue;

@@ -75,6 +75,25 @@
 @supports not (anchor-name: --probe) {
   .anchored-popover {
     position: fixed;
+
+    /*
+     * `inset: auto` and `margin: 0` first, and they are the whole reason this
+     * block is longer than it looks like it should be.
+     *
+     * The UA stylesheet gives every `[popover]` `inset: 0` and `margin: auto`,
+     * which is what centres an unpositioned one in the viewport. Setting only
+     * `inset-block-end` and `inset-inline-start` leaves the other two edges
+     * pinned at 0 with auto margins still resolving against them, so the
+     * popover lands somewhere that has nothing to do with either value.
+     *
+     * The first version of this block did exactly that. It read correctly and
+     * positioned nothing, and no browser available to the test suite takes
+     * this branch, so it was the e2e spec applying these declarations by hand
+     * that found it.
+     */
+    inset: auto;
+    margin: 0;
+
     inset-block-end: 1rem;
     inset-inline-start: 50%;
     translate: -50% 0;

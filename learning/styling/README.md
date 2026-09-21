@@ -110,6 +110,32 @@ the `auto` one and returns focus to the trigger, that the `manual` one ignores
 both Escape and an outside click, and that the popover tracks the button as the
 page scrolls with no scroll listener anywhere.
 
+## The fallback nobody can run any more
+
+`popover.css` has an `@supports not (anchor-name: --probe)` block for a browser
+with the Popover API and without anchor positioning. That combination was real
+for about a year and is still real for anyone on an older release.
+
+It is not reachable from the test suite. All three engines Playwright ships
+support anchor positioning now, and it cannot be switched off:
+`--disable-blink-features=CSSAnchorPositioning` and its variants have no effect
+once a feature has shipped.
+
+Leaving it there asserted-but-never-run is how a fallback rots, so the spec
+parses the block's declarations out of the real stylesheet, applies them to the
+popover with the anchored properties neutralised, and measures where it lands.
+
+That found a bug the structural test could not. `[popover]` carries UA styles
+of `inset: 0` and `margin: auto`. The original block set `inset-block-end` and
+`inset-inline-start` and nothing else, so the other two edges stayed pinned at
+0, the auto margins resolved against them, and the popover sat 176 pixels off
+centre. It read correctly and positioned nothing. The block now starts with
+`inset: auto` and `margin: 0`.
+
+The general version: a fallback for a condition your browsers no longer meet is
+untested code with a straight face. Either exercise its contents some other
+way, or delete it and say the feature is required.
+
 ## Not covered here
 
 CSS-in-JS runtimes, `@scope`, `:has()` beyond a mention, view transitions,

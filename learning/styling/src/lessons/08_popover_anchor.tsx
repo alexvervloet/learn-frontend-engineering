@@ -48,6 +48,14 @@
  * `anchor-name` is newer than `popover` and a browser can have one without the
  * other, so `popover.css` carries a `@supports not (anchor-name: --probe)`
  * fallback. Feature-detect the positioning, not the popover.
+ *
+ * **Writing that fallback is harder than it looks**, because `[popover]` comes
+ * with UA styles: `inset: 0` and `margin: auto`, which is what centres an
+ * unpositioned one. Override two edges and the other two stay pinned at 0 with
+ * auto margins still resolving against them, so the popover lands somewhere
+ * unrelated to either value you set. The block starts with `inset: auto` and
+ * `margin: 0` for that reason, and it did not until a test applied its
+ * declarations and measured the result.
  */
 import { useRef, useState } from "react";
 

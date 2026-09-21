@@ -5,6 +5,7 @@ import { ReactHookFormLesson } from "./lessons/02_react_hook_form";
 import { ZodValidation } from "./lessons/03_zod_validation";
 import { AccessibleErrors } from "./lessons/04_accessible_errors";
 import { FieldArrays } from "./lessons/05_field_arrays";
+import { FileUpload } from "./lessons/06_file_upload";
 
 const lessons = defineLessons([
   {
@@ -46,6 +47,14 @@ const lessons = defineLessons([
     summary: "key={field.id}, debounced availability, and why the server still decides.",
     file: "src/lessons/05_field_arrays.tsx",
     Component: FieldArrays,
+  },
+  {
+    id: "06-file-upload",
+    group: "Getting it right",
+    title: "File upload",
+    summary: "An input you cannot control, a FileList that replaces itself, and progress from XHR.",
+    file: "src/lessons/06_file_upload.tsx",
+    Component: FileUpload,
   },
 ]);
 

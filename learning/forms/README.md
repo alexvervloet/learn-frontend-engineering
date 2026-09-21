@@ -1,8 +1,9 @@
 # Forms 🟢
 
-Five lessons: who owns the value, the library almost everyone reaches for, one
-schema doing two jobs, errors a screen reader can actually find, and the two
-things that go wrong with dynamic fields.
+Six lessons: who owns the value, the library almost everyone reaches for, one
+schema doing two jobs, errors a screen reader can actually find, the two things
+that go wrong with dynamic fields, and the field that plays by none of the
+rules.
 
 ## What the files cover
 
@@ -13,6 +14,7 @@ things that go wrong with dynamic fields.
 | `03_zod_validation.tsx`          | One schema giving the runtime check, the type, and something the server imports. `.refine` needs a `path`                     |
 | `04_accessible_errors.tsx`       | `aria-invalid`, `aria-describedby`, a focused summary, and never colour alone                                                 |
 | `05_field_arrays.tsx`            | `key={field.id}` not the index, debounced async checks, and why the server still decides                                      |
+| `06_file_upload.tsx`             | A field you cannot control, a `FileList` that replaces rather than appends, `accept` as a hint, and progress that needs XHR   |
 
 ## Run it
 
@@ -64,10 +66,29 @@ Async validation needs generous `findBy` timeouts. The demo debounces by 300ms
 before a 150ms request, so a 1000ms default is not always enough on a loaded CI
 machine.
 
+## Why the upload lesson does not use React Hook Form
+
+RHF registers a file input perfectly well. The interesting rules here are not
+about the field, they are about the `File` objects behind it: size, type,
+count, and how to merge two picks. Those live in `validateFiles` and
+`mergeFiles`, which are pure functions with no form library near them, and the
+suite tests them without rendering anything.
+
+The part worth copying is what the tests say about `accept`. It filters the OS
+dialog and nothing else. `user-event` honours the attribute by default, so the
+file never arrives; with `applyAccept: false` it arrives and `validateFiles` is
+what stops it. The second case is a user switching the dialog to "All files",
+which takes one click.
+
+`fetch` still cannot report upload progress, so `uploadWithProgress` is
+`XMLHttpRequest`. That is not a legacy detail to skip past: it is the reason
+every upload widget in every codebase has an XHR in it somewhere.
+
 ## Not covered here
 
-`useActionState` and form actions (react-core lesson 10 covers those), file
-uploads with progress, multi-step wizards and their state, optimistic form
-submission, and server-returned field errors mapped back onto the form with
+`useActionState` and form actions (react-core lesson 10 covers those),
+multi-step wizards and their state, optimistic form submission, resumable and
+chunked uploads, presigned direct-to-storage URLs, drag-and-drop as a second
+entry point, and server-returned field errors mapped back onto the form with
 `setError`. The last one is worth doing in the capstone, where there is a real
 server to disagree with.

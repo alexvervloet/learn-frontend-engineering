@@ -8,6 +8,7 @@ import "./tailwind.css";
 // Semantic tokens last: they reference the primitives @theme declared.
 import "./tokens.css";
 import "./motion.css";
+import "./popover.css";
 
 import { App } from "./App";
 

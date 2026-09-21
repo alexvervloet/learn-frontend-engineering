@@ -7,6 +7,7 @@ import { ContainerQueries } from "./lessons/04_container_queries";
 import { CascadeLayers } from "./lessons/05_cascade_layers";
 import { Variants } from "./lessons/06_variants";
 import { Motion } from "./lessons/07_motion";
+import { PopoverAndAnchor } from "./lessons/08_popover_anchor";
 
 const lessons = defineLessons([
   {
@@ -64,6 +65,14 @@ const lessons = defineLessons([
     summary: "CSS first, a library for what CSS cannot do, and a cross-fade for people who ask.",
     file: "src/lessons/07_motion.tsx",
     Component: Motion,
+  },
+  {
+    id: "08-popover-anchor",
+    group: "Building components",
+    title: "Popover and anchor positioning",
+    summary: "The top layer and a positioned tooltip, with no library and no measuring loop.",
+    file: "src/lessons/08_popover_anchor.tsx",
+    Component: PopoverAndAnchor,
   },
 ]);
 

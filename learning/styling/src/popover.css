@@ -1,0 +1,95 @@
+/*
+ * The Popover API and CSS anchor positioning.
+ *
+ * Two features that together delete the reason most codebases carry Floating
+ * UI or Popper. Worth reading side by side with what they replace.
+ *
+ * `[popover]` puts an element in the **top layer**, above everything in the
+ * document regardless of `z-index` or of which ancestor has `overflow: hidden`.
+ * That single property is most of what a popover library was for: the old fix
+ * was a portal to `document.body` plus a z-index arms race, and this is a
+ * declarative attribute.
+ *
+ * Anchor positioning then says where it goes, in CSS rather than in a
+ * `requestAnimationFrame` loop reading `getBoundingClientRect`.
+ *
+ *   anchor-name      on the trigger, naming it
+ *   position-anchor  on the popover, pointing at that name
+ *   position-area    which side of the anchor to sit on
+ *   position-try     what to do instead when it would overflow the viewport
+ *
+ * `position-try-fallbacks: flip-block` is the "it would go off the bottom of
+ * the screen so put it above instead" behaviour, which is the other half of
+ * what the libraries do and about forty lines of measurement code by hand.
+ */
+
+/* The trigger. The name is a dashed ident, like a custom property. */
+.anchored-trigger {
+  anchor-name: --tip-anchor;
+}
+
+/*
+ * `[popover]` gets display: none from the UA stylesheet until it is open, so
+ * there is nothing to reset and nothing to toggle in JavaScript.
+ */
+.anchored-popover {
+  position: absolute;
+  position-anchor: --tip-anchor;
+
+  /* Centred under the trigger. */
+  position-area: block-end;
+  margin-block-start: 0.5rem;
+
+  /* Flip above when there is no room below, which is what a library's
+   * flip middleware does and what a hand-rolled version forgets. */
+  position-try-fallbacks: flip-block;
+
+  max-inline-size: 18rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+
+/*
+ * The backdrop is a real pseudo-element on the popover, so a modal dimmer
+ * needs no extra div. Only `manual` and `auto` popovers get one worth styling.
+ */
+.anchored-popover::backdrop {
+  background: rgb(0 0 0 / 0.2);
+}
+
+/*
+ * The fallback, and the reason `@supports` is here rather than in a comment.
+ *
+ * Anchor positioning is the newer of the two by some margin, and a browser can
+ * have `[popover]` without it. Without this block such a browser puts the
+ * popover in the top layer at `inset: 0`-ish, centred by the UA stylesheet,
+ * which is not wrong so much as unrelated to the button that opened it.
+ *
+ * Tested with `@supports not`, so the fallback is what an old browser reads and
+ * the anchored rules above are what a new one reads.
+ */
+@supports not (anchor-name: --probe) {
+  .anchored-popover {
+    position: fixed;
+    inset-block-end: 1rem;
+    inset-inline-start: 50%;
+    translate: -50% 0;
+  }
+}
+
+/* A second popover, to show that `auto` and `manual` differ. */
+.manual-popover {
+  position: fixed;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+  max-inline-size: 16rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+  color: var(--text);
+}

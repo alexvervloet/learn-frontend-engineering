@@ -1,9 +1,10 @@
 # Styling 🟢
 
-Seven lessons on how CSS reaches a React component in 2026: scoped stylesheets,
-Tailwind 4's CSS-first config, a two-tier token system, the layout features that
-replaced JavaScript measurement, and a variant API that does not fall over when
-someone passes a `className`.
+Eight lessons on how CSS reaches a React component in 2026: scoped
+stylesheets, Tailwind 4's CSS-first config, a two-tier token system, the layout
+features that replaced JavaScript measurement, a variant API that does not fall
+over when someone passes a `className`, and the two platform features that
+between them replace a popover library.
 
 ## What the files cover
 
@@ -24,14 +25,15 @@ someone passes a `className`.
 
 ### Building components
 
-| File              | What it teaches                                                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `06_variants.tsx` | `cva` for the variant table, `clsx` for conditionals, `tailwind-merge` for conflicts. Why `className` goes last in `cn()` |
-| `07_motion.tsx`   | CSS transitions first, Motion for what CSS cannot do, and a cross-fade for people who asked for less movement             |
+| File                    | What it teaches                                                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `06_variants.tsx`       | `cva` for the variant table, `clsx` for conditionals, `tailwind-merge` for conflicts. Why `className` goes last in `cn()`     |
+| `07_motion.tsx`         | CSS transitions first, Motion for what CSS cannot do, and a cross-fade for people who asked for less movement                 |
+| `08_popover_anchor.tsx` | `popover` for the top layer, `popovertarget` for a dropdown with no JavaScript, and `anchor-name` instead of a measuring loop |
 
 Supporting files: `src/tailwind.css` (the `@theme` block), `src/tokens.css`
 (semantic roles and the three theme states), `src/layers.css`,
-`src/motion.css`, `src/cn.ts`, `src/useReducedMotion.ts`.
+`src/motion.css`, `src/popover.css`, `src/cn.ts`, `src/useReducedMotion.ts`.
 
 ## Run it
 
@@ -81,6 +83,32 @@ under Vitest. This module processes only `.module.css`, and everything else is
 stubbed out before `?raw` is honoured. Nothing errors: every assertion against
 the file's contents just passes vacuously. The tests read the stylesheets with
 `node:fs` and `import.meta.dirname` instead.
+
+## The popover lesson is mostly checked in a browser
+
+jsdom has no popover API at all: no `showPopover`, no top layer, no
+`:popover-open`. Worse, its `CSS.supports` answers `true` for anchor
+positioning it does not implement, so a feature check there is a false
+positive. The suite says so out loud rather than letting the `true` read as a
+passing test.
+
+What it does check here is the markup and the stylesheet: that `popovertarget`
+points at the right id, that `anchor-name` is on the trigger and
+`position-anchor` on the popover rather than the other way round, and that the
+`@supports not (anchor-name: …)` fallback exists. Those are the silent
+failures. A typo'd anchor name produces no error and no warning, just a
+tooltip in the wrong corner.
+
+One assertion is worth copying: a closed `[popover]` is `display: none` from
+the UA stylesheet, so everything inside it is out of the accessibility tree.
+jsdom implements that part, which means the suite can check that a screen
+reader user does not find a Close button for a popover nobody opened.
+
+`learning/testing/e2e/popover.spec.ts` covers the rest against Chromium: that
+it opens, that it sits above an `overflow: hidden` ancestor, that Escape closes
+the `auto` one and returns focus to the trigger, that the `manual` one ignores
+both Escape and an outside click, and that the popover tracks the button as the
+page scrolls with no scroll listener anywhere.
 
 ## Not covered here
 

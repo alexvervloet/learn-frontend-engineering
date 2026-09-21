@@ -1033,3 +1033,36 @@ module augmentation do not respect workspace boundaries. When a package ships
 conflict and check `npm run typecheck` across every workspace rather than the
 one you were working in. `tsc --explainFiles | grep <package>` answers "why is
 this file in my program" in one command.
+
+## Asserting the error message made a correct test flaky
+
+**Expected.** The view-transitions e2e spec proves that a duplicated
+`view-transition-name` cancels the transition, and that Chromium reports it.
+Two console errors show up, so assert both.
+
+**What happened.** It passed, twice, and failed on the third full run:
+
+```
+Expected substring: "Snapshot capture failed"
+Received string:    "Transition was skipped. New ViewTransition started"
+```
+
+`ready` rejects either way. _Why_ it rejected depends on a race: if the
+transition started by the previous click has not finished, the new one is
+skipped as superseded rather than for the duplicate name. Both are correct
+behaviour and the test's actual claim, that the transition does not run, holds
+in both.
+
+Passing in isolation and failing one run in three is the worst shape a test can
+have, because the obvious response is to rerun it.
+
+**The call.** Assert the duplicate-name console error, which is stable and is
+the thing worth knowing, and assert that `ready` rejected without asserting the
+reason. Five consecutive full runs green afterwards.
+
+**Next time.** Pin the wording of an error only when the wording _is_ the
+claim. Here it was: "Chromium tells you about a duplicate name" is a fact with
+a shelf life and deserves a string match. "The transition was skipped" is not
+about the message at all, and matching on one made the test depend on timing it
+had no reason to care about. Before asserting a message, ask whether a
+different-but-correct message should fail the build.

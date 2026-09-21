@@ -63,6 +63,12 @@ test.describe("view transitions", () => {
 
     // `ready` rejects when the transition is skipped. Ask the browser
     // directly rather than trying to observe an animation that did not run.
+    //
+    // Only that it rejected, not what it said. The reason races: usually
+    // "Snapshot capture failed", but if the toggle's own transition has not
+    // finished it is "Transition was skipped. New ViewTransition started"
+    // instead. Asserting the message failed about one run in three, which is
+    // worse than not asserting it, and the claim was never about the wording.
     const outcome = await page.evaluate(async () => {
       const transition = document.startViewTransition(() => {
         document.body.dataset["probe"] = "changed";
@@ -85,11 +91,9 @@ test.describe("view transitions", () => {
     await expect(page.locator("body")).toHaveAttribute("data-probe", "changed");
 
     // The one sign you get, and it is a console error rather than an
-    // exception. The wording is the string to search for when a transition
-    // mysteriously stops animating.
-    const log = errors.join("\n");
-    expect(log).toContain("Unexpected duplicate view-transition-name: card");
-    expect(log).toContain("Snapshot capture failed");
+    // exception. This exact wording is the string to search for when a
+    // transition mysteriously stops animating.
+    expect(errors.join("\n")).toContain("Unexpected duplicate view-transition-name: card");
   });
 
   test("names only the row being navigated to", async ({ page }) => {

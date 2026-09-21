@@ -95,16 +95,27 @@ export function indexAtX(x: number, length: number, plot: Plot): number {
 /**
  * Compact for an axis, where space is the constraint.
  *
- * `.toUpperCase()` on the suffix, deliberately: `Intl` returns "1.5k" in
- * this locale and "1.5K" reads better on a chart. It is also a reminder
- * that Intl output depends on the runtime's ICU data, so asserting the
- * exact string without normalising it is a test that passes locally and
- * fails somewhere else.
+ * The uppercase pass is deliberate: `Intl` returns "1.5k" in this locale and
+ * "1.5K" reads better on a chart.
+ *
+ * It is also where this function was wrong for a while. The first version
+ * matched `/([a-z])$/`, one letter at the end, which is right up to a
+ * million and wrong after it, because en-GB compact notation is "bn" and
+ * "tn" rather than "b" and "t". That produced "1.5bN". The chart's own data
+ * is in the thousands so nothing ever rendered it, which is exactly the kind
+ * of bug a unit test is for and exactly the kind a unit test misses when it
+ * only checks the values the caller happens to pass today.
+ *
+ * Match the whole trailing run of letters instead. That also survives a
+ * locale whose suffix is longer still, which matters more than it looks:
+ * Intl output depends on the runtime's ICU data, so asserting an exact
+ * formatted string without normalising it is a test that passes locally and
+ * fails on CI.
  */
 export function formatCompact(value: number): string {
   return new Intl.NumberFormat("en-GB", { notation: "compact", maximumFractionDigits: 1 })
     .format(value)
-    .replace(/([a-z])$/, (suffix) => suffix.toUpperCase());
+    .replace(/\p{Ll}+$/u, (suffix) => suffix.toUpperCase());
 }
 
 export function formatFull(value: number): string {

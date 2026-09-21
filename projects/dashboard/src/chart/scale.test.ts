@@ -137,4 +137,23 @@ describe("number formatting", () => {
     expect(formatCompact(1500)).toBe("1.5K");
     expect(formatCompact(0)).toBe("0");
   });
+
+  /**
+   * Past a million the suffix stops being one letter.
+   *
+   * en-GB compact notation is "bn" and "tn", so a regex matching a single
+   * trailing letter turned 1.5bn into "1.5bN". This dashboard's traffic
+   * numbers are in the thousands and never reached it, which is the whole
+   * point of testing the function rather than the screen.
+   */
+  it("uppercases a two-letter suffix as well as a one-letter one", () => {
+    expect(formatCompact(12_000)).toBe("12K");
+    expect(formatCompact(1_500_000)).toBe("1.5M");
+    expect(formatCompact(1.5e9)).toBe("1.5BN");
+    expect(formatCompact(2.3e12)).toBe("2.3TN");
+  });
+
+  it("leaves a number with no suffix alone", () => {
+    expect(formatCompact(999)).toBe("999");
+  });
 });

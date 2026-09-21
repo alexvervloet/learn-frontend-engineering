@@ -861,3 +861,61 @@ Worth checking that the tests for a lesson practise what the lesson says.
 **Separately**, the same CI run failed `format:check` on LESSONS.md, this
 file, because Prettier reflows the prose. I had been running `lint` and
 `typecheck` locally and not `format:check`. All three now, before every push.
+
+## A Suspense fallback is the whole page for a visitor without JavaScript
+
+**What I expected.** Wrap the request-dependent part of a page in
+`<Suspense>`, give it a `null` fallback because there is nothing useful to
+show yet, and let the real content stream in.
+
+**What happened.** `/sign-in` rendered an empty page with JavaScript off, and
+`/orders` rendered the word "Checking…" and stopped. Both were fine in a
+normal browser, so nothing looked broken until a Playwright test ran with
+`javaScriptEnabled: false`.
+
+**Why.** The swap is a `$RC()` call in a `<script>`. The streamed content
+arrives in a `<div hidden>` and that script moves it into place. No script,
+no move. Whatever is in the fallback is the final state of the page.
+
+This repo already had a lesson about that hidden container. I knew the
+mechanism and still wrote a `null` fallback, because I was thinking about
+what the fallback looks like for a second rather than what it is for
+somebody who never gets past it.
+
+**Two fixes, because the two pages wanted different answers.**
+
+`/sign-in` only needs the request for the `next` parameter, so its fallback
+is a working form that defaults to `/orders`. Signed in either way; the
+streamed version just remembers where you were going.
+
+`/orders` has no static shell at all. Its heading is the only thing that does
+not depend on who you are, and showing "Your orders" to a signed-out visitor
+before redirecting them is worse than waiting. So it is the one blocking
+route in the app:
+
+```ts
+export const instant = false;
+```
+
+That export is what `cacheComponents` offers when the honest answer is that
+nothing can be prerendered, and the build names it in the error it throws.
+
+**Next time.** Write the no-JavaScript test before the fallback, not after.
+And read every fallback as a finished page, because for some readers it is
+one.
+
+**A locator note.** Making the fallback a real form puts two identical forms
+in the DOM once the stream lands, one inert inside `[hidden]`. Playwright's
+strict mode refuses to pick. The tests use `:visible`. That is now the third
+time React's hidden streaming container has broken a test in this repo, so:
+when a Playwright locator suddenly matches two of something on a streamed
+page, it is the template, not a duplicate render.
+
+**And a rename.** Next 16 deprecated `middleware.ts` in favour of `proxy.ts`
+with an exported `proxy`. The old name still builds and warns.
+
+**And the Edge runtime is not Node.** `proxy.ts` imported `SESSION_COOKIE`
+from the module that also signs the cookie, which dragged `node:crypto` into
+a runtime that has none and failed the build. The constant moved to a module
+that imports nothing. The failure is the same boundary the proxy's own
+comment is about: it can route, it cannot verify.

@@ -1,9 +1,9 @@
 # Routing 🟢
 
-Five lessons on React Router 8 and the alternative that types the URL. Nested
+Six lessons on React Router 8 and the alternative that types the URL. Nested
 layouts, loading data before render, treating the query string as state,
-splitting on route boundaries, and what TanStack Router buys for the extra
-ceremony.
+splitting on route boundaries, what TanStack Router buys for the extra
+ceremony, and the browser API that animates between two pages for you.
 
 ## What the files cover
 
@@ -14,6 +14,7 @@ ceremony.
 | `03_search_params.tsx`       | Filters and pages belong in the URL. Derive from it, never copy it. `replace` while the user is adjusting something                                      |
 | `04_lazy_routes.tsx`         | `lazy` defers the component _and_ its loader in one chunk, which `React.lazy` cannot do                                                                  |
 | `05_tanstack_router.tsx`     | Paths, params and search keys checked against the route tree. `validateSearch` parses once at the boundary                                               |
+| `06_view_transitions.tsx`    | `startViewTransition`, a shared element across a navigation, and the duplicated name that silently cancels it                                            |
 
 `src/data.ts` is the shared fake API.
 
@@ -76,3 +77,43 @@ one error is a fair summary of the whole trade the lesson describes.
 prompts, scroll restoration, view transitions, and framework mode with its file
 routes and typegen. Framework mode overlaps heavily with Next, so it belongs
 next to that comparison rather than here.
+
+## What the view-transition tests can and cannot prove
+
+jsdom has no `startViewTransition`, no `::view-transition-*` pseudo-elements
+and no animation to observe. So the split is the one this repo keeps making.
+
+**Here.** That `withViewTransition` still applies the update where the API is
+missing, which is the required behaviour in a browser that lacks it and not a
+degraded mode. That a skipped transition does not become an unhandled
+rejection, which matters because `ready` rejects whenever the transition is
+skipped and a duplicated name skips it constantly. That exactly one element
+carries the shared name at rest, and that the stylesheet honours
+`prefers-reduced-motion`.
+
+**Chromium**, in `learning/testing/e2e/view-transitions.spec.ts`: that a
+transition runs at all, that a duplicated `view-transition-name` cancels it
+while the DOM update still lands, and that removing the API entirely leaves
+navigation working.
+
+Two things that cost time writing those.
+
+**`useViewTransitionState` needs a data router.** Under `<MemoryRouter>` it
+throws "must be used within a data router". The component routers have no
+navigation state to ask about, and the hook's whole question is whether a
+navigation to a given href is in flight. `createMemoryRouter` plus
+`<RouterProvider>`, the same as lesson 02.
+
+**A duplicated name is not as silent as everyone says.** The received wisdom,
+which this lesson repeated in its first draft, is that nothing warns you.
+Chromium logs `Unexpected duplicate view-transition-name: card` and an
+`InvalidStateError` from the rejected `ready`. Both are console errors rather
+than exceptions, so nothing stops, but they are there. The spec asserts the
+exact strings, because that is a claim that can stop being true.
+
+## Not covered here
+
+Cross-document view transitions (`@view-transition { navigation: auto }`),
+which need a real multi-page app rather than a client router, React's own
+`<ViewTransition>` component and `addTransitionType`, scroll restoration
+across a transition, and route-level prefetching on hover.

@@ -5,6 +5,7 @@ import { LoadersAndActions } from "./lessons/02_loaders_and_actions";
 import { SearchParams } from "./lessons/03_search_params";
 import { LazyRoutes } from "./lessons/04_lazy_routes";
 import { TanstackRouter } from "./lessons/05_tanstack_router";
+import { ViewTransitions } from "./lessons/06_view_transitions";
 
 const lessons = defineLessons([
   {
@@ -46,6 +47,14 @@ const lessons = defineLessons([
     summary: "Paths, params and search keys all checked against the route tree at compile time.",
     file: "src/lessons/05_tanstack_router.tsx",
     Component: TanstackRouter,
+  },
+  {
+    id: "06-view-transitions",
+    group: "The platform",
+    title: "View transitions",
+    summary: "The browser animates between two states, and a duplicated name silently cancels it.",
+    file: "src/lessons/06_view_transitions.tsx",
+    Component: ViewTransitions,
   },
 ]);
 

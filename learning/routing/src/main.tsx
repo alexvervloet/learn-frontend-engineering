@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import "@lab/lesson-shell/styles.css";
+import "./viewTransitions.css";
 
 import { App } from "./App";
 

@@ -1,0 +1,72 @@
+/*
+ * View transitions for the routing lesson.
+ *
+ * The browser does the animation. What CSS provides is names, so it knows
+ * which old element became which new one, and overrides for the default
+ * cross-fade.
+ *
+ * `view-transition-name` must be **unique in the document** at the moment the
+ * snapshot is taken. Two elements sharing one name aborts the whole
+ * transition, the DOM still updates, and nothing anywhere tells you why it did
+ * not animate. That is the single most common way this feature fails, and it
+ * is why the demo assigns the name to one row at a time rather than to every
+ * row in the list.
+ */
+
+/* The shared element: a row that grows into a detail panel. */
+.vt-card {
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+}
+
+/*
+ * Only the selected row gets the name, via an inline style in the component.
+ * A rule like `.vt-card { view-transition-name: card; }` would name every row
+ * in the list at once and abort every transition.
+ */
+
+.vt-detail {
+  min-block-size: 8rem;
+}
+
+/*
+ * The default animation is a cross-fade over 250ms on ::view-transition-group.
+ * Overriding it is ordinary CSS against pseudo-elements that exist only while
+ * the transition runs.
+ */
+::view-transition-old(card),
+::view-transition-new(card) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The page-level cross-fade, slower on the way in than on the way out. */
+::view-transition-old(root) {
+  animation-duration: 120ms;
+}
+
+::view-transition-new(root) {
+  animation-duration: 240ms;
+}
+
+/*
+ * Reduced motion, and this is not optional.
+ *
+ * A view transition is motion by definition, and it is full-screen motion,
+ * which is the kind that causes trouble for people with vestibular disorders.
+ * The right answer is not to skip the transition, which loses the sense of
+ * continuity, but to cross-fade instead of moving: same information, no
+ * travel.
+ *
+ * `animation: none` on the group is the blunter alternative and is also fine.
+ * What is not fine is leaving the default slide in place.
+ */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms;
+  }
+}

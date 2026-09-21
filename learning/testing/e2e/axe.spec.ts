@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+import { PORTS } from "../../../config/ports.ts";
+
 /**
  * axe against a real page, which is the only place two of its rules work.
  *
@@ -14,7 +16,7 @@ import { expect, test } from "@playwright/test";
  * having: they fail on the component rather than on a page, which is a much
  * shorter path to the fix.
  */
-test.use({ baseURL: "http://localhost:5182" });
+test.use({ baseURL: `http://localhost:${PORTS.accessibility}` });
 
 const LESSONS = ["01-the-tree", "02-keyboard", "03-focus-management", "04-live-regions"] as const;
 

@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5190;
+import { PORTS } from "../../config/ports.ts";
+
+const PORT = PORTS["next-app-router"];
 
 /**
  * Against a production build, not `next dev`.

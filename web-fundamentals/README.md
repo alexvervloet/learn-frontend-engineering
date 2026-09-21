@@ -24,7 +24,7 @@ throws instead of returning `null`.
 
 ```bash
 npm install                        # from the repo root, once
-npm run dev -w web-fundamentals    # http://localhost:5173
+npm run dev -w web-fundamentals    # http://localhost:5170
 npm test -- --project web-fundamentals
 ```
 

@@ -2,6 +2,8 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
+import { PORTS } from "../../config/ports.ts";
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
@@ -9,7 +11,7 @@ export default defineConfig({
     sourcemap: "hidden",
   },
   server: {
-    port: 5200,
+    port: PORTS["bookmark-manager"],
     // The real Express API, when you are running it. Without a backend the
     // Service Worker in src/api/browser.ts answers instead, so `npm run dev`
     // works with nothing else running.

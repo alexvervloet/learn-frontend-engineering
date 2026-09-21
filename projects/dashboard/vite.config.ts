@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 
+import { PORTS } from "../../config/ports.ts";
+
 export default defineConfig({
   plugins: [
     react(),
@@ -14,5 +16,5 @@ export default defineConfig({
   build: {
     sourcemap: "hidden",
   },
-  server: { port: 5210 },
+  server: { port: PORTS.dashboard },
 });

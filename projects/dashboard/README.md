@@ -11,7 +11,7 @@ that either renders ten thousand DOM nodes or becomes invisible to a screen
 reader.
 
 ```bash
-npm run dev -w projects/dashboard        # http://localhost:5173
+npm run dev -w projects/dashboard        # http://localhost:5210
 npm test -w projects/dashboard           # 68 tests in jsdom
 npm run e2e -w projects/dashboard        # 27 tests in Chromium, light and dark
 npm run budget -w projects/dashboard     # fails the build if the bundle grows

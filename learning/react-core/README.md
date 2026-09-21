@@ -52,7 +52,7 @@ npm run dev -w learning/react-core
 npm test -- --project react-core
 ```
 
-Deep-link to a lesson with the hash: `http://localhost:5173/#05-effects-and-cleanup`.
+Deep-link to a lesson with the hash: `http://localhost:5171/#05-effects-and-cleanup`.
 
 ## StrictMode is on
 

@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5191;
+import { PORTS } from "../../config/ports.ts";
+
+const PORT = PORTS["astro-islands"];
 
 /**
  * Against a production build, like the Next module and for the same reason.

@@ -2,6 +2,8 @@ import react from "@vitejs/plugin-react";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 
+import { PORTS } from "../../config/ports.ts";
+
 /**
  * The React Compiler is on for this module, and only this module.
  *
@@ -31,4 +33,7 @@ export default defineConfig({
       ? [visualizer({ filename: "dist/stats.html", gzipSize: true, brotliSize: true })]
       : []),
   ],
+  // One port per module, from config/ports.ts, so this module's README
+  // can name a URL that is still true when another module is running.
+  server: { port: PORTS["performance"] },
 });

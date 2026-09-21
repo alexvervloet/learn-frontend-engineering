@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5200;
+import { PORTS } from "../../config/ports.ts";
+
+const PORT = PORTS["bookmark-manager"];
 
 /**
  * Against a production build, not the dev server.

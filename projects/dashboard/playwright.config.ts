@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5210;
+import { PORTS } from "../../config/ports.ts";
+
+const PORT = PORTS.dashboard;
 
 /**
  * Against a production build, and in a real browser, because everything in

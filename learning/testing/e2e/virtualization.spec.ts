@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { PORTS } from "../../../config/ports.ts";
+
 /**
  * The claim from `learning/performance` lesson 03, which its own tests could
  * not make: a virtualised list of ten thousand rows keeps about twenty of them
@@ -9,7 +11,7 @@ import { expect, test } from "@playwright/test";
  * virtualizer correctly renders nothing. This needs a browser, and it is the
  * single clearest example in the repo of a test that has to be end to end.
  */
-test.use({ baseURL: "http://localhost:5181" });
+test.use({ baseURL: `http://localhost:${PORTS.performance}` });
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/#03-virtualization");

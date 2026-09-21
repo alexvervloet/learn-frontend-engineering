@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { PORTS } from "../../../config/ports.ts";
+
 /**
  * `:visible`, because there are two of these forms in the DOM.
  *
@@ -45,7 +47,9 @@ test.describe("the protected route", () => {
     page,
     context,
   }) => {
-    await context.addCookies([{ name: "session", value: "made.up", url: "http://localhost:5220" }]);
+    await context.addCookies([
+      { name: "session", value: "made.up", url: `http://localhost:${PORTS["next-storefront"]}` },
+    ]);
 
     await page.goto("/orders");
 

@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5220;
+import { PORTS } from "../../config/ports.ts";
+
+const PORT = PORTS["next-storefront"];
 
 /**
  * Against `next build && next start`, never the dev server.

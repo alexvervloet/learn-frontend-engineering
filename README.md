@@ -182,10 +182,16 @@ npm run build
 Work inside one module:
 
 ```bash
-npm run dev -w learning/react-core        # http://localhost:5173
+npm run dev -w learning/react-core        # http://localhost:5171
 npm test -- --project react-core
 npm run typecheck -w learning/react-core
 ```
+
+Every workspace has its own port, listed in
+[config/ports.ts](config/ports.ts) and named in its own README, so several
+can run at once. Vite's default is 5173 for all of them, which means the
+second one you start moves to 5174 without telling you and the README you
+are reading stops being true.
 
 `npm install` ends with a warning the first time:
 

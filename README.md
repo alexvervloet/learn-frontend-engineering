@@ -48,9 +48,9 @@ Every learning module is built and tested: [web-fundamentals](web-fundamentals/)
 [learning/astro-islands](learning/astro-islands/),
 [learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). `npm test` runs 830 test cases across
+[lesson-shell](packages/lesson-shell/). `npm test` runs 835 test cases across
 fifteen modules and three capstones, including type-level ones, and the browser
-suites add 143 Playwright specs on top.
+suites add 146 Playwright specs on top.
 
 ## Suggested learning path
 

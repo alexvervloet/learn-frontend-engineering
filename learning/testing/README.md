@@ -115,6 +115,15 @@ installed. Starting a browser would end both of those properties, so
 `vitest.browser.config.ts` is a second config with its own script, and the
 ordinary config excludes `*.browser.test.tsx` so no file runs twice.
 
+`npm run e2e:install` at the repo root installs Chromium once for all of it.
+Seven workspaces run Playwright and every one of them uses that same browser,
+because Playwright keeps it in a shared cache outside the repo. That only holds
+while they all resolve the same Playwright version, so
+`06_browser_mode.test.tsx` asserts it: one declared range across the seven, no
+nested copy in any of them, and the same install script everywhere. The CI job
+used to install from inside `learning/testing`, which made the coupling look
+deliberate when it was luck.
+
 ### What the demonstration actually shows
 
 `06_browser_mode.tsx` measures its own width and picks a column count. Under

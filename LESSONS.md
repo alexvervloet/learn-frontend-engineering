@@ -1066,3 +1066,66 @@ a shelf life and deserves a string match. "The transition was skipped" is not
 about the message at all, and matching on one made the test depend on timing it
 had no reason to care about. Before asserting a message, ask whether a
 different-but-correct message should fail the build.
+
+## A fallback no browser can reach is untested code with a straight face
+
+**Expected.** `learning/styling` ships an `@supports not (anchor-name: --probe)`
+block, for a browser that has the Popover API and not anchor positioning. The
+unit suite asserts the block exists and contains `position: fixed`. A real
+browser without anchor positioning would exercise it properly.
+
+**What happened.** There is no such browser available. All three engines
+Playwright ships support anchor positioning now, and it cannot be switched off:
+`--disable-blink-features=CSSAnchorPositioning` and every variant of that flag
+have no effect once a feature has shipped. The branch was unreachable, and a
+`toMatch` against the stylesheet was the only thing holding it.
+
+So the e2e spec parses the block's declarations out of the real stylesheet,
+applies them to the popover with the anchored properties neutralised, and
+measures where it lands.
+
+It landed 176 pixels off centre. `[popover]` carries UA styles of `inset: 0`
+and `margin: auto`, and the block set only `inset-block-end` and
+`inset-inline-start`, so the other two edges stayed pinned at 0 and the auto
+margins resolved against those instead. The fallback read correctly and
+positioned nothing, and had shipped that way.
+
+**The call.** `inset: auto` and `margin: 0` first, then the two edges. Removing
+those two lines now reproduces the 176px offset exactly.
+
+The parser needed one more fix on the way: it read the block's own comment as
+declarations, `setProperty` silently ignored the nonsense keys, and `inset:
+auto` never reached the element. Strip CSS comments before parsing CSS, which
+is the second time that has come up in this repo.
+
+**Next time.** A `@supports not`, a polyfill branch, an old-browser path: if
+nothing in CI takes it, it is not covered by the tests that appear to cover it.
+Either drive its contents some other way, as here, or delete it and require the
+feature. What you cannot do is leave it asserted-but-never-run and believe the
+green tick.
+
+## The browser install every e2e suite depended on was luck
+
+**Expected.** The CI job runs `npm run e2e:install -w learning/testing` and
+then seven Playwright suites across seven workspaces. Installing from one
+workspace and running from seven looked like a deliberate arrangement.
+
+**What happened.** It works because Playwright stores browsers in a shared
+cache outside the repo, so whichever workspace asks first supplies the rest.
+That holds only while all seven resolve the same `@playwright/test`. Pin one to
+a different version and npm stops hoisting it, that workspace gets a nested
+copy expecting a different browser build, and CI fails with "Executable doesn't
+exist at …" rather than anything about a version conflict.
+
+Nothing anywhere said so, and the `-w learning/testing` made it look intended.
+
+**The call.** An `e2e:install` script at the root, which is the level the job
+actually depends on, and a test that asserts the condition it rests on: one
+declared Playwright range across the seven, no nested copy in any of them, and
+the same install script everywhere. Verified by pointing
+`PLAYWRIGHT_BROWSERS_PATH` at an empty directory, installing once, and running
+all 146 specs from it.
+
+**Next time.** When a CI step works because of a cache outside the repo, say so
+in the step and test the assumption. `PLAYWRIGHT_BROWSERS_PATH=$(mktemp -d)` is
+a one-line way to find out what a cold runner actually does.

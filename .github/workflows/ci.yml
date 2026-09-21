@@ -60,9 +60,18 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
+      # Once, at the root, for every suite in this job.
+      #
+      # It used to be `-w learning/testing`, which worked by accident: the
+      # browser cache is shared across workspaces, so whichever suite
+      # installed first supplied the rest. That holds only while every
+      # workspace resolves the same @playwright/test, and nothing said so.
+      # `learning/testing/src/lessons/06_browser_mode.test.tsx` now asserts
+      # it, and this installs at the level the whole job depends on.
+      #
       # Chromium only. The other two engines roughly triple the download for
       # tests that are about layout and the cascade, not about engine quirks.
-      - run: npm run e2e:install -w learning/testing
+      - run: npm run e2e:install
       # Playwright starts the dev servers itself; see
       # learning/testing/playwright.config.ts.
       - run: npm run e2e -w learning/testing
@@ -90,7 +99,7 @@ jobs:
       - run: npm run e2e -w learning/production
       # Vitest browser mode. Not part of `npm test`, because it starts a
       # browser and `npm test` should stay runnable without one. It lives in
-      # this job because the browsers are already installed here.
+      # this job because the browsers are installed here.
       - run: npm run test:browser -w learning/testing
       - uses: actions/upload-artifact@v4
         if: failure()

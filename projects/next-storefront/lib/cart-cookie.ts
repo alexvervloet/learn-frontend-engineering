@@ -7,8 +7,7 @@ import "server-only";
 import { cookies } from "next/headers";
 
 import { parseCart, serialiseCart, type Cart } from "./cart";
-
-const NAME = "cart";
+import { CART_COOKIE as NAME } from "./cookie-names";
 
 export async function readCart(): Promise<Cart> {
   // `cookies()` is async in Next 16 and reading it opts the route out of

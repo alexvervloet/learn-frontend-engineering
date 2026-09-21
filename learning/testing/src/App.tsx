@@ -5,6 +5,7 @@ import { Async } from "./lessons/02_async";
 import { Mocking } from "./lessons/03_mocking";
 import { WhatNotToTest } from "./lessons/04_what_not_to_test";
 import { Layers } from "./lessons/05_layers";
+import { BrowserMode } from "./lessons/06_browser_mode";
 
 const lessons = defineLessons([
   {
@@ -46,6 +47,14 @@ const lessons = defineLessons([
     summary: "jsdom's ceiling, and the Playwright suite that finishes what it could not check.",
     file: "src/lessons/05_layers.tsx",
     Component: Layers,
+  },
+  {
+    id: "06-browser-mode",
+    group: "Where a test runs",
+    title: "Vitest browser mode",
+    summary: "The same test file in a real engine, for the claims jsdom answers with a zero.",
+    file: "src/lessons/06_browser_mode.tsx",
+    Component: BrowserMode,
   },
 ]);
 

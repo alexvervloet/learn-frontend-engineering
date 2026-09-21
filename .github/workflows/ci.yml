@@ -88,6 +88,10 @@ jobs:
       # it caches hashed asset filenames and the dev server serves unhashed
       # module URLs. Also the only suite that switches the network off.
       - run: npm run e2e -w learning/production
+      # Vitest browser mode. Not part of `npm test`, because it starts a
+      # browser and `npm test` should stay runnable without one. It lives in
+      # this job because the browsers are already installed here.
+      - run: npm run test:browser -w learning/testing
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

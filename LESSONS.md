@@ -984,3 +984,52 @@ a real parser does, and the gap between the guess and the parser is where the
 bug lives. Parse, then inspect the parsed result. Same instinct as using
 DOMPurify instead of a tag blocklist, which this repo already argues for in the
 production module.
+
+## Adding a dev dependency to one workspace broke `tsc` in six others
+
+**Expected.** `@vitest/browser` goes into `learning/testing` so that module can
+run a suite in Chromium. Nothing else in the repo uses browser mode, so nothing
+else should notice.
+
+**What happened.** `npm run typecheck` failed in accessibility, performance,
+routing, typescript-react, bookmark-manager and dashboard, on six assertions
+that were correct and passing:
+
+```
+error TS2345: Argument of type 'RegExp' is not assignable to parameter of
+type 'string | number'.
+```
+
+All six were `expect(x).toHaveTextContent(/some pattern/)`.
+
+`@vitest/browser` ships its own copy of the jest-dom matcher declarations, for
+use with `expect.element` in browser mode, and augments `vitest`'s `Assertion`
+interface with them. In that copy `toHaveTextContent` takes `string | number`.
+jest-dom's real signature is `string | RegExp`, and the runtime has always
+accepted a RegExp.
+
+npm hoists the package to the root `node_modules`, and TypeScript pulls the
+augmentation into any program that imports `vitest`. `tsc --explainFiles` is
+what showed it:
+
+```
+Imported via 'vitest' from file 'node_modules/@vitest/browser/matchers.d.ts'
+```
+
+**The call.** One declaration in `config/testing-matchers.d.ts`, which every
+workspace already includes, adding the missing overload back. Interface
+declarations merge and a method declared twice becomes an overload set rather
+than a redefinition, so the correct shape is restored everywhere and no test
+changed.
+
+The alternative was rewriting six regexes as substrings to satisfy a
+declaration that is wrong about the library it describes, which would have
+meant weakening six real assertions for a types bug.
+
+**Next time.** A dev dependency in one workspace of a monorepo is a dependency
+of all of them as far as TypeScript is concerned, because hoisting and global
+module augmentation do not respect workspace boundaries. When a package ships
+`declare module` for something another package already declares, expect a
+conflict and check `npm run typecheck` across every workspace rather than the
+one you were working in. `tsc --explainFiles | grep <package>` answers "why is
+this file in my program" in one command.

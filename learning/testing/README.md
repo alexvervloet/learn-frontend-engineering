@@ -1,6 +1,6 @@
 # Testing 🟢 🎭
 
-Five lessons on writing a test worth having, plus the two things this repo had
+Six lessons on writing a test worth having, plus the two things this repo had
 been promising and not doing: a real browser suite and a Storybook.
 
 🎭 means the end-to-end suite needs Chromium. `npm run e2e:install -w
@@ -15,6 +15,7 @@ learning/testing` fetches it, once.
 | `03_mocking.tsx`          | `vi.fn`, `vi.spyOn`, the `vi.mock` hoisting trap and `vi.hoisted`, fake timers, and why the network is not a thing to mock                                                     |
 | `04_what_not_to_test.tsx` | Two tests of one component: one fails on a CSS rename, one fails when it genuinely breaks                                                                                      |
 | `05_layers.tsx`           | jsdom's ceiling, and which tool to reach for past it                                                                                                                           |
+| `06_browser_mode.tsx`     | The same test file in Chromium instead of jsdom, for the claims jsdom answers with a zero                                                                                      |
 
 | Elsewhere                          | What it is                                                   |
 | ---------------------------------- | ------------------------------------------------------------ |
@@ -86,3 +87,60 @@ Visual regression (Playwright screenshots, Chromatic), component testing in a
 real browser with `@vitest/browser`, contract testing against a real API,
 mutation testing, and load testing. `@vitest/browser` in particular is worth
 watching: it closes most of the jsdom gap this module is organised around.
+
+## Three places a test can run, and how to choose
+
+This module now has all three, which makes the choice concrete rather than
+theoretical.
+
+|                      | Runs in  | Mounts                  | Good for                                              | Costs                |
+| -------------------- | -------- | ----------------------- | ----------------------------------------------------- | -------------------- |
+| Vitest, jsdom        | Node     | a component             | logic, markup, roles, events                          | milliseconds         |
+| Vitest, browser mode | Chromium | a component             | layout, geometry, real observers, the cascade         | a browser start      |
+| Playwright           | Chromium | the built app over HTTP | routing, navigation, service workers, the real bundle | a build and a server |
+
+The rule that holds up: **if the test would mount a component and assert
+something about pixels, use browser mode. If it would visit a page, use
+Playwright.** Everything else stays in jsdom, which is most tests.
+
+Browser mode is opt in, and deliberately not part of `npm test`:
+
+```bash
+npm run e2e:install -w learning/testing    # the browsers, once
+npm run test:browser -w learning/testing
+```
+
+`npm test` across every workspace takes about ten seconds and needs nothing
+installed. Starting a browser would end both of those properties, so
+`vitest.browser.config.ts` is a second config with its own script, and the
+ordinary config excludes `*.browser.test.tsx` so no file runs twice.
+
+### What the demonstration actually shows
+
+`06_browser_mode.tsx` measures its own width and picks a column count. Under
+jsdom every element is 0x0, so it always reports one column, and the jsdom test
+can only assert that the fallback is sane. The same component in
+`06_browser_mode.browser.test.tsx` gets a real number, a real
+`ResizeObserver`, and a `gridTemplateColumns` the engine computed.
+
+That is not contrived. It is the same failure the performance module hits with
+TanStack Virtual, where the virtualizer measures a scroll container, finds
+nothing visible, renders no rows, and the suite reports success.
+
+Note what does not change between the two files: `render`, `screen`, the same
+queries, the same `expect`. Vitest's own locator API is available in browser
+mode and is good, but the files here stay on Testing Library to make the point
+that an existing suite changes environment without being rewritten.
+
+### Two things that cost time setting it up
+
+**`provider: "playwright"` is not a string any more.** Vitest 5 moved the
+providers into their own packages, so it is `playwright()` imported from
+`@vitest/browser-playwright`. The string form fails at startup with "Browser
+Mode was enabled, but provider was not specified anywhere", which does not
+obviously mean "you passed a string".
+
+**The shared jsdom setup must not load here.** `config/vitest.setup.ts` stubs
+`ResizeObserver`, `IntersectionObserver` and `matchMedia` with no-ops, which is
+correct for jsdom and would defeat the entire point in a browser.
+`vitest.browser.setup.ts` loads the matchers and nothing else.

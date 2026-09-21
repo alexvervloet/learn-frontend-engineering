@@ -14,6 +14,11 @@ export default defineConfig({
     // Playwright owns `e2e/`. Without this, Vitest tries to run those files,
     // fails to resolve `@playwright/test`'s `test` export against its own, and
     // reports a confusing error about hooks outside a suite.
-    exclude: ["e2e/**", "node_modules/**", "dist/**"],
+    //
+    // `*.browser.test.tsx` belongs to vitest.browser.config.ts, which runs in
+    // a real Chromium. Excluding it here is what stops the same file running
+    // twice under two environments, where the jsdom pass would fail on every
+    // assertion the browser pass exists to make.
+    exclude: ["e2e/**", "src/**/*.browser.test.tsx", "node_modules/**", "dist/**"],
   },
 });

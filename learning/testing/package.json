@@ -12,7 +12,8 @@
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:browser": "vitest run --config vitest.browser.config.ts"
   },
   "dependencies": {
     "@lab/lesson-shell": "*"
@@ -22,6 +23,8 @@
     "@playwright/test": "^1.63.0",
     "@storybook/addon-a11y": "^10.6.0",
     "@storybook/react-vite": "^10.6.0",
+    "@vitest/browser": "^5.0.1",
+    "@vitest/browser-playwright": "^5.0.1",
     "storybook": "^10.6.0"
   }
 }

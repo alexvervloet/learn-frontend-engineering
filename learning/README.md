@@ -10,22 +10,22 @@ npm test -- --project <module>
 
 ## Modules
 
-| Module                                        | Needs | What it covers                                                                                       |
-| --------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------- |
-| [react-core](react-core/)                     | 🟢    | State, effects, refs, context, reducers, transitions, Suspense                                       |
-| [typescript-react](typescript-react/)         | 🟢    | Props, events, refs, unions, generics, context, and the boundary. Asserts types as well as behaviour |
-| [styling](styling/)                           | 🟢    | CSS modules, Tailwind 4, design tokens, container queries, cascade layers, cva, motion               |
-| [routing](routing/)                           | 🟢    | React Router 8 data routers, the URL as state, code splitting, TanStack Router                       |
-| [state-management](state-management/)         | 🟢    | Where state belongs, the cost of lifting, Zustand, Redux Toolkit, Jotai                              |
-| [forms](forms/)                               | 🟢    | Controlled vs uncontrolled, React Hook Form, Zod, accessible errors, field arrays                    |
-| [testing](testing/)                           | 🟢 🎭 | Vitest and Testing Library, Storybook stories run in Vitest, Playwright against the styling module   |
-| [performance](performance/)                   | 🟢    | Profiler over render counts, the React Compiler, virtualization, Web Vitals, bundle size             |
-| [accessibility](accessibility/)               | 🟢    | The accessibility tree, keyboard order, focus management, live regions, axe                          |
-| [rendering-strategies](rendering-strategies/) | 🟢    | CSR, SSR, streaming, SSG and ISR against React's own server APIs                                     |
-| [next-app-router](next-app-router/)           | 🟢 🎭 | Next 16: Server Components, the client boundary, streaming, server actions                           |
-| [astro-islands](astro-islands/)               | 🟢 🎭 | Astro 7: zero JavaScript by default, and hydrating only what needs it                                |
-| [production](production/)                     | 🟢 🐳 | Env config, XSS and CSP, auth storage, error reporting, feature flags, i18n, Docker and nginx        |
-| [data-fetching](data-fetching/)               | 🟢    | TanStack Query, caching, mutations, optimistic updates, MSW                                          |
+| Module                                        | Needs    | What it covers                                                                                       |
+| --------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| [react-core](react-core/)                     | 🟢       | State, effects, refs, context, reducers, transitions, Suspense                                       |
+| [typescript-react](typescript-react/)         | 🟢       | Props, events, refs, unions, generics, context, and the boundary. Asserts types as well as behaviour |
+| [styling](styling/)                           | 🟢       | CSS modules, Tailwind 4, design tokens, container queries, cascade layers, cva, motion, popover      |
+| [routing](routing/)                           | 🟢       | React Router 8 data routers, the URL as state, code splitting, TanStack Router, view transitions     |
+| [state-management](state-management/)         | 🟢       | Where state belongs, the cost of lifting, Zustand, Redux Toolkit, Jotai                              |
+| [forms](forms/)                               | 🟢       | Controlled vs uncontrolled, React Hook Form, Zod, accessible errors, field arrays, file upload       |
+| [testing](testing/)                           | 🟢 🎭    | Vitest and Testing Library, Storybook in Vitest, browser mode, Playwright against the other modules  |
+| [performance](performance/)                   | 🟢       | Profiler over render counts, the React Compiler, virtualization, Web Vitals, bundle size             |
+| [accessibility](accessibility/)               | 🟢       | The accessibility tree, keyboard order, focus management, live regions, axe                          |
+| [rendering-strategies](rendering-strategies/) | 🟢       | CSR, SSR, streaming, SSG and ISR against React's own server APIs                                     |
+| [next-app-router](next-app-router/)           | 🟢 🎭    | Next 16: Server Components, the client boundary, streaming, server actions                           |
+| [astro-islands](astro-islands/)               | 🟢 🎭    | Astro 7: zero JavaScript by default, and hydrating only what needs it                                |
+| [production](production/)                     | 🟢 🎭 🐳 | Env config, XSS and CSP, auth storage, error reporting, flags, i18n, Docker and nginx, PWA           |
+| [data-fetching](data-fetching/)               | 🟢       | TanStack Query, caching, mutations, optimistic updates, MSW, SWR, SSE and WebSockets                 |
 
 ## All of them are built
 

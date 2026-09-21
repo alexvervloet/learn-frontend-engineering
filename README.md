@@ -48,34 +48,35 @@ Every learning module is built and tested: [web-fundamentals](web-fundamentals/)
 [learning/astro-islands](learning/astro-islands/),
 [learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). `npm test` runs 682 assertions across
+[lesson-shell](packages/lesson-shell/). `npm test` runs 830 test cases across
 fifteen modules and three capstones, including type-level ones, and the browser
-suites add 123 Playwright specs.
+suites add 143 Playwright specs on top.
 
 ## Suggested learning path
 
 Each module stands alone, so skip ahead if a topic is already familiar.
 
-1. **[web-fundamentals/](web-fundamentals/)** — the DOM, the event loop, fetch,
-   storage, and the rendering pipeline. React is an abstraction over all of it,
-   and the abstraction leaks.
+1. **[web-fundamentals/](web-fundamentals/)** — the DOM, the event loop, fetch
+   and the five places to put data. React is an abstraction over all of it, and
+   the abstraction leaks.
 2. **[learning/react-core/](learning/react-core/)** — state, effects, refs,
    context, reducers, Suspense, transitions. The largest module, and the one
    everything else assumes.
 3. **[learning/typescript-react/](learning/typescript-react/)** — typing props,
    children, events, refs, generic components, and state that cannot be invalid.
 4. **[learning/styling/](learning/styling/)** — CSS modules, Tailwind 4, design
-   tokens, dark mode, container queries, animation.
+   tokens, dark mode, container queries, animation, popovers.
 5. **[learning/routing/](learning/routing/)** — React Router 8 data routers and
-   TanStack Router, nested layouts, and the URL as state.
+   TanStack Router, nested layouts, the URL as state, view transitions.
 6. **[learning/data-fetching/](learning/data-fetching/)** — TanStack Query,
-   caching, mutations, optimistic updates, and mocking a network with MSW.
+   caching, mutations, optimistic updates, SWR for contrast, real time, and
+   mocking a network with MSW.
 7. **[learning/state-management/](learning/state-management/)** — where state
    belongs, and what Zustand, Redux Toolkit and Jotai each buy you.
 8. **[learning/forms/](learning/forms/)** — React Hook Form with Zod, validation
-   UX, and errors a screen reader announces.
+   UX, errors a screen reader announces, and file upload.
 9. **[learning/testing/](learning/testing/)** — Vitest, Testing Library,
-   Playwright, Storybook.
+   browser mode, Playwright, Storybook.
 10. **[learning/accessibility/](learning/accessibility/)** — semantics, keyboard
     order, focus management, and axe in CI.
 11. **[learning/performance/](learning/performance/)** — the React Compiler,
@@ -85,7 +86,8 @@ Each module stands alone, so skip ahead if a topic is already familiar.
     then [next-app-router](learning/next-app-router/) and
     [astro-islands](learning/astro-islands/).
 13. **[learning/production/](learning/production/)** — env config, CSP, auth in
-    the browser, Sentry, analytics, feature flags, i18n, PWA, Docker, CI/CD.
+    the browser, error reporting, feature flags, i18n, Docker and nginx, and a
+    service worker.
 14. **[projects/](projects/)** — read and run
     [bookmark-manager](projects/bookmark-manager/) first, then
     [dashboard](projects/dashboard/), then
@@ -107,54 +109,63 @@ Each module's README states exactly what it needs.
 
 ### web-fundamentals
 
-The platform React compiles down to. Event loop and task queues, DOM APIs and
-event delegation, the rendering pipeline, `fetch` with abort and caching
-headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
+The platform React compiles down to. Four lessons: DOM APIs and event
+delegation, including the one listener that genuinely leaks; the event loop and
+what is and is not ordered by the spec; `fetch` with `AbortController` and the
+stale-response bug; and the five places a browser can store something, with a
+working adapter for each.
 
 ### learning/
 
-- **react-core** — rendering, state, props, lists and keys, effects and when not
-  to use one, refs, context, `useReducer`, composition, custom hooks, portals,
-  error boundaries, Suspense, `useTransition`, `useOptimistic`, `useActionState`
+- **[react-core](learning/react-core/)** — rendering and commit, state as a
+  snapshot, lists and keys, effects and when not to use one, refs and focus,
+  context, `useReducer` as a state machine, `useTransition` and
+  `useDeferredValue`, `useActionState` and `useOptimistic`, Suspense with
+  `use` and `lazy`
 - **[typescript-react](learning/typescript-react/)** — props and children, events, `ref` as a prop in React 19,
   generic and polymorphic components, discriminated unions for state, type-safe
   context, when `as` is a bug
-- **[styling](learning/styling/)** — CSS modules, Tailwind 4 and its CSS-first config, design tokens
-  with custom properties, dark mode, container queries, cascade layers,
-  `class-variance-authority` and the shadcn/ui pattern, animation with Motion
-- **[routing](learning/routing/)** — React Router 8 data routers, loaders and actions, nested
-  layouts, route-level code splitting, TanStack Router's type-safe params,
-  search params as application state
-- **data-fetching** — `fetch` in an effect and why it goes wrong, TanStack Query
-  (cache keys, staleness, invalidation, mutations, optimistic updates, infinite
-  queries, prefetching), SWR for contrast, MSW as the test network, retries,
-  error and loading states that do not flash
+- **[styling](learning/styling/)** — CSS modules, Tailwind 4 and its CSS-first
+  config, design tokens with custom properties, dark mode, container queries,
+  cascade layers, `class-variance-authority` and the shadcn/ui pattern,
+  animation with Motion, and the Popover API with anchor positioning
+- **[routing](learning/routing/)** — React Router 8 data routers, loaders and
+  actions, nested layouts, route-level code splitting, TanStack Router's
+  type-safe params, search params as application state, and view transitions
+- **[data-fetching](learning/data-fetching/)** — `fetch` in an effect and why it
+  goes wrong, TanStack Query (cache keys, staleness, invalidation, mutations,
+  optimistic updates, infinite queries), SWR beside it for contrast, polling
+  against SSE against WebSockets, MSW as the test network for both HTTP and a
+  socket
 - **[state-management](learning/state-management/)** — local vs lifted vs context vs store, the server/client
   state split, Zustand, Redux Toolkit, Jotai, selectors and the re-render cost
   of getting it wrong
-- **[forms](learning/forms/)** — controlled and uncontrolled inputs, React Hook Form with a Zod
-  schema, async validation, field arrays, file upload, `useActionState`,
-  accessible error messaging
-- **[testing](learning/testing/)** — Vitest, Testing Library and querying by role, `user-event`, MSW,
-  what belongs in a unit test and what does not, Playwright end to end,
-  Storybook 10 with interaction and a11y tests, coverage that means something
-- **[accessibility](learning/accessibility/)** — semantic HTML first, the accessibility tree, keyboard
-  order, focus management in dialogs and route changes, live regions, ARIA
-  patterns, axe in CI
-- **[performance](learning/performance/)** — the React Profiler, `memo`/`useMemo`/`useCallback` and how
-  the React Compiler changes that advice, `Suspense` and lazy routes,
-  virtualization with TanStack Virtual, images, Core Web Vitals, reading a
-  bundle analysis
+- **[forms](learning/forms/)** — controlled and uncontrolled inputs, React Hook
+  Form with a Zod schema, async validation, field arrays, accessible error
+  messaging, and file upload: the field you cannot control, `accept` as a hint
+  rather than a check, and progress that still needs XHR
+- **[testing](learning/testing/)** — Vitest, Testing Library and querying by
+  role, `user-event`, mocking and what not to mock, what belongs in a unit test
+  and what does not, Storybook 10 with interaction and a11y tests, and the
+  three places a test can run: jsdom, Vitest browser mode, and Playwright
+- **[accessibility](learning/accessibility/)** — semantic HTML first, the
+  accessibility tree, keyboard order and roving tabindex, focus management in a
+  dialog, live regions and the one that is silent, and what axe catches and
+  what it cannot
+- **[performance](learning/performance/)** — the React Profiler over render
+  counts, `memo`/`useMemo`/`useCallback` and how the React Compiler changes
+  that advice, virtualization with TanStack Virtual, Core Web Vitals and their
+  thresholds, reading a bundle analysis
 - **[rendering-strategies](learning/rendering-strategies/)** — CSR, SSR, SSG, ISR and streaming, hand-rolled
   against React's own APIs so the framework versions stop being magic
 - **[next-app-router](learning/next-app-router/)** — Next 16, Server Components, server actions, streaming
   and caching, route handlers, the client/server boundary
 - **[astro-islands](learning/astro-islands/)** — Astro 7, partial hydration, and when a React SPA is the
   wrong answer
-- **[production](learning/production/)** — build output and env config, Content Security Policy and XSS,
-  where a token can safely live, Sentry, RUM and Core Web Vitals in the field,
-  feature flags, i18n with react-i18next, PWA and offline, Docker and nginx,
-  CI/CD and preview deploys
+- **[production](learning/production/)** — build output and env config, Content
+  Security Policy and XSS, where a token can safely live, error reporting and
+  what a boundary does not catch, feature flags, i18n with react-i18next,
+  Docker and nginx, and a PWA with a service worker short enough to read
 
 ### projects/
 
@@ -217,7 +228,8 @@ is not listed, run `npm install-scripts approve <pkg>`.
 
 Versions were pinned from the registry in September 2026: React 19.3, Vite 8,
 Vitest 5, TypeScript 5.9, Tailwind 4.3, React Router 8, TanStack Query 5.103,
-Next 16.3, Storybook 10, Playwright 1.63, MSW 2.15, Zod 4.6.
+SWR 2.5, Next 16.3, Astro 7.3, Storybook 10, Playwright 1.63, MSW 2.15,
+Zod 4.6.
 
 ## Related
 

@@ -51,12 +51,25 @@ function stubViewTransitions({ skip = false } = {}) {
     value: (update: () => void) => {
       calls.push(update);
       update();
+      // A skipped transition rejects both `ready` and `finished`. A
+      // duplicated view-transition-name is how that happens in practice.
+      //
+      // The `.catch` on `ready` is not the stub being tidy, it is the stub
+      // staying out of the way. `withViewTransition` deliberately awaits
+      // `finished` and never touches `ready`, so an unhandled rejection here
+      // is Vitest reporting the *stub's* dangling promise rather than
+      // anything about the code under test. A real browser does report it,
+      // and that is the one the e2e spec asserts.
+      const rejected = (): Promise<void> => {
+        const promise = Promise.reject(new Error("skipped"));
+        promise.catch(() => undefined);
+        return promise;
+      };
+
       return {
         updateCallbackDone: Promise.resolve(),
-        // A skipped transition rejects `ready`. The demo of that is a
-        // duplicated view-transition-name, which happens constantly.
-        ready: skip ? Promise.reject(new Error("skipped")) : Promise.resolve(),
-        finished: skip ? Promise.reject(new Error("skipped")) : Promise.resolve(),
+        ready: skip ? rejected() : Promise.resolve(),
+        finished: skip ? rejected() : Promise.resolve(),
         skipTransition: () => undefined,
       };
     },

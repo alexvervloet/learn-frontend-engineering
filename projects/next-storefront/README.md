@@ -10,8 +10,8 @@ work to the server and asks what is left.
 
 ```bash
 npm run dev -w projects/next-storefront     # http://localhost:5220
-npm test -w projects/next-storefront        # 29 tests in Node
-npm run e2e -w projects/next-storefront     # 31 tests in Chromium
+npm test -w projects/next-storefront        # 34 tests in Node
+npm run e2e -w projects/next-storefront     # 38 tests in Chromium
 npm run build -w projects/next-storefront   # read the route table it prints
 ```
 
@@ -96,6 +96,57 @@ one you get wrong.
 There is a Playwright test that runs the whole add-to-bag flow with
 `javaScriptEnabled: false`, because the claim is easy to make and easy to
 break.
+
+## The gate is not the lock
+
+`/orders` is protected twice, on purpose.
+
+[`proxy.ts`](proxy.ts) runs at the edge, before the route, and redirects
+anyone without a `session` cookie. It checks that the cookie exists. It
+cannot check that it is valid, because verifying an HMAC needs
+`node:crypto` and the Edge runtime has none. Importing a module that touches
+crypto there fails the build, which is a quick way to find out.
+
+So [`app/orders/page.tsx`](app/orders/page.tsx) verifies the signature
+itself. A forged cookie gets past the proxy and no further, and there is a
+test that sets `session=made.up` and watches it bounce.
+
+That split is the thing to take away. The proxy is a fast gate that saves
+rendering a page nobody may see. It is not the lock. A page that trusts it
+and skips its own check is one routing mistake away from being open, and the
+proxy does not run for a server action at all.
+
+The other trap here is the redirect. `?next=` comes from the query string,
+so `/sign-in?next=https://evil.example` is a link from your own domain that
+sends people elsewhere the moment they finish signing in. Only a path is
+accepted, and not `//host` either, which a browser reads as
+protocol-relative.
+
+None of this is authentication. There is no password and no user store.
+Swapping in Auth.js changes [`lib/session.ts`](lib/session.ts) and nothing
+else, which is why it is one file.
+
+## A fallback is a finished page for some readers
+
+Two pages here need the request, and they answer it differently.
+
+`/sign-in` needs it only for `next`, so its Suspense fallback is a working
+form that defaults to `/orders`. You can sign in either way; the streamed
+version just remembers where you were going.
+
+`/orders` has no static shell worth sending. Its heading is the only thing
+that does not depend on who you are, and showing "Your orders" to a
+signed-out visitor before redirecting them is worse than waiting. So it is
+the one route in the app that blocks:
+
+```ts
+export const instant = false;
+```
+
+Both of these started as `<Suspense fallback={null}>`, which rendered an
+empty page with JavaScript switched off. The swap is a `$RC()` call in a
+script, so with no script the fallback is the whole page. Read every
+fallback as a finished page.
 
 ## The URL is the search state
 

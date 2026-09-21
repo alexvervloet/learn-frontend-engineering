@@ -48,9 +48,9 @@ Every learning module is built and tested: [web-fundamentals](web-fundamentals/)
 [learning/astro-islands](learning/astro-islands/),
 [learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). `npm test` runs 677 assertions across
+[lesson-shell](packages/lesson-shell/). `npm test` runs 682 assertions across
 fifteen modules and three capstones, including type-level ones, and the browser
-suites add 116 Playwright specs.
+suites add 123 Playwright specs.
 
 ## Suggested learning path
 
@@ -164,8 +164,8 @@ headers, cookies vs `localStorage` vs IndexedDB, ES modules and tree shaking.
   10,000-row virtualised grid, a validated palette in two themes, and a
   bundle budget that fails the build
 - **[next-storefront](projects/next-storefront/)** — Server Components,
-  validated server actions, a cookie cart, streaming search, and forms that
-  work before JavaScript does
+  validated server actions, a cookie cart, streaming search, a
+  proxy-gated route, and forms that work before JavaScript does
 
 ## Setup
 

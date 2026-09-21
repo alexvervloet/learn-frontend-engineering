@@ -7,6 +7,7 @@ import { ErrorsAndMonitoring } from "./lessons/04_errors_and_monitoring";
 import { FeatureFlags } from "./lessons/05_feature_flags";
 import { Internationalisation } from "./lessons/06_i18n";
 import { Shipping } from "./lessons/07_shipping";
+import { Offline } from "./lessons/08_offline";
 
 const lessons = defineLessons([
   {
@@ -65,6 +66,14 @@ const lessons = defineLessons([
     summary: "Two build stages, and the four nginx rules that are not optional.",
     file: "src/lessons/07_shipping.tsx",
     Component: Shipping,
+  },
+  {
+    id: "08-offline",
+    group: "Shipping",
+    title: "PWA and offline",
+    summary: "A service worker you can read, the caching rule that matters, and the kill switch.",
+    file: "src/lessons/08_offline.tsx",
+    Component: Offline,
   },
 ]);
 

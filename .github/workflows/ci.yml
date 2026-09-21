@@ -84,6 +84,10 @@ jobs:
       # everything on demand, so an ISR test against it passes whatever the
       # caching config says.
       - run: npm run e2e -w projects/next-storefront
+      # The service worker, against a production build for the same reason:
+      # it caches hashed asset filenames and the dev server serves unhashed
+      # module URLs. Also the only suite that switches the network off.
+      - run: npm run e2e -w learning/production
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -95,6 +99,7 @@ jobs:
             projects/bookmark-manager/playwright-report/
             projects/dashboard/playwright-report/
             projects/next-storefront/playwright-report/
+            learning/production/playwright-report/
           retention-days: 7
 
   build:

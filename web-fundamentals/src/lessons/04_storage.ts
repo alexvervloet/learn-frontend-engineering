@@ -318,7 +318,8 @@ export async function openKeyValueStore(name = DB_NAME): Promise<KeyValueStore> 
  * It is available on the window as well as in a worker, which makes it easy
  * to try. jsdom does not implement it, so the test for this asserts the
  * feature detection and nothing more; the behaviour is proved against a real
- * browser in the production module's offline lesson.
+ * browser in `learning/production/e2e/offline.spec.ts`, which registers a
+ * service worker, precaches the shell, and switches the network off.
  */
 export function hasCacheStorage(): boolean {
   return typeof globalThis.caches !== "undefined";

@@ -919,3 +919,68 @@ from the module that also signs the cookie, which dragged `node:crypto` into
 a runtime that has none and failed the build. The constant moved to a module
 that imports nothing. The failure is the same boundary the proxy's own
 comment is about: it can route, it cannot verify.
+
+## A cleanup test that passed with the cleanup deleted
+
+**Expected.** `web-fundamentals` lesson 01 is about event delegation and the
+teardown contract, and it has a test called "stops responding once unmounted".
+Deleting the `removeEventListener` calls should fail it.
+
+**What happened.** It did not. The test asserted `root.innerHTML === ""` and
+nothing else, and every listener in the lesson was attached to a node _inside_
+`root`. The teardown's last line is `root.innerHTML = ""`, which detaches those
+nodes, and an unreachable node's listeners are unreachable with it. The
+`removeEventListener` calls the whole lesson was written to teach were doing
+nothing at all.
+
+Worse than a weak test: the lesson taught the wrong instinct. "Always remove
+your listeners or you leak" is true for the case it did not show and false for
+the case it did.
+
+**The call.** Add a `keydown` handler on `document`, which is the case that
+does leak: `document` outlives the teardown, so the listener stays, its closure
+keeps the old list and counters alive, and a second mount stacks another one
+beside it. The lesson's header now separates the two cases explicitly.
+
+Testing it took a second attempt. A leaked handler clears a list nobody can see
+any more, so every user-facing assertion still passed. The test keeps a
+reference to the first mount's `<ul>` — detached after unmount, but still a
+live node that a leaked closure would still be holding — puts a row into it,
+and checks the row survives the shortcut.
+
+**Next time.** For any test named "stops doing X", write it by deleting the
+code that stops X and watching it fail. A test that passes against both
+versions of the code is measuring something else. The same check caught a
+Storybook `play` function in `learning/testing` that asserted its own initial
+render, and a `safeNext` test in `projects/next-storefront` that had
+reimplemented the function it was supposed to be guarding.
+
+## A URL is a grammar, and a string check is a guess at it
+
+**Expected.** `projects/next-storefront` guards its post-sign-in redirect with
+`value.startsWith("/") && !value.startsWith("//")`. Reject absolute URLs,
+reject protocol-relative ones, done.
+
+**What happened.** `/\evil.example` passes that check, and every browser
+resolves it to `https://evil.example/`. Backslash is a path separator for
+special schemes, so `/\` is `//` by the time the address bar sees it. Confirmed
+end to end against `next build && next start` with a real browser: signing in
+from `/sign-in?next=/\evil.example/p` landed on the attacker's page.
+
+`/<tab>/evil.example` and `/<newline>/evil.example` get there the same way,
+because tab, carriage return and newline are stripped before the URL is parsed.
+
+The e2e test covered `https://` and `//` and passed throughout.
+
+**The call.** Stop reading URLs as strings. Resolve against a sentinel origin
+with `new URL(value, "https://next.invalid")` and compare `origin`, then return
+the parser's own `pathname + search + hash` rather than the string that
+arrived. Using the same parser the browser uses is the only way to be sure the
+answer matches.
+
+**Next time.** Any check on a URL, a path, a hostname or a content type that is
+written with `startsWith`, `endsWith`, `includes` or a regex is a guess at what
+a real parser does, and the gap between the guess and the parser is where the
+bug lives. Parse, then inspect the parsed result. Same instinct as using
+DOMPurify instead of a tag blocklist, which this repo already argues for in the
+production module.

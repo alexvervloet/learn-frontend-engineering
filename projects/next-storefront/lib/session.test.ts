@@ -25,25 +25,26 @@ describe("the session cookie", () => {
     expect(readSession("a.b")).toBeNull();
     expect(readSession("....")).toBeNull();
   });
-});
 
-describe("where to go after signing in", () => {
-  // The same rule the action applies, spelled out. `next` comes from the
-  // query string, so a link like `/sign-in?next=https://evil.example`
-  // sends people off your domain right after they sign in.
-  function safeNext(value: string): string {
-    return value.startsWith("/") && !value.startsWith("//") ? value : "/orders";
-  }
+  /**
+   * The test the first version of this file was missing, and the reason the
+   * one above is not enough: every string in it fails on character length
+   * too, so none of them reached the compare.
+   *
+   * A signature of 43 multi-byte characters is 43 long and 86 bytes. Against
+   * a check on `.length` it got past the guard and threw out of
+   * `timingSafeEqual`, which Next renders as a server error. Reached in the
+   * running app with a percent-encoded cookie, because cookie values are
+   * decoded before they are handed to the route.
+   */
+  it("rejects a signature that is the right length in the wrong units", () => {
+    const encoded = Buffer.from("admin@example.com").toString("base64url");
+    const signature = "é".repeat(43);
 
-  it("keeps a path on this site", () => {
-    expect(safeNext("/orders")).toBe("/orders");
-    expect(safeNext("/cart")).toBe("/cart");
-  });
+    expect(signature).toHaveLength(43);
+    expect(Buffer.byteLength(signature)).toBe(86);
 
-  it("refuses anywhere else", () => {
-    expect(safeNext("https://evil.example")).toBe("/orders");
-    // Protocol-relative: a browser reads this as another origin.
-    expect(safeNext("//evil.example")).toBe("/orders");
-    expect(safeNext("javascript:alert(1)")).toBe("/orders");
+    expect(() => readSession(`${encoded}.${signature}`)).not.toThrow();
+    expect(readSession(`${encoded}.${signature}`)).toBeNull();
   });
 });

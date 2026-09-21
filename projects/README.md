@@ -6,8 +6,11 @@ combines what several modules teach.
 | Project                               | Needs    | What it pulls together                                                                                               |
 | ------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
 | [bookmark-manager](bookmark-manager/) | 🟢 🎭 🐳 | React Router, TanStack Query, React Hook Form and Zod, tested end to end with Playwright, containerised behind nginx |
-| dashboard (planned)                   |          | Charts, a virtualised table, full keyboard support, and a measured bundle                                            |
-| next-storefront (planned)             |          | Next 16 Server Components, server actions, ISR                                                                       |
+| [dashboard](dashboard/)               | 🟢 🎭    | A hand-rolled SVG chart, a 10,000-row virtualised grid, two themes, and a bundle budget that fails the build         |
+| [next-storefront](next-storefront/)   | 🟢 🎭    | Next 16 Server Components, validated server actions, a cookie cart, streaming search, and forms that work with no JS |
+
+All three are built. Read them in that order: `bookmark-manager` is the
+smallest, `next-storefront` is the one with a server in it.
 
 [bookmark-manager](bookmark-manager/) is built to talk to the Express API of
 the same name in

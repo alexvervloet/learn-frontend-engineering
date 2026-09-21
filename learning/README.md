@@ -29,8 +29,8 @@ npm test -- --project <module>
 
 ## All of them are built
 
-Every module listed above is complete, with a README of its own. The
-[projects](../projects/) folder is what remains.
+Every module listed above is complete, with a README of its own, and so are the
+three capstones in [projects](../projects/).
 
 ## Adding one
 

@@ -2,9 +2,18 @@ import { fileURLToPath } from "node:url";
 
 import { defineConfig, devices } from "@playwright/test";
 
-const STYLING_PORT = 5180;
-const PERFORMANCE_PORT = 5181;
-const ACCESSIBILITY_PORT = 5182;
+import { PORTS } from "../../config/ports.ts";
+
+// Each module's own dev port, from config/ports.ts, not a block reserved
+// here. These were 5180-5182 while the modules themselves all defaulted to
+// Vite's 5173, which meant `--strictPort` below bound three ports no README
+// mentioned, a dev server you already had running was never the one reused,
+// and 5180 is the performance module's documented port while it was starting
+// the styling one on it.
+const STYLING_PORT = PORTS.styling;
+const PERFORMANCE_PORT = PORTS.performance;
+const ACCESSIBILITY_PORT = PORTS.accessibility;
+const ROUTING_PORT = PORTS.routing;
 const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
 /**
@@ -38,8 +47,8 @@ export default defineConfig({
 
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
-  // Two servers, because the specs cover two modules. Each spec that is not
-  // about the styling module overrides `baseURL` with `test.use`.
+  // One server per module the specs point at. Each spec that is not about the
+  // styling module overrides `baseURL` with `test.use`.
   webServer: [
     {
       command: `npm run dev -w learning/styling -- --port ${STYLING_PORT} --strictPort`,
@@ -58,6 +67,13 @@ export default defineConfig({
     {
       command: `npm run dev -w learning/accessibility -- --port ${ACCESSIBILITY_PORT} --strictPort`,
       url: `http://localhost:${ACCESSIBILITY_PORT}`,
+      cwd: repoRoot,
+      reuseExistingServer: !process.env["CI"],
+      timeout: 120_000,
+    },
+    {
+      command: `npm run dev -w learning/routing -- --port ${ROUTING_PORT} --strictPort`,
+      url: `http://localhost:${ROUTING_PORT}`,
       cwd: repoRoot,
       reuseExistingServer: !process.env["CI"],
       timeout: 120_000,

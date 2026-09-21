@@ -104,3 +104,70 @@ describe("incremental regeneration", () => {
     });
   });
 });
+
+describe("when a background rebuild fails", () => {
+  /**
+   * The visitor is never the one who finds out. They were answered from the
+   * stored copy before the rebuild started, and so is everyone after them.
+   *
+   * What must not happen is the process exiting. `void build(...)` with no
+   * catch is an unhandled rejection, and Node's default for one of those is
+   * to terminate, so a CMS being down for a minute takes the site with it.
+   */
+  it("keeps serving the stored copy and reports the failure", async () => {
+    let clock = 0;
+    const errors: unknown[] = [];
+    const store = createIsrStore({
+      revalidate: 10,
+      now: () => clock,
+      onError: (error) => errors.push(error),
+    });
+
+    let renders = 0;
+    const render = async (): Promise<string> => {
+      renders += 1;
+      if (renders > 1) throw new Error("the CMS is down");
+      return "<p>v1</p>";
+    };
+
+    expect(await store.serve("/p", render)).toEqual({ html: "<p>v1</p>", status: "miss" });
+
+    clock += 20_000;
+    expect(await store.serve("/p", render)).toEqual({ html: "<p>v1</p>", status: "stale" });
+
+    // Let the rejected rebuild settle. Without the catch this is where the
+    // process would go.
+    await vi.waitFor(() => expect(store.failureCount()).toBe(1));
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toBeInstanceOf(Error);
+    expect(store.buildCount()).toBe(1);
+  });
+
+  it("lets the next request try again", async () => {
+    let clock = 0;
+    const store = createIsrStore({ revalidate: 10, now: () => clock, onError: () => {} });
+
+    let renders = 0;
+    const render = async (): Promise<string> => {
+      renders += 1;
+      if (renders === 2) throw new Error("transient");
+      return `<p>v${String(renders)}</p>`;
+    };
+
+    await store.serve("/p", render);
+
+    clock += 20_000;
+    await store.serve("/p", render);
+    // The failed rebuild has to clear `pending`, or the page is stuck stale
+    // for as long as the process lives.
+    await vi.waitFor(() => expect(store.failureCount()).toBe(1));
+
+    clock += 20_000;
+    await store.serve("/p", render);
+    await vi.waitFor(() => expect(store.buildCount()).toBe(2));
+
+    clock += 1_000;
+    expect(await store.serve("/p", render)).toEqual({ html: "<p>v3</p>", status: "hit" });
+  });
+});

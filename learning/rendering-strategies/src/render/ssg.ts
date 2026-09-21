@@ -17,10 +17,20 @@
  * staleTime. It keeps turning up because it is the only way to have both a
  * fast response and fresh data.
  *
- * The thing to get right is that a revalidation in flight must not start a
- * second one. Without the `pending` guard, a burst of traffic after expiry
- * kicks off a rebuild per request, which is the cache stampede from the
- * backend repo's caching module, in a different hat.
+ * Two things to get right, and both are about the rebuild nobody is waiting
+ * for.
+ *
+ * **A revalidation in flight must not start a second one.** Without the
+ * `pending` guard, a burst of traffic after expiry kicks off a rebuild per
+ * request, which is the cache stampede from the backend repo's caching
+ * module, in a different hat.
+ *
+ * **A rebuild that throws must not take the process down.** Nothing awaits
+ * it, so a rejection is an unhandled rejection, and Node exits on one of
+ * those by default. The visitor is fine either way, because they were
+ * answered from the cache before the rebuild started; it is the server that
+ * dies. Catch it, count it, hand it to `onError`, and let the next request
+ * try again.
  */
 export type Entry = { html: string; generatedAt: number };
 
@@ -29,6 +39,13 @@ export type StoreOptions = {
   revalidate: number;
   /** Injected so tests do not have to wait. */
   now?: () => number;
+  /**
+   * Where a failed background rebuild goes. There is nobody to return it
+   * to: the visitor who triggered it was answered from the cache before it
+   * started, and the next one will be too. Without this the failure is
+   * silent and the page is stale until someone notices.
+   */
+  onError?: (error: unknown, key: string) => void;
 };
 
 export type Served = {
@@ -43,10 +60,17 @@ export function createIsrStore(options: StoreOptions) {
   const entries = new Map<string, Entry>();
   const pending = new Set<string>();
   let builds = 0;
+  let failures = 0;
 
   async function build(key: string, render: () => Promise<string>): Promise<Entry> {
+    // After the await, so `buildCount` is renders that produced a page
+    // rather than renders that were attempted. A failed rebuild is counted
+    // by `failureCount` instead, and conflating the two makes the number
+    // ISR exists to keep down impossible to read.
+    const html = await render();
     builds += 1;
-    const entry = { html: await render(), generatedAt: now() };
+
+    const entry = { html, generatedAt: now() };
     entries.set(key, entry);
     return entry;
   }
@@ -54,6 +78,9 @@ export function createIsrStore(options: StoreOptions) {
   return {
     /** How many times the page was actually rendered. The number ISR exists to keep down. */
     buildCount: () => builds,
+
+    /** How many background rebuilds threw. Zero is the only good value. */
+    failureCount: () => failures,
 
     async serve(key: string, render: () => Promise<string>): Promise<Served> {
       const existing = entries.get(key);
@@ -71,7 +98,22 @@ export function createIsrStore(options: StoreOptions) {
       // but only if a rebuild is not already running.
       if (!pending.has(key)) {
         pending.add(key);
-        void build(key, render).finally(() => pending.delete(key));
+
+        // The catch is not defensive programming, it is the difference
+        // between a stale page and no server. Nothing is awaiting this
+        // promise, so a render that throws is an unhandled rejection, and
+        // Node's default for one of those is to exit. A CMS being briefly
+        // down would take the whole site with it.
+        //
+        // Failing is the right outcome here anyway: the stored copy is
+        // still being served, and the next request tries again. What you
+        // must not do is lose the error, so it goes to onError.
+        void build(key, render)
+          .catch((error: unknown) => {
+            failures += 1;
+            options.onError?.(error, key);
+          })
+          .finally(() => pending.delete(key));
       }
 
       return { html: existing.html, status: "stale" };

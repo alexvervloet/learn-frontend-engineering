@@ -16,7 +16,7 @@ import * as stories from "./Badge.stories";
  * behind and later tests failed with "Found multiple elements with the role
  * status". Rendering first and passing the container keeps teardown working.
  */
-const { Neutral, Success, Danger, NumericWithLabel, CopiesOnClick } = composeStories(stories);
+const { Neutral, Success, Danger, NumericWithLabel, CountsRetries } = composeStories(stories);
 
 describe("every documented state renders", () => {
   it("neutral", () => {
@@ -49,12 +49,16 @@ describe("the play functions", () => {
   });
 
   it("runs the interaction story", async () => {
-    const { container } = render(<CopiesOnClick />);
+    const { container } = render(<CountsRetries />);
 
-    expect(CopiesOnClick.play).toBeDefined();
-    await CopiesOnClick.play?.({ canvasElement: container });
+    expect(CountsRetries.play).toBeDefined();
+    await CountsRetries.play?.({ canvasElement: container });
 
-    expect(screen.getByRole("status")).toHaveTextContent("Click me");
+    // The state the play function drove it to, not the state it started in.
+    // The previous version of this story asserted its own initial render, so
+    // this line could not fail either.
+    expect(screen.getByRole("status")).toHaveTextContent("4 retries");
+    expect(screen.getByRole("status")).toHaveAccessibleName("4 retries");
   });
 });
 

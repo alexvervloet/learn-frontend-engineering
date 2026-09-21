@@ -51,8 +51,19 @@ export function search(query: string, signal?: AbortSignal): Promise<string[]> {
         clearTimeout(timer);
         reject(new AbortError("aborted"));
       },
-      // once: true is not decoration. Without it the listener outlives every
-      // request and the controller keeps them all alive.
+      // once: true, for the case this demo does not have.
+      //
+      // Here every request gets its own controller, so when the request
+      // settles the controller, the signal and this listener all become
+      // unreachable together and nothing accumulates. `once` changes
+      // nothing.
+      //
+      // It matters the moment a signal outlives one request: a controller
+      // held for a whole page, or `AbortSignal.timeout()` shared across
+      // several calls. Then every request adds a listener to the same
+      // signal and none of them is ever removed, because a listener added
+      // without `once` is only removed by removing it. That is a leak that
+      // grows with traffic and is invisible until it is not.
       { once: true },
     );
   });

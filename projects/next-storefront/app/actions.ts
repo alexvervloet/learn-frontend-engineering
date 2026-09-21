@@ -11,12 +11,14 @@
  * catalogue rather than trusting what arrived.
  */
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getProduct } from "@/lib/catalogue";
 import { addItem, removeItem, setQuantity } from "@/lib/cart";
 import { readCart, writeCart } from "@/lib/cart-cookie";
+import { SESSION_COOKIE, createSession } from "@/lib/session";
 
 export type ActionState = { ok: boolean; message: string };
 
@@ -105,4 +107,45 @@ export async function checkout(_state: ActionState, formData: FormData): Promise
   // write, not before, and it cannot be inside a try/catch that swallows
   // the control-flow error it uses.
   redirect("/checkout/done");
+}
+
+const signInSchema = z.object({
+  email: z.email("That email does not look right."),
+  next: z.string().default("/orders"),
+});
+
+/**
+ * `next` comes from the query string, so it is attacker-controlled.
+ * Redirecting to whatever arrives is an open redirect: a link to
+ * `/sign-in?next=https://evil.example` that sends people there from your
+ * own domain, after they have just typed their credentials.
+ *
+ * Only a path on this site, and not `//host` either, which a browser reads
+ * as protocol-relative and resolves to another origin.
+ */
+function safeNext(value: string): string {
+  return value.startsWith("/") && !value.startsWith("//") ? value : "/orders";
+}
+
+export async function signIn(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = signInSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) {
+    return { ok: false, message: parsed.error.issues[0]?.message ?? "Check the form." };
+  }
+
+  const store = await cookies();
+  store.set(SESSION_COOKIE, createSession(parsed.data.email), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+
+  redirect(safeNext(parsed.data.next));
+}
+
+export async function signOut(): Promise<void> {
+  (await cookies()).delete(SESSION_COOKIE);
+  redirect("/");
 }

@@ -49,6 +49,31 @@ export const NumericWithLabel: Story = {
 };
 
 /**
+ * A component, not an inline `render`, because `render` holds state here.
+ *
+ * `render: () => { const [x] = useState() }` fails react-hooks/rules-of-hooks:
+ * the rule keys off the name, and a lowercase `render` is neither a component
+ * nor a hook as far as it can tell. The rule is right to complain. Storybook
+ * calls `render` like a component, but nothing guarantees that, and the fix is
+ * a line long.
+ */
+function RetryCounter() {
+  const [retries, setRetries] = useState(0);
+  const tone = retries >= 3 ? "danger" : "neutral";
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      <Badge tone={tone} label={`${String(retries)} retries`}>
+        {retries === 0 ? "no retries" : `${String(retries)} retries`}
+      </Badge>
+      <button type="button" onClick={() => setRetries((count) => count + 1)}>
+        Retry
+      </button>
+    </div>
+  );
+}
+
+/**
  * A play function can drive an interaction, not just assert the initial state.
  *
  * The first version of this story had an `onClick` of `() => undefined` and
@@ -62,21 +87,7 @@ export const NumericWithLabel: Story = {
  */
 export const CountsRetries: Story = {
   args: { children: "0 retries", tone: "neutral" },
-  render: () => {
-    const [retries, setRetries] = useState(0);
-    const tone = retries >= 3 ? "danger" : "neutral";
-
-    return (
-      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        <Badge tone={tone} label={`${String(retries)} retries`}>
-          {retries === 0 ? "no retries" : `${String(retries)} retries`}
-        </Badge>
-        <button type="button" onClick={() => setRetries((count) => count + 1)}>
-          Retry
-        </button>
-      </div>
-    );
-  },
+  render: () => <RetryCounter />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const badge = canvas.getByRole("status");

@@ -31,11 +31,19 @@ export function readSession(token: string | undefined): string | null {
   const email = Buffer.from(encoded, "base64url").toString();
   const expected = sign(email);
 
-  // Length first, because timingSafeEqual throws on a mismatch, and then a
-  // constant-time compare so the signature cannot be guessed a byte at a
-  // time by measuring how long the rejection takes.
-  if (signature.length !== expected.length) return null;
-  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  // Bytes, not characters, and the difference is a live bug rather than a
+  // nicety. `timingSafeEqual` throws unless both buffers are the same byte
+  // length, and `"é".length` is 1 while `Buffer.byteLength("é")` is 2. A
+  // cookie of 43 multi-byte characters passed a check on `.length` and then
+  // threw ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH from the compare, so a forged
+  // cookie produced a server error instead of a redirect to sign in.
+  const received = Buffer.from(signature, "utf8");
+  const wanted = Buffer.from(expected, "utf8");
+  if (received.length !== wanted.length) return null;
+
+  // Constant time, so the signature cannot be guessed a byte at a time by
+  // measuring how long each rejection takes.
+  if (!timingSafeEqual(received, wanted)) return null;
 
   return email;
 }

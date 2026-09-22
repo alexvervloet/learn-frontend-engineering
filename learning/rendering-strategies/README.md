@@ -26,7 +26,7 @@ much easier to read.
 
 ```bash
 npm install                               # from the repo root, once
-npm run dev -w learning/rendering-strategies
+npm run dev -w learning/rendering-strategies   # http://localhost:5181
 npm test -- --project rendering-strategies
 ```
 

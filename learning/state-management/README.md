@@ -20,7 +20,7 @@ the library lessons and they stop being magic.
 
 ```bash
 npm install                              # from the repo root, once
-npm run dev -w learning/state-management
+npm run dev -w learning/state-management   # http://localhost:5176
 npm test -- --project state-management
 ```
 

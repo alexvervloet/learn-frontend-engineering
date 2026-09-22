@@ -22,7 +22,7 @@ into something a failing test can print.
 
 ```bash
 npm install                           # from the repo root, once
-npm run dev -w learning/accessibility
+npm run dev -w learning/accessibility   # http://localhost:5179
 npm test -- --project accessibility
 ```
 

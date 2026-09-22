@@ -39,7 +39,7 @@ Supporting files: `src/tailwind.css` (the `@theme` block), `src/tokens.css`
 
 ```bash
 npm install                     # from the repo root, once
-npm run dev -w learning/styling
+npm run dev -w learning/styling   # http://localhost:5173
 npm test -- --project styling
 ```
 

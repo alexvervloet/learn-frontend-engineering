@@ -20,7 +20,7 @@ rules.
 
 ```bash
 npm install                   # from the repo root, once
-npm run dev -w learning/forms
+npm run dev -w learning/forms   # http://localhost:5177
 npm test -- --project forms
 ```
 

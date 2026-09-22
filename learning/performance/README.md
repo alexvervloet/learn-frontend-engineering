@@ -22,7 +22,7 @@ change the render counts the other modules assert.
 
 ```bash
 npm install                         # from the repo root, once
-npm run dev -w learning/performance
+npm run dev -w learning/performance   # http://localhost:5180
 npm test -- --project performance
 npm run analyse -w learning/performance   # writes dist/stats.html
 ```

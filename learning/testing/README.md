@@ -28,7 +28,7 @@ learning/testing` fetches it, once.
 
 ```bash
 npm install                     # from the repo root, once
-npm run dev -w learning/testing
+npm run dev -w learning/testing         # http://localhost:5178
 npm test -- --project testing
 
 npm run e2e:install -w learning/testing   # Chromium, once

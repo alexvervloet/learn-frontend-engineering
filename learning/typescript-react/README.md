@@ -38,7 +38,7 @@ Alongside the usual `.test.tsx` files there are `.test-d.tsx` files full of
 
 ```bash
 npm install                            # from the repo root, once
-npm run dev -w learning/typescript-react
+npm run dev -w learning/typescript-react   # http://localhost:5172
 npm test -- --project typescript-react
 ```
 

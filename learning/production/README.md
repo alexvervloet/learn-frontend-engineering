@@ -27,7 +27,7 @@ Supporting code: `src/lib/config.ts`, `security.ts`, `auth.ts`, `reporting.ts`,
 
 ```bash
 npm install                        # from the repo root, once
-npm run dev -w learning/production
+npm run dev -w learning/production   # http://localhost:5182
 npm test -- --project production
 
 # The service worker, in a real browser, against a production build.

@@ -22,7 +22,7 @@ ceremony, and the browser API that animates between two pages for you.
 
 ```bash
 npm install                     # from the repo root, once
-npm run dev -w learning/routing
+npm run dev -w learning/routing   # http://localhost:5174
 npm test -- --project routing
 ```
 

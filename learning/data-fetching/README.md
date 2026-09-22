@@ -35,7 +35,7 @@ No backend needed. MSW intercepts the requests.
 
 ```bash
 npm install                          # from the repo root, once
-npm run dev -w learning/data-fetching
+npm run dev -w learning/data-fetching   # http://localhost:5175
 npm test -- --project data-fetching
 ```
 

@@ -18,7 +18,12 @@
  *   Sequence number  ignore any response that is not the newest. Cheaper, but
  *                    the wasted request still runs to completion.
  *
- * Prefer abort. Use a sequence number when you cannot cancel the work.
+ * Prefer abort. Use a sequence number when you cannot cancel the work, which
+ * is more often than it sounds: a `postMessage` round trip to a worker, an
+ * SDK that hands you a promise and no handle, a cache read you would rather
+ * not abandon halfway. The two also compose, and in a real client they
+ * usually do, because a sequence check costs one comparison and protects you
+ * from the one request that got away.
  *
  * `search` below is a stand-in server so the lesson runs offline. It takes a
  * signal and rejects with an AbortError exactly like `fetch` does.
@@ -112,6 +117,40 @@ export async function raceWithAbort(queries: readonly string[]): Promise<string[
   return shown;
 }
 
+/**
+ * The same list again, guarded by a counter instead of a cancellation.
+ *
+ * Every request still runs to completion and every response still arrives.
+ * The difference is that a response now has to prove it is the newest before
+ * it is allowed to touch the UI, and a stale one is dropped on the floor.
+ *
+ * Read the two lines that matter together: `own` is claimed synchronously
+ * when the request starts, `latest` keeps moving as later requests start, so
+ * `own < latest` is exactly "something newer began while I was in flight".
+ * The comparison has to happen *after* the await. Capturing the number before
+ * and comparing before is a guard that is always true.
+ */
+export async function raceWithSequence(queries: readonly string[]): Promise<string[]> {
+  let shown: string[] = [];
+  let latest = 0;
+
+  await Promise.all(
+    queries.map(async (query) => {
+      latest += 1;
+      const own = latest;
+
+      const results = await search(query);
+
+      // The whole fix. Without this line the slow "re" lands last and wins.
+      if (own < latest) return;
+
+      shown = results;
+    }),
+  );
+
+  return shown;
+}
+
 export function mountFetchRaces(root: HTMLElement): () => void {
   root.innerHTML = `
     <div class="stack">
@@ -123,6 +162,13 @@ export function mountFetchRaces(root: HTMLElement): () => void {
       <pre id="bad-out" class="log">—</pre>
       <label class="row">Aborted <input id="good" type="search" placeholder="type fast" /></label>
       <pre id="good-out" class="log">—</pre>
+      <label class="row">Sequenced <input id="seq" type="search" placeholder="type fast" /></label>
+      <pre id="seq-out" class="log">—</pre>
+      <p class="note">
+        The bottom two end up in the same place by different routes. Watch the counter:
+        the sequenced one keeps answering requests it then throws away, which is the work
+        abort would have saved.
+      </p>
     </div>
   `;
 
@@ -130,6 +176,8 @@ export function mountFetchRaces(root: HTMLElement): () => void {
   const good = must<HTMLInputElement>(root, "#good");
   const badOut = must<HTMLPreElement>(root, "#bad-out");
   const goodOut = must<HTMLPreElement>(root, "#good-out");
+  const seq = must<HTMLInputElement>(root, "#seq");
+  const seqOut = must<HTMLPreElement>(root, "#seq-out");
 
   async function onBadInput(): Promise<void> {
     const query = bad.value;
@@ -154,13 +202,36 @@ export function mountFetchRaces(root: HTMLElement): () => void {
     }
   }
 
+  let latest = 0;
+  let discarded = 0;
+
+  async function onSeqInput(): Promise<void> {
+    latest += 1;
+    const own = latest;
+
+    const query = seq.value;
+    const results = await search(query);
+
+    // Nothing was cancelled, so this response definitely arrived. It just
+    // does not get to be the answer.
+    if (own < latest) {
+      discarded += 1;
+      seqOut.textContent = `${seqOut.textContent ?? ""}\n(dropped a stale answer for "${query}", ${discarded} so far)`;
+      return;
+    }
+
+    seqOut.textContent = `query "${query}" → ${results.join(", ") || "(none)"}`;
+  }
+
   bad.addEventListener("input", onBadInput);
   good.addEventListener("input", onGoodInput);
+  seq.addEventListener("input", onSeqInput);
 
   return () => {
     controller?.abort();
     bad.removeEventListener("input", onBadInput);
     good.removeEventListener("input", onGoodInput);
+    seq.removeEventListener("input", onSeqInput);
     root.innerHTML = "";
   };
 }
@@ -168,7 +239,8 @@ export function mountFetchRaces(root: HTMLElement): () => void {
 export const lesson: Lesson = {
   id: "fetch-and-races",
   title: "fetch, abort, and stale responses",
-  summary: "A slow earlier request overwrites a fast later one unless you cancel it.",
+  summary:
+    "A slow earlier request overwrites a fast later one unless you cancel it, or refuse to believe it.",
   file: "src/lessons/03_fetch_and_races.ts",
   mount: mountFetchRaces,
 };

@@ -84,6 +84,12 @@ jobs:
       # Chromium only. The other two engines roughly triple the download for
       # tests that are about layout and the cascade, not about engine quirks.
       - run: npm run e2e:install
+      # The platform module first, because it is the cheapest and because a
+      # failure here means something about the browser itself has moved, which
+      # makes every suite after it easier to read. It covers only what jsdom
+      # cannot: Cache Storage, a real Worker, and a main thread that stops
+      # painting when you block it.
+      - run: npm run e2e -w web-fundamentals
       # Playwright starts the dev servers itself; see
       # learning/testing/playwright.config.ts.
       - run: npm run e2e -w learning/testing

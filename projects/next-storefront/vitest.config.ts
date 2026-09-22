@@ -15,6 +15,10 @@ export default defineConfig({
   test: {
     root: fileURLToPath(new URL(".", import.meta.url)),
     environment: "node",
+    // Narrow on purpose, and it is also what keeps Playwright's `e2e/` out:
+    // Vitest's default include matches `.spec.ts` too, and running those under
+    // Vitest fails with a message about `test.describe()` that points nowhere
+    // near the cause. Widen this and add an `exclude` in the same commit.
     include: ["lib/**/*.test.ts"],
     name: "next-storefront",
   },

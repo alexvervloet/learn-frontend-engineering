@@ -433,11 +433,19 @@ test.describe("animating in and out", () => {
     await page.keyboard.press("Escape");
     await page.waitForTimeout(250);
 
-    const state = await tip.evaluate((node) => ({
-      overlay: getComputedStyle(node).overlay,
-      opacity: getComputedStyle(node).opacity,
-      stillOpen: node.matches(":popover-open"),
-    }));
+    const state = await tip.evaluate((node) => {
+      const style = getComputedStyle(node);
+      return {
+        // `getPropertyValue`, not `style.overlay`. The property is real in
+        // Chromium and is not in TypeScript's DOM lib yet, so the dotted
+        // spelling is a type error. The lib trails the platform by a good
+        // while on anything this new, and the string form is the escape
+        // hatch that does not need an `as`.
+        overlay: style.getPropertyValue("overlay"),
+        opacity: style.opacity,
+        stillOpen: node.matches(":popover-open"),
+      };
+    });
 
     // Closing, still fading, still in the top layer. Take `overlay` out of the
     // transition and this reads "none" while the opacity is still above zero,

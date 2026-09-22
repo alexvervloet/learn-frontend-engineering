@@ -208,7 +208,8 @@ export function mountWorkers(root: HTMLElement): () => void {
   root.innerHTML = `
     <div class="stack">
       <p class="note">
-        Both buttons count the primes below 300,000, which takes about a second. The
+        Both buttons count the primes below 3,000,000 by trial division, which is about a
+        second on a fast laptop and several on a phone. The
         spinner is a requestAnimationFrame loop: it paints once per frame, so it stops
         dead whenever the main thread is busy.
       </p>
@@ -244,7 +245,18 @@ export function mountWorkers(root: HTMLElement): () => void {
   });
   const client = createWorkerClient(worker);
 
-  const LIMIT = 300_000;
+  // Sized so the demo demonstrates something.
+  //
+  // This was 300,000 and claimed "about a second" in the paragraph above. A
+  // browser on a 2026 laptop finished it in 63ms, which is not a freeze
+  // anybody can see, so the blocking button was making the opposite of its
+  // point. The e2e suite is what found it: a test waiting for the
+  // "counting…" message never saw it, because the answer had already
+  // replaced it.
+  //
+  // Anything CPU-bound enough to be worth a worker is machine-dependent by
+  // nature, so the note says "a fast laptop" rather than a number.
+  const LIMIT = 3_000_000;
 
   function onBlock(): void {
     out.textContent = "Counting on the main thread. The spinner is frozen.";

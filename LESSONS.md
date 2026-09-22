@@ -1186,3 +1186,34 @@ from memory, and the five seconds that would have saved were spent twice over
 working out whether the failure was React's behaviour or `act()`'s. It was
 React's: flushing passive effects before the next render is what
 `flushPassiveEffects` does, and `act` only makes the timing deterministic.
+
+## The demo that proved the opposite of its point
+
+**Expected.** The new Web Worker lesson counts primes by trial division on
+both threads, so the "count on the main thread" button freezes the page and
+the "count in a worker" button does not. The limit was 300,000 and the
+paragraph above the buttons said it took about a second.
+
+**What happened.** The browser suite written for the same lesson has a test
+that clicks the worker button and waits for the "Counting in a worker…"
+status line. It never saw it. The job had already finished and the result had
+replaced the message: 63ms, not a second.
+
+So the blocking button was demonstrating nothing. A 63ms freeze is not visible,
+the rAF spinner barely stutters, and a reader pressing it would conclude that
+blocking the main thread is fine. The lesson said one thing and the demo showed
+the reverse, and every unit test passed throughout, because none of them is
+about how long anything takes.
+
+**The call.** Raise the limit to 3,000,000, which is roughly a second on a
+fast laptop and several on a phone, and say it that way in the note rather than
+naming a number. The e2e test no longer waits for the transient status line
+either: a message that exists only while work is in flight is a race whatever
+the duration.
+
+**Next time.** A demo whose point is "this takes long enough to hurt" has a
+number in it that was guessed, and guesses about CPU time on unknown hardware
+are usually wrong by an order of magnitude. Measure it on the slowest machine
+you can find, not the one you wrote it on. And note which kind of test caught
+it: the unit suite could not have, because the claim was never about the
+answer, only about how long it took to arrive.

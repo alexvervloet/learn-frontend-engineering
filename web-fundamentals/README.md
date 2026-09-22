@@ -1,4 +1,4 @@
-# Web fundamentals 🟢
+# Web fundamentals 🟢 🎭
 
 The browser platform React sits on. No React, no JSX, no framework: five lessons
 written with `document.createElement` and `addEventListener`, because React is an
@@ -77,12 +77,30 @@ Four of the five storage mechanisms are exercised for real. Cookies,
 suite installs `fake-indexeddb`, because a lesson claiming five mechanisms
 should not be testing four and describing the fifth.
 
-Cache Storage is the one left over. jsdom has no implementation, and a
-Map-backed fake would only prove the fake works, so the tests here cover the
-feature detection and say so. The behaviour is proved against Chromium in
+Cache Storage is the one left over in jsdom, which has no implementation, and a
+Map-backed fake would only prove the fake works. So the Vitest suite covers the
+feature detection and `e2e/platform.spec.ts` covers the behaviour against
+Chromium, where the API is real. It is exercised again from the other end in
 [`learning/production/e2e/offline.spec.ts`](../learning/production/e2e/offline.spec.ts),
 which registers a service worker, precaches the shell and switches the network
 off.
+
+## The browser suite
+
+`npm run e2e -w web-fundamentals` runs eight specs against Chromium, and they
+are deliberately not a second copy of the Vitest suite. Three of these five
+lessons make claims jsdom is the wrong instrument for:
+
+| Claim                                        | Why jsdom cannot settle it                                      |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| Cache Storage is the fifth place to put data | No implementation at all                                        |
+| A worker is a second thread                  | No `Worker`, so the unit tests speak the protocol to a stand-in |
+| A blocked main thread stops the page         | Nothing is ever painted, so there is no frame loop to interrupt |
+
+If a claim can be settled in jsdom it is settled in jsdom and not repeated
+here. The one thing the browser suite found straight away: the worker demo
+counted primes below 300,000, said it took about a second, and took 63ms, so
+the blocking button was demonstrating the opposite of its point.
 
 The worker lesson splits the same way, and the split is in the design rather
 than bolted on afterwards. jsdom implements no `Worker`, so the computation is

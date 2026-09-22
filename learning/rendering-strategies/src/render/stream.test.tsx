@@ -80,12 +80,46 @@ describe("streaming", () => {
     expect(html).toContain("all of it");
   });
 
+  /**
+   * The two halves of "when did it throw", which is the only question that
+   * decides what a server can do about it.
+   *
+   * Same error, same component, one `<Suspense>` boundary apart. Inside one,
+   * the shell is already out, the status line is gone and all that is left is
+   * a fallback on screen and a line in the logs. Outside every boundary, the
+   * shell never rendered, nothing was written, and the server can still answer
+   * 500 properly.
+   *
+   * The first version of this file tested only the second case and described
+   * the first in a comment, which left the recoverable half of the lesson as
+   * prose.
+   */
+  it("fails the whole response when the shell itself throws", async () => {
+    function Throws(): never {
+      throw new Error("the shell exploded");
+    }
+
+    // No Suspense boundary, so there is no shell without this component.
+    const result = await renderStream(
+      <Shell title="Products">
+        <Throws />
+      </Shell>,
+    );
+
+    expect(result.status).toBe(500);
+    expect((result.shellError as Error).message).toBe("the shell exploded");
+
+    // Nothing went out, which is exactly why a 500 is still available.
+    expect(result.html).toBe("");
+    expect(result.chunks).toHaveLength(0);
+  });
+
   it("reports an error after the shell instead of failing the response", async () => {
     function Throws(): never {
       throw new Error("the slow part exploded");
     }
 
-    const { html, errors } = await renderStream(
+    const { status, html, errors } = await renderStream(
       <Shell title="Products">
         <ProductList products={PRODUCTS} />
         <Suspense fallback={<p>loading…</p>}>
@@ -96,6 +130,7 @@ describe("streaming", () => {
 
     // The status line was sent long ago, so this cannot become a 500. onError
     // is the only place you will ever hear about it.
+    expect(status).toBe(200);
     expect(errors).toHaveLength(1);
     expect((errors[0] as Error).message).toBe("the slow part exploded");
     // The rest of the page still went out.

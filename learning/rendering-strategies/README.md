@@ -15,12 +15,12 @@ much easier to read.
 | `04_ssg_isr.tsx`   | Serve stale, rebuild behind. A simulator running the real store                                                         |
 | `05_choosing.tsx`  | Three questions, five strategies, no free option                                                                        |
 
-| Under `src/render/` | What it is                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| `page.tsx`          | The app every strategy renders, and the document shell around it                            |
-| `ssr.ts`            | `renderToString` plus the serialised data the client needs                                  |
-| `stream.ts`         | `renderToReadableStream`, collected chunk by chunk                                          |
-| `ssg.ts`            | An ISR store: revalidate window, background rebuild, stampede guard, on-demand invalidation |
+| Under `src/render/` | What it is                                                                                                 |
+| ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `page.tsx`          | The app every strategy renders, and the document shell around it                                           |
+| `ssr.ts`            | `renderToString` plus the serialised data the client needs                                                 |
+| `stream.ts`         | `renderToReadableStream`, collected chunk by chunk, and the 500 you can still send before the shell is out |
+| `ssg.ts`            | An ISR store: revalidate window, background rebuild, stampede guard, on-demand invalidation                |
 
 ## Run it
 
@@ -46,6 +46,13 @@ crash on the first real request. One of the assertions is exactly that:
 expect(typeof globalThis.window).toBe("undefined");
 expect(() => renderBody(<UsesWindow />)).toThrow(/window is not defined/);
 ```
+
+`stream.ts` uses `renderToReadableStream`, the Web-stream API that edge
+runtimes want. An Express server wants `renderToPipeableStream` instead, which
+returns something you `.pipe()` into the response and replaces the awaited
+promise with `onShellReady` and `onShellError` callbacks. The distinction that
+matters is the same in both: before the shell you can still change the status
+code, after it you cannot. The file says so where the code is.
 
 The streaming tests assert the chunk boundaries rather than the final HTML:
 that the first chunk contains the shell and the fallback and _not_ the slow

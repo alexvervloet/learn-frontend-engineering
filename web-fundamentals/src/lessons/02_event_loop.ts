@@ -43,6 +43,11 @@
  * machinery. "Why is my state still the old value on the next line" is a
  * question about this diagram. So is every dropped frame: a synchronous 200ms
  * loop is 200ms of no painting, no scrolling and no clicking.
+ *
+ * And that last one has exactly one real fix, which is lesson 05. Chunking the
+ * work with timers hands the thread back often enough to paint, which helps.
+ * Moving the work to a worker takes it off this thread altogether, which is
+ * the only thing that actually solves it.
  */
 import { must, type Lesson } from "../types";
 

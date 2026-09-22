@@ -1,6 +1,6 @@
 # Web fundamentals 🟢
 
-The browser platform React sits on. No React, no JSX, no framework: four lessons
+The browser platform React sits on. No React, no JSX, no framework: five lessons
 written with `document.createElement` and `addEventListener`, because React is an
 abstraction over this and the abstraction leaks.
 
@@ -15,6 +15,7 @@ Skip it if you already know what a microtask is and why a search box needs an
 | `src/lessons/02_event_loop.ts`      | Sync, then microtasks, then timers, which the spec fixes. Where `requestAnimationFrame` falls, which it does not. Plus 1.5s of a blocked thread so you can feel it |
 | `src/lessons/03_fetch_and_races.ts` | The stale-response bug, and the two fixes: abort the old request, or ignore its answer                                                                             |
 | `src/lessons/04_storage.ts`         | Cookies, `localStorage`, `sessionStorage`, IndexedDB, Cache Storage. Size, thread cost, and XSS exposure for each                                                  |
+| `src/lessons/05_workers.ts`         | The only way to not block the main thread, and why a worker `message` is not a reply to a `postMessage`                                                            |
 | `src/main.ts`                       | The sidebar, hand-rolled. Sixty lines that do badly what React does well                                                                                           |
 
 `src/types.ts` holds the `Lesson` shape and `must()`, a `querySelector` that
@@ -82,6 +83,15 @@ feature detection and say so. The behaviour is proved against Chromium in
 [`learning/production/e2e/offline.spec.ts`](../learning/production/e2e/offline.spec.ts),
 which registers a service worker, precaches the shell and switches the network
 off.
+
+The worker lesson splits the same way, and the split is in the design rather
+than bolted on afterwards. jsdom implements no `Worker`, so the computation is
+a plain exported function, the protocol is a plain pair of types, and the
+client takes anything shaped like a worker. The tests run the real client
+against a stand-in that can make the second job answer first, which is the
+case the correlation id exists for and the one a real thread will not
+reproduce on demand. What they do not prove is that a second thread exists;
+for that, press the button and watch the spinner keep turning.
 
 The event-loop lesson makes the same split for a different reason. Sync then
 microtasks then timers is fixed by the spec and asserted exactly. Where

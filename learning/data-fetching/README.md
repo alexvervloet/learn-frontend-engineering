@@ -9,15 +9,15 @@ No backend needed. MSW intercepts the requests.
 
 ## What the files cover
 
-| File                        | What it teaches                                                                                                               |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `01_fetch_in_an_effect.tsx` | A careful hand-rolled fetch next to `useQuery`, counting requests. The difference is a cache                                  |
-| `02_keys_and_staleness.tsx` | The key _is_ the cache. `staleTime` is how long you trust an answer; `gcTime` is how long you keep it after nobody is looking |
-| `03_mutations.tsx`          | `useMutation`, prefix-matched `invalidateQueries`, and showing the message the API actually sent                              |
-| `04_optimistic.tsx`         | Cancel, snapshot, guess, roll back. Why `cancelQueries` is the step you cannot skip                                           |
-| `05_infinite.tsx`           | `useInfiniteQuery`, cursors over offsets, and letting the server decide where the list ends                                   |
-| `06_swr.tsx`                | The same cache and dedup in a third of the bundle, and the four things you write yourself instead                             |
-| `07_realtime.tsx`           | Polling, SSE and WebSockets. The SSE wire format, backoff with jitter, and why the cache is the state                         |
+| File                        | What it teaches                                                                                                                    |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `01_fetch_in_an_effect.tsx` | A careful hand-rolled fetch next to `useQuery`, counting requests. The difference is a cache                                       |
+| `02_keys_and_staleness.tsx` | The key _is_ the cache. `staleTime` is how long you trust an answer; `gcTime` is how long you keep it after nobody is looking      |
+| `03_mutations.tsx`          | `useMutation`, prefix-matched `invalidateQueries`, and showing the message the API actually sent                                   |
+| `04_optimistic.tsx`         | Cancel, snapshot, guess, roll back. Why `cancelQueries` is the step you cannot skip, and the smaller version that needs none of it |
+| `05_infinite.tsx`           | `useInfiniteQuery`, cursors over offsets, and letting the server decide where the list ends                                        |
+| `06_swr.tsx`                | The same cache and dedup in a third of the bundle, and the four things you write yourself instead                                  |
+| `07_realtime.tsx`           | Polling, SSE and WebSockets. The SSE wire format, backoff with jitter, and why the cache is the state                              |
 
 ### The mock network
 

@@ -23,6 +23,30 @@
  * second. Invalidating either way costs one request and means the screen ends
  * up agreeing with the server.
  *
+ * **There is a smaller version, and it is worth knowing before you reach for
+ * this one.** Everything above rewrites the cache, which means four hooks'
+ * worth of ceremony and a snapshot you have to remember to restore. If the
+ * optimistic state only has to show up in the component doing the mutating,
+ * you can read it off the mutation instead:
+ *
+ *   const { mutate, isPending, variables } = useMutation({ mutationFn: voteFor });
+ *   // while isPending, render `variables` as the pending row
+ *
+ * and `useMutationState` does the same for a component that did not start the
+ * mutation but wants to see it, which is the common case of a list showing a
+ * row that a form elsewhere is still submitting.
+ *
+ * Nothing to snapshot, nothing to roll back: when the mutation settles the
+ * variables go away on their own, and an error leaves the real cache
+ * untouched because it was never written to. The trade is that the optimistic
+ * value is not *in* the cache, so a component reading the query key does not
+ * see it, and it is gone the moment the mutation finishes rather than
+ * surviving until something invalidates.
+ *
+ * So: rewrite the cache when the optimistic value is data other components
+ * read. Read it off the mutation when it belongs to one screen. Most vote
+ * buttons are the second kind and get written as the first.
+ *
  * Compare this with `useOptimistic` in react-core lesson 10. React's version is
  * less code and rolls back on its own, but the optimistic value lives for the
  * length of one action and is gone afterwards. This one writes into a shared

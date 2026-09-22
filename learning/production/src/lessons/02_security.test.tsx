@@ -1,8 +1,17 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { baselineCsp, sanitise, serialiseCsp } from "../lib/security";
+import {
+  REPORT_GROUP,
+  baselineCsp,
+  reportingEndpointsHeader,
+  sanitise,
+  serialiseCsp,
+} from "../lib/security";
 import { Security } from "./02_security";
 
 describe("sanitising", () => {
@@ -58,6 +67,80 @@ describe("sanitising", () => {
   });
 });
 
+/**
+ * The served policy, parsed out of the nginx config.
+ *
+ * `baselineCsp()` is what this lesson teaches and what every test above
+ * checks. It is not what anybody gets: the container serves the header in
+ * `nginx-security-headers.conf`, written by hand. Two copies of one decision
+ * drift, and the drift is silent, because a weaker policy breaks nothing and
+ * a missing directive is only missing.
+ *
+ * So the file is read and compared. The CI smoke test already curls the
+ * running container and greps for the header; this checks it says the same
+ * thing the lesson does.
+ */
+const nginxConf = readFileSync(
+  join(import.meta.dirname, "..", "..", "nginx-security-headers.conf"),
+  "utf8",
+);
+
+/**
+ * The directives, with the `#` comments removed.
+ *
+ * Assert the absence of a string in a file whose comments explain why that
+ * string is absent, and the comment is what you find. The HSTS block below
+ * says "`preload` is deliberately absent", so `not.toContain("preload")` went
+ * looking for the word and read the sentence saying it is not there.
+ *
+ * LESSONS.md has an entry on this from the first time. It has now happened
+ * three times in this repo, always in a test that reads a real config or
+ * stylesheet off disk. Strip comments before matching, every time.
+ */
+const nginxRules = nginxConf.replace(/^\s*#.*$/gm, "");
+
+function servedPolicy(): Record<string, string[]> {
+  const header = /add_header Content-Security-Policy "([^"]+)"/.exec(nginxRules);
+  if (header === null) throw new Error("no Content-Security-Policy in the nginx config");
+
+  const parsed: Record<string, string[]> = {};
+  for (const directive of (header[1] ?? "").split(";")) {
+    const [name, ...values] = directive.trim().split(/\s+/);
+    if (name !== undefined && name !== "") parsed[name] = values;
+  }
+  return parsed;
+}
+
+describe("the policy the container actually serves", () => {
+  it("declares every directive the lesson's baseline does", () => {
+    const served = servedPolicy();
+    const baseline = baselineCsp({ apiUrl: "https://api.example.com" });
+
+    // Add a directive to security.ts and forget the conf and this fails by
+    // name, which is the whole reason it exists.
+    expect(Object.keys(served).sort()).toEqual(Object.keys(baseline).sort());
+  });
+
+  it("matches the baseline on every directive that is pure policy", () => {
+    const served = servedPolicy();
+    const baseline = baselineCsp({ apiUrl: "https://api.example.com" });
+
+    for (const [name, values] of Object.entries(baseline)) {
+      // connect-src is the one that legitimately differs: the baseline takes
+      // an API origin as an argument and the served app has none.
+      if (name === "connect-src") continue;
+      expect(served[name], `${name} differs between the lesson and the conf`).toEqual(values);
+    }
+  });
+
+  it("sets HSTS, without preload", () => {
+    expect(nginxRules).toMatch(/Strict-Transport-Security "max-age=\d+; includeSubDomains"/);
+    // preload asks browser vendors to hard-code the domain and takes months
+    // to undo. Not a default.
+    expect(nginxRules).not.toContain("preload");
+  });
+});
+
 describe("the baseline policy", () => {
   const directives = baselineCsp({ apiUrl: "https://api.example.com" });
 
@@ -77,6 +160,33 @@ describe("the baseline policy", () => {
     expect(directives["frame-ancestors"]).toEqual(["'none'"]);
     expect(directives["base-uri"]).toEqual(["'self'"]);
     expect(directives["form-action"]).toEqual(["'self'"]);
+  });
+
+  it("blocks plugin documents, which nothing uses and everything forgets", () => {
+    // object-src 'none' and base-uri are the two Google's CSP Evaluator calls
+    // mandatory. This one gets left out because nobody has embedded a plugin
+    // this decade, which is also why nobody notices it missing.
+    expect(directives["object-src"]).toEqual(["'none'"]);
+  });
+
+  it("reports to both the deprecated directive and its replacement", () => {
+    const reporting = baselineCsp({
+      apiUrl: "https://api.example.com",
+      reportUri: "https://example.com/csp",
+    });
+
+    // report-uri is deprecated and still the only one some browsers honour;
+    // report-to replaces it. Send both until the old one is unused.
+    expect(reporting["report-uri"]).toEqual(["https://example.com/csp"]);
+    expect(reporting["report-to"]).toEqual([REPORT_GROUP]);
+  });
+
+  it("names the group in a header, or the reports go nowhere", () => {
+    // `report-to csp` with nothing defining the group `csp` is dropped
+    // silently, which looks exactly like having no violations.
+    expect(reportingEndpointsHeader("https://example.com/csp")).toBe(
+      'csp="https://example.com/csp"',
+    );
   });
 
   it("falls back to a closed default", () => {

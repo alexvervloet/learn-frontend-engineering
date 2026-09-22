@@ -49,6 +49,13 @@ export function baselineCsp(options: { apiUrl: string; reportUri?: string }): Cs
     "img-src": ["'self'", "data:", "https:"],
     "font-src": ["'self'"],
 
+    // <object>, <embed> and <applet>. Nothing in a modern app uses them, and
+    // a plugin document is another way to get script running on your origin.
+    // It is one of the two directives Google's CSP Evaluator treats as
+    // mandatory, alongside base-uri, and it is the one people leave out
+    // because they have never needed the elements it blocks.
+    "object-src": ["'none'"],
+
     // Where the app is allowed to make requests. This is what turns a stolen
     // token into a token the attacker cannot exfiltrate from your page.
     "connect-src": ["'self'", options.apiUrl],
@@ -64,10 +71,37 @@ export function baselineCsp(options: { apiUrl: string; reportUri?: string }): Cs
   };
 
   if (options.reportUri !== undefined) {
+    // Both, and deliberately.
+    //
+    // `report-uri` is deprecated in CSP Level 3 and is still the only one some
+    // browsers honour. `report-to` replaces it and names a group defined by a
+    // separate `Reporting-Endpoints` response header, which is why it cannot
+    // be expressed here on its own: this function returns directives, and that
+    // header is not one. `reportingEndpointsHeader` below builds it.
+    //
+    // Send both until the old one is genuinely unused, because a policy whose
+    // reports go nowhere is a policy you will never dare enforce.
     directives["report-uri"] = [options.reportUri];
+    directives["report-to"] = [REPORT_GROUP];
   }
 
   return directives;
+}
+
+/** The group name tying `report-to` to the `Reporting-Endpoints` header. */
+export const REPORT_GROUP = "csp";
+
+/**
+ * The companion header for `report-to`.
+ *
+ *   Reporting-Endpoints: csp="https://example.com/csp-reports"
+ *
+ * Without it, `report-to csp` names a group nothing has defined and the
+ * reports are dropped silently, which looks exactly like having no
+ * violations.
+ */
+export function reportingEndpointsHeader(reportUri: string): string {
+  return `${REPORT_GROUP}="${reportUri}"`;
 }
 
 export function serialiseCsp(directives: CspDirectives): string {

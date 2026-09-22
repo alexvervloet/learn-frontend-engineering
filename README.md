@@ -48,20 +48,21 @@ Every learning module is built and tested: [web-fundamentals](web-fundamentals/)
 [learning/astro-islands](learning/astro-islands/),
 [learning/production](learning/production/),
 [learning/data-fetching](learning/data-fetching/), and the shared
-[lesson-shell](packages/lesson-shell/). `npm test` runs 835 test cases across
-fifteen modules and three capstones, including type-level ones, and the browser
-suites add 146 Playwright specs on top.
+[lesson-shell](packages/lesson-shell/). `npm test` runs 923 test cases across
+fifteen modules and three capstones, including type-level ones and a handful
+about the repo itself, and the browser suites add 157 Playwright specs on
+top.
 
 ## Suggested learning path
 
 Each module stands alone, so skip ahead if a topic is already familiar.
 
 1. **[web-fundamentals/](web-fundamentals/)** — the DOM, the event loop, fetch
-   and the five places to put data. React is an abstraction over all of it, and
-   the abstraction leaks.
+   and the five places to put data, then the one way to stop blocking it. React
+   is an abstraction over all of it, and the abstraction leaks.
 2. **[learning/react-core/](learning/react-core/)** — state, effects, refs,
-   context, reducers, Suspense, transitions. The largest module, and the one
-   everything else assumes.
+   context, reducers, Suspense, transitions, and what React 19.2 added to all
+   of it. The largest module, and the one everything else assumes.
 3. **[learning/typescript-react/](learning/typescript-react/)** — typing props,
    children, events, refs, generic components, and state that cannot be invalid.
 4. **[learning/styling/](learning/styling/)** — CSS modules, Tailwind 4, design
@@ -109,26 +110,30 @@ Each module's README states exactly what it needs.
 
 ### web-fundamentals
 
-The platform React compiles down to. Four lessons: DOM APIs and event
+The platform React compiles down to. Five lessons: DOM APIs and event
 delegation, including the one listener that genuinely leaks; the event loop and
 what is and is not ordered by the spec; `fetch` with `AbortController` and the
-stale-response bug; and the five places a browser can store something, with a
-working adapter for each.
+stale-response bug, with both fixes; the five places a browser can store
+something, with a working adapter for each; and Web Workers, because the event
+loop lesson ends on a frozen page and this is the only thing that unfreezes
+it.
 
 ### learning/
 
 - **[react-core](learning/react-core/)** — rendering and commit, state as a
-  snapshot, lists and keys, effects and when not to use one, refs and focus,
-  context, `useReducer` as a state machine, `useTransition` and
-  `useDeferredValue`, `useActionState` and `useOptimistic`, Suspense with
-  `use` and `lazy`
+  snapshot, lists and keys, effects and when not to use one, `useEffectEvent`
+  for the value an effect reads but must not react to, `useLayoutEffect` and
+  the frame it saves, refs and focus, context, `useReducer` as a state
+  machine, `useTransition` and `useDeferredValue`, `useActionState` and
+  `useOptimistic`, Suspense with `use` and `lazy`, and `<Activity>`
 - **[typescript-react](learning/typescript-react/)** — props and children, events, `ref` as a prop in React 19,
   generic and polymorphic components, discriminated unions for state, type-safe
   context, when `as` is a bug
 - **[styling](learning/styling/)** — CSS modules, Tailwind 4 and its CSS-first
-  config, design tokens with custom properties, dark mode, container queries,
-  cascade layers, `class-variance-authority` and the shadcn/ui pattern,
-  animation with Motion, and the Popover API with anchor positioning
+  config, design tokens with custom properties, dark mode with `light-dark()`,
+  container queries, cascade layers, `class-variance-authority` and the
+  shadcn/ui pattern, animation with Motion, and the Popover API with anchor
+  positioning and the three declarations that let it animate at all
 - **[routing](learning/routing/)** — React Router 8 data routers, loaders and
   actions, nested layouts, route-level code splitting, TanStack Router's
   type-safe params, search params as application state, and view transitions
@@ -163,9 +168,10 @@ working adapter for each.
 - **[astro-islands](learning/astro-islands/)** — Astro 7, partial hydration, and when a React SPA is the
   wrong answer
 - **[production](learning/production/)** — build output and env config, Content
-  Security Policy and XSS, where a token can safely live, error reporting and
-  what a boundary does not catch, feature flags, i18n with react-i18next,
-  Docker and nginx, and a PWA with a service worker short enough to read
+  Security Policy and XSS, security headers the container is tested against,
+  where a token can safely live, error reporting and what a boundary does not
+  catch, feature flags, i18n with react-i18next, Docker and nginx, and a PWA
+  with a service worker short enough to read
 
 ### projects/
 

@@ -1,0 +1,45 @@
+# Dependabot, because `npm audit` in CI only reports advisories that already
+# exist. This is the half that keeps the lockfile from drifting far enough
+# behind that an upgrade becomes a project.
+#
+# The repo pins versions on purpose and the README names them, so an update
+# here is a pull request to read rather than something to merge on green. That
+# is why the groups exist: one PR for "the React ecosystem moved" is a decision
+# you can make once, and fifteen separate PRs is a chore nobody does.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # The ones that move together and break together.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - "@types/react"
+          - "@types/react-dom"
+      tooling:
+        patterns:
+          - vite
+          - vitest
+          - "@vitejs/*"
+          - "@vitest/*"
+          - eslint
+          - "eslint-*"
+          - "@eslint/*"
+          - typescript-eslint
+          - prettier
+      # TypeScript on its own. Moving it is a decision about typescript-eslint's
+      # peer range, which LESSONS.md has an entry about, not a routine bump.
+      typescript:
+        patterns:
+          - typescript
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

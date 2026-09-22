@@ -32,6 +32,18 @@ jobs:
       # worth failing a build over.
       - run: npm run lint -- --max-warnings 0
       - run: npm run format:check
+      # A frontend ships its dependencies to the user, so a vulnerable
+      # transitive package is not a build-server problem, it is a payload.
+      #
+      # `--audit-level=high` rather than the default, deliberately. An audit
+      # that fails on every low-severity advisory in a dev-only tool gets
+      # `|| true` appended within a fortnight, and then it is worse than not
+      # having one, because the job is green and nobody is reading it.
+      #
+      # This is a floor. It only knows about advisories that have been
+      # published, so it is worth pairing with Dependabot rather than treating
+      # as the whole answer.
+      - run: npm audit --audit-level=high
 
   test:
     runs-on: ubuntu-latest

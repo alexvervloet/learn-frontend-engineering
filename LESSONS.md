@@ -1129,3 +1129,44 @@ all 146 specs from it.
 **Next time.** When a CI step works because of a cache outside the repo, say so
 in the step and test the assumption. `PLAYWRIGHT_BROWSERS_PATH=$(mktemp -d)` is
 a one-line way to find out what a cold runner actually does.
+
+## A passive effect is not always the last thing to run
+
+**Expected.** Writing the `useLayoutEffect` lesson, I asserted this order for a
+layout effect that calls `setState`:
+
+```
+render (false) → layout-effect → render (true) → layout-effect → effect (true)
+```
+
+The reasoning was that `useLayoutEffect` finishes its work before React hands
+the frame back, so the re-render it causes must come before anything passive.
+The passive effect queued by the first commit would run at the end, once.
+
+**What happened.** The test failed on an extra entry in the middle:
+
+```
+render (false) → layout-effect → effect (false) → render (true)
+               → layout-effect → effect (true)
+```
+
+The first commit's passive effect ran before the re-render, and it ran with
+the _old_ value. React empties the pending passive queue before it begins a new
+render pass, so an update scheduled from a layout effect does not jump ahead of
+effects that were already waiting. It goes behind them.
+
+The half of my model that was right: none of this is separated by a paint. The
+half that was wrong: "before the paint" and "before any passive effect" are not
+the same statement, and I had been treating them as one.
+
+**The call.** Assert the real order and put the surprising step in a comment
+next to it, because a reader's model will have the same hole. The lesson's
+tests now say what they can settle, which is ordering, and say explicitly that
+the paint is not one of those things, since jsdom never paints.
+
+**Next time.** When a test encodes a mental model of framework internals, print
+the actual array once before writing the expectation. I wrote the assertion
+from memory, and the five seconds that would have saved were spent twice over
+working out whether the failure was React's behaviour or `act()`'s. It was
+React's: flushing passive effects before the next render is what
+`flushPassiveEffects` does, and `act` only makes the timing deterministic.

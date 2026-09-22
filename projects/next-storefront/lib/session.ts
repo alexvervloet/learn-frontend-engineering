@@ -25,7 +25,18 @@ export function createSession(email: string): string {
 export function readSession(token: string | undefined): string | null {
   if (token === undefined) return null;
 
-  const [encoded, signature] = token.split(".");
+  // Check the shape before the signature, and check it exactly.
+  //
+  // `const [encoded, signature] = token.split(".")` takes the first two fields
+  // and silently drops the rest, so `<valid token>.anything` verified and
+  // returned the email. The signed part was still the real one, so it was not
+  // an escalation, but a cookie the attacker can append to is a cookie the
+  // signature has stopped fully covering, and that is the whole point of
+  // having one.
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+
+  const [encoded, signature] = parts;
   if (encoded === undefined || signature === undefined) return null;
 
   const email = Buffer.from(encoded, "base64url").toString();

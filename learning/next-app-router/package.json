@@ -2,6 +2,7 @@
   "name": "next-app-router",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Next 16 App Router: Server Components, the client boundary, server actions, caching",
   "scripts": {
     "dev": "next dev --port 5190",

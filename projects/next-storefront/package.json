@@ -2,6 +2,7 @@
   "name": "next-storefront",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "description": "Capstone: a storefront on the App Router. Server Components for reads, server actions for writes, ISR, streaming search, and a cookie-backed cart.",
   "scripts": {
     "dev": "next dev --port 5220",

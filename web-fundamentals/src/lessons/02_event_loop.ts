@@ -196,7 +196,8 @@ export function mountEventLoop(root: HTMLElement): () => void {
 export const lesson: Lesson = {
   id: "event-loop",
   title: "The event loop and microtasks",
-  summary: "Sync, then microtasks, then a frame, then timers. Block any of it and the page stops.",
+  summary:
+    "Sync, then microtasks, then timers, and a frame whenever the browser decides. Block any of it and the page stops.",
   file: "src/lessons/02_event_loop.ts",
   mount: mountEventLoop,
 };

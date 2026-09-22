@@ -1,7 +1,7 @@
 # React core 🟢
 
-The largest module, and the one every other module assumes. Eleven lessons on
-what React actually does when you call `setState`, why effects have a return
+The largest module, and the one every other module assumes. Fourteen lessons
+on what React actually does when you call `setState`, why effects have a return
 value, and what React 19 added on top.
 
 Every lesson is a component you can click and a test that asserts what the
@@ -23,6 +23,8 @@ lesson claims.
 | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
 | `04_no_effect_needed.tsx`    | State mirrored from a calculation costs a render and a frame of stale UI. Two versions, with counters |
 | `05_effects_and_cleanup.tsx` | Connect and disconnect, not mount and unmount. Skip the cleanup and intervals stack up until reload   |
+| `12_effect_events.tsx`       | `useEffectEvent`: the value an effect reads but must not re-run for. Two panels, one dependency apart |
+| `13_layout_effect.tsx`       | `useLayoutEffect` runs between the commit and the paint, which is the whole difference and the cost   |
 
 ### Escape hatches
 
@@ -39,6 +41,11 @@ lesson claims.
 | `09_transitions.tsx`            | `useTransition` and `useDeferredValue` over a 20,000 row filter. Interruption, not debouncing             |
 | `10_actions_and_optimistic.tsx` | `<form action>`, `useActionState`, `useFormStatus`, and a rollback you did not write                      |
 | `11_suspense.tsx`               | `use(promise)`, why the promise must be cached, `lazy()`, and keeping content on screen with a transition |
+| `14_activity.tsx`               | `<Activity>`: hidden without being unmounted. State persists, effects do not. Against both older options  |
+
+File numbers run in the order lessons were written; the sidebar groups them by
+topic, so 12 and 13 sit with the other effects lessons and 14 with the
+concurrent ones. The numbers are stable because the deep links use them.
 
 `useRenderCount.ts` is the measuring instrument the lessons share. It mutates a
 ref during render, which is exactly what React asks you not to do, and it has

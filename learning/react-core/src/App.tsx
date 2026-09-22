@@ -11,6 +11,9 @@ import { ReducerStateMachine } from "./lessons/08_reducer_state_machine";
 import { Transitions } from "./lessons/09_transitions";
 import { ActionsAndOptimistic } from "./lessons/10_actions_and_optimistic";
 import { SuspenseAndUse } from "./lessons/11_suspense";
+import { EffectEvents } from "./lessons/12_effect_events";
+import { LayoutEffects } from "./lessons/13_layout_effect";
+import { ActivityLesson } from "./lessons/14_activity";
 
 const lessons = defineLessons([
   {
@@ -52,6 +55,22 @@ const lessons = defineLessons([
     summary: "An effect connects and disconnects. Skip the disconnect and intervals pile up.",
     file: "src/lessons/05_effects_and_cleanup.tsx",
     Component: EffectsAndCleanup,
+  },
+  {
+    id: "12-effect-events",
+    group: "Effects",
+    title: "useEffectEvent",
+    summary: "The value an effect reads but must not react to. One dependency apart.",
+    file: "src/lessons/12_effect_events.tsx",
+    Component: EffectEvents,
+  },
+  {
+    id: "13-layout-effect",
+    group: "Effects",
+    title: "useLayoutEffect",
+    summary: "Runs before the paint, so the user never sees the unmeasured frame. Costs one.",
+    file: "src/lessons/13_layout_effect.tsx",
+    Component: LayoutEffects,
   },
   {
     id: "06-refs-and-focus",
@@ -100,6 +119,14 @@ const lessons = defineLessons([
     summary: "Read a promise as if it were a value. The promise has to be cached.",
     file: "src/lessons/11_suspense.tsx",
     Component: SuspenseAndUse,
+  },
+  {
+    id: "14-activity",
+    group: "Concurrent React",
+    title: "Activity",
+    summary: "Hidden but not unmounted: the state persists, the effects do not.",
+    file: "src/lessons/14_activity.tsx",
+    Component: ActivityLesson,
   },
 ]);
 

@@ -288,6 +288,22 @@ in as well, so checking only for the explicit path would miss it.
 **Next time.** Any test that greps a source file is also grepping its comments.
 In a repo whose files are mostly comments on purpose, match on structure.
 
+**It has now happened three times.** Once originally, then twice in one
+afternoon: a test asserting `tokens.css` has no `@media (prefers-color-scheme)`
+found the docblock describing the shape that was removed, and a test asserting
+the nginx config does not say `preload` found the comment explaining why it
+does not.
+
+The shape is always the same. A file is read off disk, the assertion is about
+the _absence_ of something, and the file documents why that thing is absent.
+Prose about a decision contains the words of the decision, so any file worth
+commenting is a file whose comments will match your search.
+
+The rule that would have caught all three: when a test reads a real config,
+stylesheet or conf file, strip the comments at the top of the test and assert
+against what is left. It costs one line, it is obviously right once written,
+and it did not come to mind on any of the three occasions.
+
 ## jsdom is missing three browser APIs, and each one costs a confused half hour
 
 **What happened.** `ResizeObserver is not defined` in `learning/styling`, having

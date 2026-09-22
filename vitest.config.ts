@@ -8,6 +8,8 @@ export default defineConfig({
     // matches learning/README.md, and Vitest refuses to start rather than
     // guessing what you meant.
     projects: [
+      // The repo's own claims, the ones no single workspace owns.
+      "config/vitest.config.ts",
       "packages/*/vitest.config.ts",
       "web-fundamentals/vitest.config.ts",
       "learning/*/vitest.config.ts",

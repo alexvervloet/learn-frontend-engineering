@@ -54,6 +54,76 @@
 }
 
 /*
+ * Animating it in and out, which is the part of the Popover API that catches
+ * everybody.
+ *
+ * A popover is `display: none` when closed. Transitions do not run on a
+ * property that jumps between `none` and `block`, and there is no previous
+ * style to interpolate from when an element appears, so the obvious
+ * `transition: opacity 180ms` does nothing in either direction. Three
+ * additions fix it, and all three are load-bearing.
+ *
+ * **1. `@starting-style` gives the browser a "before" to start from.** Without
+ * it the element's first rendered style *is* the open style, so there is
+ * nothing to animate towards. It only applies to the first style change after
+ * the element becomes rendered, which is exactly the entry animation.
+ *
+ * **2. `display` has to be in the transition, with `allow-discrete`.** A
+ * discrete property normally flips at the halfway point. `allow-discrete`
+ * makes it flip at the *end* when transitioning to `none`, which is what keeps
+ * the element visible for the length of the exit animation instead of
+ * vanishing on frame one.
+ *
+ * **3. `overlay` has to be in it too, and this is the one people miss.**
+ * `overlay` is the property that tracks top-layer membership, and it is
+ * discrete like `display`. Leave it out and the popover drops out of the top
+ * layer the instant it closes, so the exit animation plays *behind* whatever
+ * it was sitting above: it looks like the popover is being swallowed by the
+ * page. `overlay` is only settable by the browser, but it is transitionable,
+ * which is the whole reason it is nameable at all.
+ *
+ * The reduced-motion net in `motion.css` catches this like everything else: it
+ * drops every transition-duration to 0.01ms, so the discrete flips happen
+ * almost immediately and the popover simply appears.
+ */
+.anchored-popover {
+  opacity: 0;
+
+  /*
+   * `transform`, not the newer `translate` property, and for a boring reason
+   * worth knowing: the @supports fallback further down centres itself with
+   * `translate: -50% 0`. `.anchored-popover:popover-open` is the more specific
+   * selector, so animating `translate` here would win and un-centre the
+   * fallback whenever it was open. `transform` and `translate` are separate
+   * properties that compose, so this one stays out of its way.
+   */
+  transform: translateY(-4px);
+
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    /* Both discrete, and both required. See 2 and 3 above. */ display 180ms allow-discrete,
+    overlay 180ms allow-discrete;
+}
+
+.anchored-popover:popover-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/*
+ * The entry values. Note the selector repeats `:popover-open`: this block
+ * describes the first frame of the *open* state, not a separate state of its
+ * own, and a bare `.anchored-popover` here would not match.
+ */
+@starting-style {
+  .anchored-popover:popover-open {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/*
  * The backdrop is a real pseudo-element on the popover, so a modal dimmer
  * needs no extra div. Only `manual` and `auto` popovers get one worth styling.
  */

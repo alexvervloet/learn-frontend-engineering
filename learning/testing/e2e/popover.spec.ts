@@ -13,6 +13,31 @@ import { expect, test } from "@playwright/test";
  *
  * Runs against the styling module, which is this config's default baseURL.
  */
+
+/**
+ * Waits for the open transition to finish before anything measures geometry.
+ *
+ * The popover slides 4px as it fades in, so a `boundingBox()` taken straight
+ * after the click is a reading from the middle of an animation. Every
+ * positioning assertion below was written before there was an animation and
+ * two of them started failing by a few pixels the moment there was one, which
+ * is the right failure: they were measuring a moving element.
+ *
+ * Opacity is the settle signal because it shares the duration and easing with
+ * the transform, so opacity 1 means the transform has arrived too.
+ */
+async function settled(page: import("@playwright/test").Page): Promise<void> {
+  await expect
+    .poll(
+      async () =>
+        Number(
+          await page.getByTestId("anchored-tip").evaluate((node) => getComputedStyle(node).opacity),
+        ),
+      { timeout: 5_000 },
+    )
+    .toBe(1);
+}
+
 test.describe("the Popover API", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/#08-popover-anchor");
@@ -129,6 +154,7 @@ test.describe("anchor positioning", () => {
 
     const tip = page.getByTestId("anchored-tip");
     await expect(tip).toBeVisible();
+    await settled(page);
 
     const triggerBox = await trigger.boundingBox();
     const tipBox = await tip.boundingBox();
@@ -158,6 +184,7 @@ test.describe("anchor positioning", () => {
     await trigger.click();
     const tip = page.getByTestId("anchored-tip");
     await expect(tip).toBeVisible();
+    await settled(page);
 
     const before = await trigger.boundingBox();
     const beforeTip = await tip.boundingBox();
@@ -244,6 +271,7 @@ test.describe("the no-anchor-positioning fallback", () => {
 
     const tip = page.getByTestId("anchored-tip");
     await expect(tip).toBeVisible();
+    await settled(page);
 
     // Take the anchored positioning away and apply the fallback's own
     // declarations, which is the state an older browser is in.
@@ -310,5 +338,113 @@ test.describe("the no-anchor-positioning fallback", () => {
     );
 
     expect(onTop).toBe("anchored-tip");
+  });
+});
+
+/**
+ * Entry and exit animation, which is the part of the Popover API that silently
+ * does nothing when you get it wrong.
+ *
+ * A popover is `display: none` when closed, so a plain `transition: opacity`
+ * never runs in either direction and the failure is no animation rather than a
+ * broken one. Three things make it work, and each has a test here because each
+ * fails invisibly on its own: `@starting-style` for the entry, `display` in
+ * the transition with `allow-discrete` for the exit, and `overlay` with it so
+ * the exit plays in the top layer rather than behind the page.
+ *
+ * **The transitions are slowed to 1500ms for these tests.** The real duration
+ * is 180ms, which is fine for a person and far too short to sample reliably
+ * from another process on a loaded CI machine. What is being asserted is the
+ * mechanism, not the number, and the mechanism is identical at either speed.
+ * The alternative is a test that passes on a fast machine and flakes on a
+ * slow one, and this repo already has a LESSONS.md entry about that.
+ */
+test.describe("animating in and out", () => {
+  const SLOW = 1500;
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/#08-popover-anchor");
+    await expect(page.getByTestId("support")).toContainText("popover: yes");
+    await page.addStyleTag({
+      content: `.anchored-popover { transition-duration: ${String(SLOW)}ms !important; }`,
+    });
+  });
+
+  const opacityOf = async (page: import("@playwright/test").Page): Promise<number> =>
+    Number(
+      await page.getByTestId("anchored-tip").evaluate((node) => getComputedStyle(node).opacity),
+    );
+
+  test("fades in rather than appearing, which is @starting-style working", async ({ page }) => {
+    await page.getByTestId("open-anchored").click();
+    await page.waitForTimeout(250);
+
+    // Without @starting-style there is no previous style to interpolate from,
+    // the element's first rendered style is the open one, and this reads 1.
+    const midway = await opacityOf(page);
+    expect(midway).toBeGreaterThan(0);
+    expect(midway).toBeLessThan(1);
+
+    await expect.poll(async () => opacityOf(page), { timeout: SLOW * 2 }).toBe(1);
+  });
+
+  test("stays on screen while it fades out, which is display allow-discrete", async ({ page }) => {
+    const tip = page.getByTestId("anchored-tip");
+
+    await page.getByTestId("open-anchored").click();
+    await expect.poll(async () => opacityOf(page), { timeout: SLOW * 2 }).toBe(1);
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(250);
+
+    // Without `display 180ms allow-discrete` the element is display:none on
+    // the first frame after closing and there is nothing left to animate.
+    const display = await tip.evaluate((node) => getComputedStyle(node).display);
+    expect(display).not.toBe("none");
+
+    const fading = await opacityOf(page);
+    expect(fading).toBeLessThan(1);
+    expect(fading).toBeGreaterThan(0);
+
+    // And it does finish.
+    await expect(tip).toBeHidden({ timeout: SLOW * 2 });
+  });
+
+  /**
+   * `overlay` is read directly rather than inferred from a hit test, and the
+   * first version of this test got that wrong.
+   *
+   * Hit-testing the popover's centre mid-exit finds the section behind it, not
+   * the popover, even though the popover is still painted on top at 75%
+   * opacity. That is deliberate browser behaviour: a popover that is closing
+   * stops being a pointer target, so a click during the fade goes to whatever
+   * the user can see themselves about to click. Correct, and nothing to do
+   * with the top layer.
+   *
+   * The computed value of `overlay` is the thing itself. `auto` means in the
+   * top layer, `none` means out of it.
+   */
+  test("fades out in the top layer, not behind the page, which is overlay", async ({ page }) => {
+    const tip = page.getByTestId("anchored-tip");
+
+    await page.getByTestId("open-anchored").click();
+    await expect.poll(async () => opacityOf(page), { timeout: SLOW * 2 }).toBe(1);
+
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(250);
+
+    const state = await tip.evaluate((node) => ({
+      overlay: getComputedStyle(node).overlay,
+      opacity: getComputedStyle(node).opacity,
+      stillOpen: node.matches(":popover-open"),
+    }));
+
+    // Closing, still fading, still in the top layer. Take `overlay` out of the
+    // transition and this reads "none" while the opacity is still above zero,
+    // which is the fade happening behind the page.
+    expect(state.stillOpen).toBe(false);
+    expect(Number(state.opacity)).toBeGreaterThan(0);
+    expect(Number(state.opacity)).toBeLessThan(1);
+    expect(state.overlay).toBe("auto");
   });
 });

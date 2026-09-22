@@ -45,6 +45,27 @@
  * user can walk away from. The accessibility module's lesson 03 builds the
  * dialog case.
  *
+ * **Animating it is where everyone gets stuck.** A popover is `display: none`
+ * when closed, and a transition does not run on a property jumping between
+ * `none` and `block`, so the obvious `transition: opacity 180ms` does nothing
+ * in either direction and nothing tells you why. Three additions fix it:
+ *
+ *   @starting-style              the style to fade in *from*. Without it the
+ *                                first rendered style is the open one, so
+ *                                there is nothing to interpolate
+ *   display …ms allow-discrete   keeps the element rendered for the length of
+ *                                the exit instead of vanishing on frame one
+ *   overlay …ms allow-discrete   keeps it in the *top layer* for that exit.
+ *                                Miss this and the fade plays behind the page
+ *
+ * `popover.css` has all three, with the reasoning next to them.
+ *
+ * One detail the e2e suite turned up: a closing popover stops being a pointer
+ * target straight away, even while it is still painted at 75% opacity. Hit
+ * testing its centre mid-fade finds whatever is behind it. That is deliberate,
+ * and it is why "is it still on top" has to be asked of the computed `overlay`
+ * value rather than of `elementFromPoint`.
+ *
  * `anchor-name` is newer than `popover` and a browser can have one without the
  * other, so `popover.css` carries a `@supports not (anchor-name: --probe)`
  * fallback. Feature-detect the positioning, not the popover.

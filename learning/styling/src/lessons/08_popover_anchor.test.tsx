@@ -130,6 +130,36 @@ describe("the stylesheet", () => {
     expect(popoverCss).toMatch(/position-try-fallbacks:\s*flip-block/);
   });
 
+  /**
+   * Three declarations, each of which fails silently on its own, so each gets
+   * its own assertion rather than one regex over the whole transition.
+   *
+   * These are structure, not behaviour: jsdom has no top layer and runs no
+   * transitions, so all it can say is that the CSS still asks for the right
+   * things. That the browser then does them is
+   * `learning/testing/e2e/popover.spec.ts`, which fades the popover in and out
+   * for real and was checked against all three of these being deleted one at a
+   * time.
+   */
+  it("gives the popover a starting style, so there is something to fade in from", () => {
+    // Without it the element's first rendered style is the open style, there
+    // is nothing to interpolate from, and it appears instead of fading.
+    expect(popoverCss).toMatch(/@starting-style\s*\{[\s\S]*?\.anchored-popover:popover-open/);
+  });
+
+  it("transitions display with allow-discrete, so the exit is visible at all", () => {
+    // display flips none/block. A discrete property jumps at the halfway
+    // point unless allow-discrete moves the jump to the end.
+    expect(popoverCss).toMatch(/display\s+\d+ms\s+allow-discrete/);
+  });
+
+  it("transitions overlay too, which is the one people miss", () => {
+    // overlay tracks top-layer membership and is also discrete. Leave it out
+    // and the popover drops out of the top layer on the first frame of the
+    // exit, so the rest of the fade happens behind the page.
+    expect(popoverCss).toMatch(/overlay\s+\d+ms\s+allow-discrete/);
+  });
+
   it("has a fallback for a browser with popover but not anchor positioning", () => {
     // The two shipped separately, so this combination is real rather than
     // hypothetical, and without the block the popover lands nowhere near the

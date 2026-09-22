@@ -2,12 +2,19 @@ import { expect, test } from "@playwright/test";
 
 /**
  * The claim from `learning/styling` lesson 03: an explicit light choice beats a
- * dark OS setting, because of one `:not([data-theme="light"])` in the media
- * query.
+ * dark OS setting.
  *
- * jsdom has no `prefers-color-scheme` and no cascade, so its tests could only
- * read the stylesheet. Playwright can emulate the OS setting, which is the only
- * way to test this properly.
+ * The mechanism is `light-dark()` reading `color-scheme`, so choosing light
+ * pins `color-scheme: light` on `<html>` and every token resolves to its light
+ * value. It used to be a `@media (prefers-color-scheme: dark)` block guarded
+ * by `:root:not([data-theme="light"])`, and the behaviour asserted here is
+ * deliberately identical, which is the point of testing behaviour: the
+ * implementation underneath these assertions was replaced and they did not
+ * have to change.
+ *
+ * jsdom has no `prefers-color-scheme`, no `light-dark()` and no cascade, so
+ * its tests can only read the stylesheet. Playwright can emulate the OS
+ * setting, which is the only way to settle this one.
  */
 test.use({ colorScheme: "dark" });
 
@@ -28,8 +35,9 @@ test("follows a dark OS by default", async ({ page }) => {
   await page.getByRole("button", { name: "light" }).click();
   const light = await surface(page);
 
-  // The user's choice wins over the OS. Delete the :not() from tokens.css and
-  // these two are identical, with nothing in the console to say so.
+  // The user's choice wins over the OS. Take the `color-scheme: light` off
+  // `:root[data-theme="light"]` and these two are identical, with nothing in
+  // the console to say so.
   expect(light).not.toBe(dark);
 });
 

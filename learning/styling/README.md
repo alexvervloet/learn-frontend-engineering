@@ -10,11 +10,11 @@ between them replace a popover library.
 
 ### Writing the CSS
 
-| File                    | What it teaches                                                                                                                |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `01_css_modules.tsx`    | Two files both declaring `.title`, and why neither collides. `composes` adds a class reference, not a copy of the declarations |
-| `02_tailwind_theme.tsx` | No `tailwind.config.js`. A token in `@theme` becomes a custom property _and_ a family of utilities. What changed from v3       |
-| `03_design_tokens.tsx`  | Primitive vs semantic tokens. Three theme states, and the one selector that stops a dark OS overriding the user's choice       |
+| File                    | What it teaches                                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `01_css_modules.tsx`    | Two files both declaring `.title`, and why neither collides. `composes` adds a class reference, not a copy of the declarations        |
+| `02_tailwind_theme.tsx` | No `tailwind.config.js`. A token in `@theme` becomes a custom property _and_ a family of utilities. What changed from v3              |
+| `03_design_tokens.tsx`  | Primitive vs semantic tokens. `light-dark()`, so a role cannot have one value without the other, and three states from `color-scheme` |
 
 ### Modern layout
 
@@ -53,11 +53,18 @@ So the suite asserts three kinds of thing, and is explicit about which:
 picking a compound variant, `motionPropsFor` dropping the travel, the width
 threshold the `ResizeObserver` version branches on.
 
-**Structure**, by reading the stylesheets from disk. That the dark block
-redefines every role the light block declares, that the layer order is declared
-up front, that `@theme` declares every `brand-` shade the components render.
-These catch the failures that are otherwise silent: a missing token produces no
-CSS and no warning, just an unstyled element.
+**Structure**, by reading the stylesheets from disk. That every semantic role
+is a `light-dark()` pair, that the layer order is declared up front, that
+`@theme` declares every `brand-` shade the components render. These catch the
+failures that are otherwise silent: a missing token produces no CSS and no
+warning, just an unstyled element.
+
+That first one used to read "the dark block redefines every role the light
+block declares", which is the same worry one level less certain. Two parallel
+lists can drift and a test can notice; one list of `light-dark()` pairs cannot
+drift, because the function takes two arguments. The test changed from
+detecting the mistake to checking the property that makes it unspellable, and
+that is the better trade when it is available.
 
 **Markup**, that the right classes are on the right elements, including that
 the `@container` element is not the same element as the one querying it.

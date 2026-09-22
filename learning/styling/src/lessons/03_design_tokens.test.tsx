@@ -9,11 +9,24 @@ import { DesignTokens, applyTheme } from "./03_design_tokens";
 
 const tokensCss = readFileSync(join(import.meta.dirname, "..", "tokens.css"), "utf8");
 
-/** The custom properties declared inside one selector block. */
-function tokensIn(selector: string): string[] {
-  const block = new RegExp(`${selector}\\s*\\{([^}]*)\\}`).exec(tokensCss);
-  if (block === null) throw new Error(`no block for ${selector} in tokens.css`);
-  return [...(block[1] ?? "").matchAll(/(--[\w-]+):/g)].map((match) => match[1] ?? "").sort();
+/**
+ * The file with its comments taken out.
+ *
+ * LESSONS.md already has an entry called "A substring check matched the
+ * comment explaining it", and writing these tests produced it a second time:
+ * the docblock at the top of tokens.css describes the
+ * `@media (prefers-color-scheme: dark)` shape it replaced, so a search for
+ * that string found the paragraph saying it is gone. Assert against the rules,
+ * not the prose.
+ */
+const rules = tokensCss.replace(/\/\*[\s\S]*?\*\//g, "");
+
+/** Every `--role: value;` declaration in the file, as [name, value] pairs. */
+function declarations(): [string, string][] {
+  return [...rules.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((match) => [
+    match[1] ?? "",
+    (match[2] ?? "").trim(),
+  ]);
 }
 
 afterEach(() => {
@@ -22,19 +35,39 @@ afterEach(() => {
 });
 
 describe("the token file", () => {
-  it("redefines every role in dark, so nothing falls back to a light value", () => {
-    const light = tokensIn(":root");
-    const dark = tokensIn(':root\\[data-theme="dark"\\]');
+  /**
+   * The assertion that replaced "the dark block declares every role the light
+   * block does".
+   *
+   * That one existed because two parallel lists can drift: declare a role in
+   * `:root`, forget it in the dark block, and it keeps its light value in dark
+   * mode, which is usually white text on white. Nothing warns you, because
+   * nothing is wrong with the CSS.
+   *
+   * `light-dark()` makes the drift unspellable rather than merely detectable.
+   * There is one list, and a role cannot have one value without the other,
+   * because the function takes two arguments. This test now checks the
+   * property that gives that guarantee.
+   */
+  it("gives every role both of its values in one declaration", () => {
+    const roles = declarations();
 
-    // A role declared in :root but missing from the dark block keeps its light
-    // value in dark mode. Usually that is white text on white.
-    expect(dark).toEqual(light);
-    expect(light.length).toBeGreaterThan(5);
+    expect(roles.length).toBeGreaterThan(5);
+    for (const [name, value] of roles) {
+      expect(value, `${name} is not a light-dark() pair`).toMatch(/^light-dark\(.+,.+\)$/s);
+    }
   });
 
-  it("guards the media query so an explicit light choice wins", () => {
-    // Without the :not(), a dark OS beats the user's own choice.
-    expect(tokensCss).toMatch(/:root:not\(\[data-theme="light"\]\)/);
+  it("has no second list of tokens under a media query", () => {
+    // The old shape. If one comes back, so does the drift the test above
+    // exists to prevent, and so does the :not() guard it needed.
+    expect(rules).not.toMatch(/@media[^{]*prefers-color-scheme/);
+  });
+
+  it("drives the three states with color-scheme and nothing else", () => {
+    expect(rules).toMatch(/:root\s*\{[^}]*color-scheme:\s*light dark/);
+    expect(rules).toMatch(/:root\[data-theme="light"\]\s*\{\s*color-scheme:\s*light;\s*\}/);
+    expect(rules).toMatch(/:root\[data-theme="dark"\]\s*\{\s*color-scheme:\s*dark;\s*\}/);
   });
 });
 

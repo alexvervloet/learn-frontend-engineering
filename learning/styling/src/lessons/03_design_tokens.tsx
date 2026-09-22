@@ -13,26 +13,37 @@
  * colours after what they look like gives you `--light-grey` being dark in dark
  * mode.
  *
- * **Theming is then reassignment.** `src/tokens.css` redefines the same role
- * names under a dark selector. No component knows a theme exists.
+ * **Theming is then `light-dark()`.** `src/tokens.css` declares each role once
+ * with both of its values, and the browser picks according to the element's
+ * `color-scheme`. No component knows a theme exists, and no token can be
+ * given a light value without a dark one, because the function takes two
+ * arguments.
+ *
+ *   --surface: light-dark(oklch(1 0 0), oklch(0.21 0.015 265));
  *
  * **Three states, not two.** "Dark" and "light" are not enough, because the
- * honest default is "whatever the OS says". So:
+ * honest default is "whatever the OS says". Each one is a `color-scheme`:
  *
- *   system   no attribute. `prefers-color-scheme` decides
- *   light    data-theme="light" on <html>
- *   dark     data-theme="dark"
+ *   system   no attribute. `color-scheme: light dark`, and the OS decides
+ *   light    data-theme="light" pins `color-scheme: light`
+ *   dark     data-theme="dark"  pins `color-scheme: dark`
  *
- * The selector that makes this work is
- * `:root:not([data-theme="light"])` inside the media query. Without the
- * `:not()`, a user on a dark OS who picks light gets dark anyway: the media
- * query has equal specificity and comes later in the file, so it wins. It is a
- * one-selector fix for a bug that reads as "the light button does nothing".
+ * **The bug this used to need a selector for.** Before `light-dark()`, the
+ * dark values lived in `@media (prefers-color-scheme: dark)` and had to be
+ * written `:root:not([data-theme="light"])`. Without that `:not()`, a user on
+ * a dark OS who picked light got dark anyway: equal specificity, later in the
+ * file, media query wins. It read as "the light button does nothing".
+ *
+ * There is no media query now, so there is nothing to guard. Worth
+ * remembering anyway, because you will meet the old shape in existing
+ * codebases and the symptom is not obviously a specificity problem.
  *
  * **Writing to `<html>` rather than a wrapper div** means the background behind
- * an overscroll bounce is right, and `color-scheme` can be set so native
- * scrollbars and form controls follow. A React context holding a theme string
- * that only styles a `<div>` leaves the edges of the page wrong.
+ * an overscroll bounce is right, and `color-scheme` is what makes native
+ * scrollbars, form controls and the overscroll flash follow the theme. It is
+ * now doing two jobs: that one, and telling `light-dark()` which value to
+ * take. A React context holding a theme string that only styles a `<div>`
+ * leaves the edges of the page wrong.
  *
  * **Tailwind's `dark:` variant is the other approach.** `bg-white dark:bg-black`
  * puts the decision at every use site. It is fine for a small app and it does
@@ -130,9 +141,10 @@ export function DesignTokens() {
       </div>
 
       <p className="note">
-        Set your OS to dark, then press “light” here. It goes light and stays light. Delete the{" "}
-        <code>:not([data-theme="light"])</code> from <code>src/tokens.css</code> and that button
-        stops working, with no error anywhere.
+        Set your OS to dark, then press “light” here. It goes light and stays light, because the
+        button pins <code>color-scheme</code> and every token reads it. Each role above is declared
+        once in <code>src/tokens.css</code>, with both values, so there is no second list that can
+        drift out of step with the first.
       </p>
     </div>
   );

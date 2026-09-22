@@ -12,46 +12,59 @@
  * file rather than a search-and-replace: the roles keep their names and change
  * what they point at.
  *
- * The dark block is written three times on purpose, and the guard matters:
+ * **Every role is declared once, with both of its values.** `light-dark()`
+ * takes the light value and the dark one and picks between them according to
+ * the element's `color-scheme`. So the file has one block of tokens instead of
+ * three, and the three theme states become three lines that set nothing but
+ * `color-scheme`.
  *
- *   @media (prefers-color-scheme: dark) with :root:not([data-theme="light"])
- *     follow the OS, unless the user has explicitly chosen light
- *   :root[data-theme="dark"]
- *     the user chose dark, whatever the OS says
+ * That is not only shorter. It removes the failure this file used to be
+ * written around: with a light block and a separate dark block, a role
+ * declared in one and forgotten in the other silently keeps its light value in
+ * dark mode, which is usually white text on white. Nothing warns you, because
+ * there is nothing wrong with the CSS. With `light-dark()` you cannot write
+ * one value without the other; the function takes two arguments.
  *
- * Without the :not() guard, a user on a dark OS who picks light in your app
- * gets dark anyway, because the media query has the same specificity and comes
- * later. That bug is common and confusing, and it is one selector to avoid.
+ * **The three states.**
+ *
+ *   system   no attribute. `color-scheme: light dark`, so the OS decides
+ *   light    data-theme="light" pins `color-scheme: light`
+ *   dark     data-theme="dark"  pins `color-scheme: dark`
+ *
+ * The old version of this file needed `@media (prefers-color-scheme: dark)`
+ * with a `:root:not([data-theme="light"])` guard, because the media query and
+ * the attribute rule had the same specificity and the later one won: a user on
+ * a dark OS who chose light in the app got dark anyway. There is no media
+ * query here any more, so there is nothing to guard against. The bug is gone
+ * by construction rather than by remembering a selector.
+ *
+ * **`color-scheme` is doing a second job too.** It tells the browser to use
+ * the matching native styling for form controls, scrollbars and the
+ * overscroll flash. Setting it is what stops a dark page having a white
+ * scrollbar and a light date picker.
  */
 
 :root {
-  --surface: oklch(1 0 0);
-  --surface-sunken: oklch(0.97 0.004 265);
-  --text-strong: oklch(0.2 0.02 265);
-  --text-muted: oklch(0.55 0.02 265);
-  --border-subtle: oklch(0.9 0.01 265);
-  --accent-fg: var(--color-brand-700);
-  --accent-bg: var(--color-brand-50);
+  /* Follow the OS unless something below pins it. `light-dark()` reads this. */
+  color-scheme: light dark;
+
+  --surface: light-dark(oklch(1 0 0), oklch(0.21 0.015 265));
+  --surface-sunken: light-dark(oklch(0.97 0.004 265), oklch(0.17 0.015 265));
+  --text-strong: light-dark(oklch(0.2 0.02 265), oklch(0.95 0.01 265));
+  --text-muted: light-dark(oklch(0.55 0.02 265), oklch(0.7 0.02 265));
+  --border-subtle: light-dark(oklch(0.9 0.01 265), oklch(0.32 0.02 265));
+  --accent-fg: light-dark(var(--color-brand-700), var(--color-brand-200));
+  --accent-bg: light-dark(var(--color-brand-50), oklch(0.27 0.05 265));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --surface: oklch(0.21 0.015 265);
-    --surface-sunken: oklch(0.17 0.015 265);
-    --text-strong: oklch(0.95 0.01 265);
-    --text-muted: oklch(0.7 0.02 265);
-    --border-subtle: oklch(0.32 0.02 265);
-    --accent-fg: var(--color-brand-200);
-    --accent-bg: oklch(0.27 0.05 265);
-  }
+/*
+ * The user's explicit choice. One declaration each, and no token is repeated,
+ * so there is no second list to keep in step with the first.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --surface: oklch(0.21 0.015 265);
-  --surface-sunken: oklch(0.17 0.015 265);
-  --text-strong: oklch(0.95 0.01 265);
-  --text-muted: oklch(0.7 0.02 265);
-  --border-subtle: oklch(0.32 0.02 265);
-  --accent-fg: var(--color-brand-200);
-  --accent-bg: oklch(0.27 0.05 265);
+  color-scheme: dark;
 }

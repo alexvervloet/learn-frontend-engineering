@@ -106,4 +106,22 @@ describe("not colour alone", () => {
     const errorId = email.getAttribute("aria-describedby")?.split(" ").at(-1) ?? "";
     expect(document.getElementById(errorId)).toHaveTextContent("Enter your email address");
   });
+
+  /**
+   * The icon is for the eyes, so keep it out of the ears.
+   *
+   * A bare "x" in the markup is text like any other, and the description a
+   * screen reader reads out for the field begins with whatever it decides to
+   * call that character. The redundancy that helps a sighted user is noise to
+   * everyone else, so the glyph is `aria-hidden` and the words carry the
+   * meaning on their own.
+   */
+  it("does not read the decorative glyph out as part of the error", async () => {
+    await submitEmpty();
+
+    const email = screen.getByLabelText("Email");
+
+    expect(email).toHaveAccessibleDescription(expect.stringContaining("Enter your email address"));
+    expect(email).not.toHaveAccessibleDescription(expect.stringContaining("✕"));
+  });
 });

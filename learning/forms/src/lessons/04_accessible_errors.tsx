@@ -40,6 +40,12 @@
  * **Never colour alone.** Every error here has text, an icon character and a
  * changed border. Around one man in twelve cannot reliably tell your red from
  * your grey.
+ *
+ * **But hide the icon from the accessibility tree.** A bare glyph in the
+ * markup is text, so it goes into the description the screen reader reads for
+ * the field, and the user hears whatever that character is called before they
+ * hear the problem. `aria-hidden="true"` on the glyph keeps the redundancy
+ * where it helps and out of where it does not.
  */
 import { useEffect, useId, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -139,7 +145,9 @@ export function AccessibleForm({ onValid }: { onValid?: (values: Values) => void
         />
         {errors.email && (
           <p id={`${ids.email}-error`} style={{ color: "var(--danger)", margin: 0 }}>
-            {/* Text, not just colour. */}✕ {errors.email.message}
+            {/* Text, not just colour. And the glyph is decoration, so it is hidden
+                from the accessibility tree: the words are the message. */}
+            <span aria-hidden="true">✕</span> {errors.email.message}
           </p>
         )}
       </div>
@@ -158,7 +166,7 @@ export function AccessibleForm({ onValid }: { onValid?: (values: Values) => void
         />
         {errors.password && (
           <p id={`${ids.password}-error`} style={{ color: "var(--danger)", margin: 0 }}>
-            ✕ {errors.password.message}
+            <span aria-hidden="true">✕</span> {errors.password.message}
           </p>
         )}
       </div>

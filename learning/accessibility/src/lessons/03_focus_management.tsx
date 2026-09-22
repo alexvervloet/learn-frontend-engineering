@@ -32,8 +32,15 @@
  * **The rule for the trap**: Tab from the last focusable element goes to the
  * first, and Shift-Tab from the first goes to the last. Escape closes. Both
  * directions, or it is a one-way trap that is worse than none.
+ *
+ * **And the edge that rule forgets is the panel itself.** The panel has
+ * `tabindex="-1"` so it can be focused on open, which also keeps it out of any
+ * list of focusable children. So right after opening, focus is on an element
+ * that is neither the first nor the last of them, and a trap that only
+ * compares against those two lets Shift-Tab straight back out to the opener.
+ * This file got that wrong until a test stopped tabbing forward first.
  */
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useId, useRef, useState } from "react";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -52,6 +59,19 @@ export function Dialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
+  /**
+   * `onClose` is a new arrow on every render of whatever owns this dialog, so
+   * listing it as a dependency re-runs the effect on every one of those
+   * renders: the cleanup hands focus back to the opener and the next run drags
+   * it into the panel, taking it from the control the user had tabbed to.
+   *
+   * `useEffectEvent` is the fix React shipped for exactly this. It gives the
+   * effect a stable function that always sees the latest `onClose`, so the
+   * dependency list can say what it means, which is "when the dialog opens".
+   * react-core lesson 12 is about the general shape of this.
+   */
+  const close = useEffectEvent(() => onClose());
+
   useEffect(() => {
     if (!open) return;
 
@@ -62,7 +82,7 @@ export function Dialog({
 
     function onKeyDown(event: KeyboardEvent): void {
       if (event.key === "Escape") {
-        onClose();
+        close();
         return;
       }
       if (event.key !== "Tab" || panel === null) return;
@@ -72,11 +92,27 @@ export function Dialog({
       const last = focusable.at(-1);
       if (first === undefined || last === undefined) return;
 
-      // Both directions. A trap that only wraps forwards lets Shift-Tab out.
-      if (event.shiftKey && document.activeElement === first) {
+      const active = document.activeElement;
+
+      // The panel counts as a backward edge as well as `first`, and leaving it
+      // out is how this trap leaked.
+      //
+      // The panel is focusable by script and deliberately absent from
+      // `focusable`, because its tabindex is -1. So at the one moment that
+      // matters most, immediately after opening, focus is on the panel and is
+      // neither `first` nor `last`. A check written against only those two
+      // falls through to the browser, and Shift-Tab walks to whatever precedes
+      // the dialog in the DOM: the button that opened it, behind the overlay.
+      //
+      // A test that tabs forward before it shift-tabs never sees this. Test
+      // the trap from the state the user is actually in when it opens.
+      const leavingBackwards = event.shiftKey && (active === first || active === panel);
+      const leavingForwards = !event.shiftKey && active === last;
+
+      if (leavingBackwards) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (leavingForwards) {
         event.preventDefault();
         first.focus();
       }
@@ -90,7 +126,7 @@ export function Dialog({
       // of the page.
       previouslyFocused?.focus();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
